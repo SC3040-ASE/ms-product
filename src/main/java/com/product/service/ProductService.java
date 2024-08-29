@@ -1,9 +1,8 @@
 package com.product.service;
 
-import com.product.dto.ProductReceived;
-import com.product.dto.ProductSearchResult;
-import com.product.dto.ResponseObject;
-import com.product.dto.SearchQuery;
+import com.product.dto.ProductCreationDTO;
+import com.product.dto.ResponseObjectDTO;
+import com.product.dto.SearchQueryDTO;
 import com.product.entity.Category;
 import com.product.entity.Product;
 import com.product.entity.Tag;
@@ -36,24 +35,24 @@ public class ProductService {
     private PictureBlobStorageService pictureBlobStorageService;
 
 
-    public ResponseObject handleUpdateProduct(ProductReceived productDetails) {
+    public ResponseObjectDTO handleUpdateProduct(ProductCreationDTO productDetails) {
         //TODO: Implement this method
         return null;
     }
 
-    public ResponseObject handleDeleteProduct(Long id) {
+    public ResponseObjectDTO handleDeleteProduct(Long id) {
         productRepository.deleteById(id);
-        return new ResponseObject("Product deleted successfully", null);
+        return new ResponseObjectDTO("Product deleted successfully", null);
     }
 
-    public ResponseObject handleSearchProduct(SearchQuery searchQuery) {
-        List<Object[]> results = productRepository.searchProducts(searchQuery.getQuery(), searchQuery.getNumberOfResults());
-        return new ResponseObject("Search results", productMapper.mapToSearchResults(results));
+    public ResponseObjectDTO handleSearchProduct(SearchQueryDTO searchQueryDTO) {
+        List<Object[]> results = productRepository.searchProducts(searchQueryDTO.getQuery(), searchQueryDTO.getNumberOfResults());
+        return new ResponseObjectDTO("Search results", productMapper.mapToSearchResults(results));
     }
 
-    public ResponseObject handleCreateProduct(ProductReceived productReceived) {
+    public ResponseObjectDTO handleCreateProduct(ProductCreationDTO productCreationDTO) {
         try {
-            List<String> tagNames = productReceived.getTags();
+            List<String> tagNames = productCreationDTO.getTags();
             List<Tag> existingTags = tagRepository.findTagsByTagNames(tagNames);
 
 
@@ -66,22 +65,22 @@ public class ProductService {
             List<Tag> savedNewTags = tagRepository.saveAll(newTags);
             existingTags.addAll(savedNewTags);
 
-            Category category = categoryRepository.findByName(productReceived.getCategory())
-                    .orElseGet(() -> categoryRepository.save(new Category(productReceived.getCategory())));
+            Category category = categoryRepository.findByName(productCreationDTO.getCategory())
+                    .orElseGet(() -> categoryRepository.save(new Category(productCreationDTO.getCategory())));
 
-            Product product = productMapper.mapToEntity(productReceived, existingTags, category);
+            Product product = productMapper.mapToEntity(productCreationDTO, existingTags, category);
 
             Product savedProduct = productRepository.saveAndFlush(product);
 
             String imageFilename = "product_" + savedProduct.getId() + ".jpg";
-            byte[] imageBytes = Base64.getDecoder().decode(productReceived.getImageBase64());
+            byte[] imageBytes = Base64.getDecoder().decode(productCreationDTO.getImageBase64());
             pictureBlobStorageService.saveImage(imageBytes, imageFilename);
 
             savedProduct.setProductImage(imageFilename);
             productRepository.save(savedProduct);
-            return new ResponseObject("Product created successfully", savedProduct);
+            return new ResponseObjectDTO("Product created successfully", savedProduct);
         } catch (Exception e) {
-            return new ResponseObject("Error creating product", null);
+            return new ResponseObjectDTO("Error creating product", null);
         }
     }
 }
