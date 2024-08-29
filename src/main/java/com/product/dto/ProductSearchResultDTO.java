@@ -5,7 +5,7 @@ import lombok.Data;
 import java.math.BigDecimal;
 
 @Data
-public class ProductSearchResult {
+public class ProductSearchResultDTO {
     private Integer productId;
     private String productName;
     private BigDecimal price;

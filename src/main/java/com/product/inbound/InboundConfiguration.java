@@ -7,9 +7,9 @@ import com.google.cloud.spring.pubsub.integration.inbound.PubSubInboundChannelAd
 import com.google.cloud.spring.pubsub.support.BasicAcknowledgeablePubsubMessage;
 import com.google.cloud.spring.pubsub.support.GcpPubSubHeaders;
 import com.product.config.PubSubConfiguration;
-import com.product.dto.ProductReceived;
-import com.product.dto.ResponseObject;
-import com.product.dto.SearchQuery;
+import com.product.dto.ProductCreationDTO;
+import com.product.dto.ResponseObjectDTO;
+import com.product.dto.SearchQueryDTO;
 import com.product.outbound.OutboundConfiguration;
 import com.product.service.ProductService;
 import lombok.RequiredArgsConstructor;
@@ -54,17 +54,17 @@ public class InboundConfiguration {
             String payload = new String((byte[]) message.getPayload());
 
             try {
-                ResponseObject response;
+                ResponseObjectDTO response;
                 switch (messageType) {
                     case "create-product":
-                        ProductReceived productReceived = objectMapper.readValue(payload, ProductReceived.class);
-                        log.info("Received product: {}", productReceived);
-                        response = productService.handleCreateProduct(productReceived);
+                        ProductCreationDTO productCreationDTO = objectMapper.readValue(payload, ProductCreationDTO.class);
+                        log.info("Received product: {}", productCreationDTO);
+                        response = productService.handleCreateProduct(productCreationDTO);
                         break;
                     case "search-product":
-                        SearchQuery searchQuery = objectMapper.readValue(payload, SearchQuery.class);
+                        SearchQueryDTO searchQueryDTO = objectMapper.readValue(payload, SearchQueryDTO.class);
                         log.info("Received search request: {}", payload);
-                        response = productService.handleSearchProduct(searchQuery);
+                        response = productService.handleSearchProduct(searchQueryDTO);
                         break;
                     case "delete-product":
                         Long productId = objectMapper.readValue(payload, Long.class);
@@ -72,13 +72,13 @@ public class InboundConfiguration {
                         response = productService.handleDeleteProduct(productId);
                         break;
                     case "update-product":
-                        ProductReceived productUpdate = objectMapper.readValue(payload, ProductReceived.class);
+                        ProductCreationDTO productUpdate = objectMapper.readValue(payload, ProductCreationDTO.class);
                         log.info("Received product update: {}", productUpdate);
                         response = productService.handleUpdateProduct(productUpdate);
                         break;
                     default:
                         log.warn("Unknown message type: {}", messageType);
-                        response = new ResponseObject("Unknown message type", null);
+                        response = new ResponseObjectDTO("Unknown message type", null);
                         break;
                 }
 

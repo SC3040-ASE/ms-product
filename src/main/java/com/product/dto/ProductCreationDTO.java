@@ -5,7 +5,7 @@ import lombok.Data;
 import java.util.List;
 
 @Data
-public class ProductReceived {
+public class ProductCreationDTO {
     private Integer ownerId;
     private String productName;
     private Double price;

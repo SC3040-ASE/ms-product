@@ -4,7 +4,7 @@ import lombok.Data;
 
 
 @Data
-public class SearchQuery {
+public class SearchQueryDTO {
     private String query;
     private int numberOfResults;
 }
