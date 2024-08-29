@@ -1,0 +1,108 @@
+pipeline {
+    agent any
+    environment {
+        DOCKER_REGISTRY = 'https://registry.hub.docker.com'
+        DOCKER_CREDENTIALS_ID = 'docker-hub-credentials'  
+        GITHUB_CREDENTIALS_ID = 'github-credentials'  
+        DOCKER_REPO = 'rowentey/sc3040'  
+        REPO_NAME = 'ms-product'
+        BRANCH = 'main'  
+    }
+
+    stages {
+        stage('Check Conditions') {
+            steps {
+                script {
+                    def shouldRun = false
+                    echo "Debugging environment variables:"
+                    echo "GIT_BRANCH: ${env.GIT_BRANCH}"
+                    echo "GIT_LOCAL_BRANCH: ${env.GIT_LOCAL_BRANCH}"
+                    echo "GIT_COMMIT: ${env.GIT_COMMIT}"
+                    echo "GIT_PREVIOUS_COMMIT: ${env.GIT_PREVIOUS_COMMIT}"
+                    echo "GIT_PREVIOUS_SUCCESSFUL_COMMIT: ${env.GIT_PREVIOUS_SUCCESSFUL_COMMIT}"
+
+                    // Check if this is a merge to main
+                    if (env.GIT_BRANCH == "origin/${BRANCH}" || env.GIT_LOCAL_BRANCH == BRANCH) {
+                        // Check if this commit has more than one parent (indicating a merge)
+                        def commitParents = sh(script: "git log --pretty=%P -n 1 ${env.GIT_COMMIT}", returnStdout: true).trim().split()
+                        if (commitParents.size() > 1) {
+                            echo "This appears to be a merge commit to ${BRANCH}"
+                            shouldRun = true
+                        } else {
+                            echo "This is a direct push to ${BRANCH}, not running the pipeline"
+                        }
+                    } else {
+                        echo "This is not a commit to ${BRANCH}, not running the pipeline"
+                    }
+
+                    // Store the decision in an environment variable
+                    env.SHOULD_RUN_PIPELINE = shouldRun.toString()
+                }
+            }
+        }
+
+        stage('Run Pipeline') {
+            when {
+                expression { return env.SHOULD_RUN_PIPELINE == 'true' }
+            }
+            stages {
+                stage('Checkout') {
+                    steps {
+                        checkout scm
+                    }
+                }
+                
+                stage('Build and Push Docker Image') {
+                    steps {
+                        script {
+                            def dockerImageName = "${DOCKER_REPO}:${REPO_NAME}-${env.BUILD_NUMBER}"
+                            // Build Docker image
+                            docker.build(dockerImageName, '.')
+                            // Tag and push Docker image
+                            docker.withRegistry(DOCKER_REGISTRY, DOCKER_CREDENTIALS_ID) {
+                                docker.image(dockerImageName).push()
+                                docker.image(dockerImageName).push('latest')
+                            }
+                        }
+                    }
+                }
+            }
+        }
+    }
+    
+    post {
+        success {
+            script {
+                if (env.SHOULD_RUN_PIPELINE == 'true') {
+                    echo "Docker image built and pushed successfully."
+                } else {
+                    echo "Pipeline skipped due to unmet conditions."
+                }
+            }
+        }
+        
+        failure {
+            script {
+                if (env.SHOULD_RUN_PIPELINE == 'true') {
+                    echo "Pipeline failed. Check the logs for details."
+                    withCredentials([string(credentialsId: 'asana-token', variable: 'ASANA_TOKEN')]) {
+                        def asanaProjectId = '1208082719272721'
+                        def asanaSectionId = '1208132316363016'
+                        def taskName = "Pipeline failure: ${env.JOB_NAME} #${env.BUILD_NUMBER}"
+                        def taskNotes = "Pipeline failed. Check Jenkins for details: ${env.BUILD_URL}"
+        
+                        sh """
+                        curl -H "Authorization: Bearer ${ASANA_TOKEN}" \
+                             -H "Content-Type: application/json" \
+                             -X POST \
+                             -d '{"data": {"name": "${taskName}", "notes": "${taskNotes}", "projects": ["${asanaProjectId}"], "memberships":[{"project":"${asanaProjectId}","section":"${asanaSectionId}"}] }}' \
+                             https://app.asana.com/api/1.0/tasks
+                        """
+                    }
+                } else {
+                    echo "Pipeline skipped due to unmet conditions."
+                }
+            }
+        }
+    }
+}
