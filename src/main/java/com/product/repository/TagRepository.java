@@ -11,10 +11,11 @@ import java.util.Optional;
 import java.util.Set;
 
 @Repository
-public interface TagRepository extends JpaRepository<Tag, Long> {
+public interface TagRepository extends JpaRepository<Tag, Integer> {
     @Query(value = "SELECT t FROM Tag t WHERE t.tagName = :targetTag")
     Optional<Tag> findByName(@Param("targetTag") String targetCategory);
 
     @Query("SELECT t FROM Tag t WHERE t.tagName IN :tagNames")
     List<Tag> findTagsByTagNames(@Param("tagNames") List<String> tagNames);
+
 }

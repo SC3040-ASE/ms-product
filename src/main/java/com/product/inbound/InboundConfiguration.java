@@ -8,6 +8,7 @@ import com.google.cloud.spring.pubsub.support.BasicAcknowledgeablePubsubMessage;
 import com.google.cloud.spring.pubsub.support.GcpPubSubHeaders;
 import com.product.config.PubSubConfiguration;
 import com.product.dto.ProductCreationDTO;
+import com.product.dto.ProductUpdateDTO;
 import com.product.dto.ResponseObjectDTO;
 import com.product.dto.SearchQueryDTO;
 import com.product.outbound.OutboundConfiguration;
@@ -61,18 +62,23 @@ public class InboundConfiguration {
                         log.info("Received product: {}", productCreationDTO);
                         response = productService.handleCreateProduct(productCreationDTO);
                         break;
+                    case "read-product":
+                        Integer readProductId = objectMapper.readValue(payload, Integer.class);
+                        log.info("Received read request for product with id: {}", readProductId);
+                        response = productService.handleReadProduct(readProductId);
+                        break;
                     case "search-product":
                         SearchQueryDTO searchQueryDTO = objectMapper.readValue(payload, SearchQueryDTO.class);
                         log.info("Received search request: {}", payload);
                         response = productService.handleSearchProduct(searchQueryDTO);
                         break;
                     case "delete-product":
-                        Long productId = objectMapper.readValue(payload, Long.class);
+                        Integer productId = objectMapper.readValue(payload, Integer.class);
                         log.info("Received delete request for product with id: {}", productId);
                         response = productService.handleDeleteProduct(productId);
                         break;
                     case "update-product":
-                        ProductCreationDTO productUpdate = objectMapper.readValue(payload, ProductCreationDTO.class);
+                        ProductUpdateDTO productUpdate = objectMapper.readValue(payload, ProductUpdateDTO.class);
                         log.info("Received product update: {}", productUpdate);
                         response = productService.handleUpdateProduct(productUpdate);
                         break;

@@ -9,7 +9,7 @@ import org.springframework.stereotype.Repository;
 import java.util.Optional;
 
 @Repository
-public interface CategoryRepository extends JpaRepository<Category, Long> {
+public interface CategoryRepository extends JpaRepository<Category, Integer> {
 
     @Query(value = "SELECT c FROM Category c WHERE c.categoryName = :targetCategory")
     Optional<Category> findByName(@Param("targetCategory") String targetCategory);

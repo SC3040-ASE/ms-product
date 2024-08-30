@@ -2,6 +2,7 @@ package com.product.mapper;
 
 import com.product.dto.ProductCreationDTO;
 import com.product.dto.ProductSearchResultDTO;
+import com.product.dto.ProductUpdateDTO;
 import com.product.entity.Category;
 import com.product.entity.Product;
 import com.product.entity.Tag;
@@ -26,6 +27,21 @@ public class ProductMapper {
         product.setCurrentQuantity(productCreationDTO.getTotalQuantity()); // Assuming current quantity is same as total initially
         product.setCategory(category);
         product.setDescription(productCreationDTO.getDescription());
+
+        return product;
+    }
+
+    public Product updateProductFromDTO(Product product, ProductUpdateDTO productUpdateDTO, List<Tag> existingTags, Category category) {
+        product.setId(productUpdateDTO.getId());
+        product.setOwnerId(productUpdateDTO.getOwnerId());
+        product.setProductName(productUpdateDTO.getProductName());
+        product.setPrice(BigDecimal.valueOf(productUpdateDTO.getPrice()));
+        product.setTags(existingTags);
+        product.setCondition(productUpdateDTO.getCondition());
+        product.setTotalQuantity(productUpdateDTO.getTotalQuantity());
+        product.setCurrentQuantity(productUpdateDTO.getTotalQuantity()); // Assuming current quantity is same as total initially
+        product.setCategory(category);
+        product.setDescription(productUpdateDTO.getDescription());
 
         return product;
     }

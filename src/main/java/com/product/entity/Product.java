@@ -1,9 +1,11 @@
 package com.product.entity;
 
-import lombok.*;
+import jakarta.persistence.*;
+import lombok.AllArgsConstructor;
+import lombok.Data;
+import lombok.NoArgsConstructor;
 import org.hibernate.annotations.CreationTimestamp;
 import org.hibernate.annotations.UpdateTimestamp;
-import jakarta.persistence.*;
 
 import java.math.BigDecimal;
 import java.sql.Timestamp;
@@ -29,7 +31,7 @@ public class Product {
     @Column(name = "price", nullable = false)
     private BigDecimal price;
 
-    @ManyToMany
+    @ManyToMany(fetch = FetchType.EAGER)
     @JoinTable(
             name = "PRODUCT_TAG",
             joinColumns = @JoinColumn(name = "product_id"),
@@ -57,12 +59,10 @@ public class Product {
     @Column(name = "current_quantity", nullable = false)
     private Integer currentQuantity;
 
-    @ManyToOne
+    @ManyToOne(fetch = FetchType.EAGER)
     @JoinColumn(name = "category_id", nullable = false)
     private Category category;
 
     @Column(name = "description", columnDefinition = "TEXT")
     private String description;
-
-
 }
