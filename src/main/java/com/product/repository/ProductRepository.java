@@ -1,6 +1,5 @@
 package com.product.repository;
 
-import com.product.dto.ProductSearchResultDTO;
 import com.product.entity.Product;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;

@@ -6,7 +6,7 @@ import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
-import java.util.Set;
+import java.util.List;
 
 @Entity
 @Table(name = "TAG")
@@ -24,7 +24,7 @@ public class Tag {
 
     @JsonIgnore
     @ManyToMany(mappedBy = "tags", fetch = FetchType.LAZY)
-    private Set<Product> products;
+    private List<Product> products;
 
     public Tag(String tagName) {
         this.tagName = tagName;

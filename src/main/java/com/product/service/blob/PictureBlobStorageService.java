@@ -1,8 +1,8 @@
-package com.product.service;
+package com.product.service.blob;
 
 import com.azure.storage.blob.BlobContainerClient;
 import com.azure.storage.blob.specialized.BlockBlobClient;
-import org.springframework.beans.factory.annotation.Autowired;
+import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
 import java.io.ByteArrayInputStream;
@@ -10,10 +10,10 @@ import java.io.ByteArrayOutputStream;
 import java.util.Base64;
 
 @Service
+@RequiredArgsConstructor
 public class PictureBlobStorageService {
 
-    @Autowired
-    private BlobContainerClient pictureContainerClient;
+    private final BlobContainerClient pictureContainerClient;
 
     public void saveImage(byte[] imageByte, String imgName) {
         BlockBlobClient blobClient = pictureContainerClient
@@ -22,6 +22,14 @@ public class PictureBlobStorageService {
 
         ByteArrayInputStream dataStream = new ByteArrayInputStream(imageByte);
         blobClient.upload(dataStream, imageByte.length, true);
+    }
+
+    public void deleteImage(String imgName) {
+        BlockBlobClient blobClient = pictureContainerClient
+                .getBlobClient(imgName)
+                .getBlockBlobClient();
+
+        blobClient.delete();
     }
 
     public String getImage(String imgName) {

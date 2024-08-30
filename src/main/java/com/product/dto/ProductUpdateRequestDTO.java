@@ -2,13 +2,15 @@ package com.product.dto;
 
 import lombok.Data;
 
+import java.math.BigDecimal;
 import java.util.List;
 
 @Data
-public class ProductCreationDTO {
+public class ProductUpdateRequestDTO {
+    private Integer id;
     private Integer ownerId;
     private String productName;
-    private Double price;
+    private BigDecimal price;
     private List<String> tags;
     private String condition;
     private String imageBase64;

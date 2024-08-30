@@ -1,18 +1,18 @@
-package com.product.service;
+package com.product.service.tag;
 
 import com.product.entity.Tag;
 import com.product.repository.TagRepository;
-import org.springframework.beans.factory.annotation.Autowired;
+import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
 import java.util.stream.Collectors;
 
 @Service
+@RequiredArgsConstructor
 public class TagService {
 
-    @Autowired
-    private TagRepository tagRepository;
+    private final TagRepository tagRepository;
 
     public List<Tag> saveTagsIfNotExists(List<String> tagNames) {
         List<Tag> existingTags = tagRepository.findTagsByTagNames(tagNames);

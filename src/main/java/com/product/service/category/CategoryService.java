@@ -1,13 +1,10 @@
-package com.product.service;
+package com.product.service.category;
 
 import com.product.entity.Category;
 import com.product.repository.CategoryRepository;
-import jakarta.transaction.Transactional;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-
-import java.util.Optional;
 
 @Service
 @Slf4j
