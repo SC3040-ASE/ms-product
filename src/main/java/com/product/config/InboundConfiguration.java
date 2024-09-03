@@ -51,35 +51,44 @@ public class InboundConfiguration {
                 RequestMessageDTO requestMessage = objectMapper.readValue(payload, RequestMessageDTO.class);
                 log.info("Received message: {}", requestMessage);
                 String messageMethod = requestMessage.getMethod();
+                String messagePath = requestMessage.getPath();
                 String requestBody = requestMessage.getBody();
                 String responseId = requestMessage.getId();
 
                 ResponseMessageDTO responseMessage;
                 switch (messageMethod) {
-                    case "create-product":
+                    case "GET":
+                        switch (messagePath) {
+                            case "/product":
+                                Integer readProductId = objectMapper.readValue(requestBody, Integer.class);
+                                log.info("Received read request for product with id: {}", readProductId);
+                                responseMessage = productService.handleReadProduct(responseId, readProductId);
+                                break;
+                            case "/product/search":
+                                ProductSearchRequestDTO productSearchRequestDTO = objectMapper.readValue(requestBody, ProductSearchRequestDTO.class);
+                                log.info("Received search request: {}", requestBody);
+                                responseMessage = productService.handleSearchProduct(responseId, productSearchRequestDTO);
+                                break;
+                            default:
+                                log.warn("Unknown message path: {}", messagePath);
+                                responseMessage = new ResponseMessageDTO(responseId, 404, null);
+                                break;
+                        }
+                        break;
+                    case "POST":
                         ProductCreationRequestDTO productCreationRequestDTO = objectMapper.readValue(requestBody, ProductCreationRequestDTO.class);
                         log.info("Received product: {}", productCreationRequestDTO);
                         responseMessage = productService.handleCreateProduct(responseId, productCreationRequestDTO);
                         break;
-                    case "read-product":
-                        Integer readProductId = objectMapper.readValue(requestBody, Integer.class);
-                        log.info("Received read request for product with id: {}", readProductId);
-                        responseMessage = productService.handleReadProduct(responseId, readProductId);
-                        break;
-                    case "search-product":
-                        ProductSearchRequestDTO productSearchRequestDTO = objectMapper.readValue(requestBody, ProductSearchRequestDTO.class);
-                        log.info("Received search request: {}", requestBody);
-                        responseMessage = productService.handleSearchProduct(responseId, productSearchRequestDTO);
-                        break;
-                    case "delete-product":
-                        ProductDeleteRequestDTO productDeleteRequestDTO = objectMapper.readValue(requestBody, ProductDeleteRequestDTO.class);
-                        log.info("Received delete request for product with id: {}", productDeleteRequestDTO);
-                        responseMessage = productService.handleDeleteProduct(responseId, productDeleteRequestDTO);
-                        break;
-                    case "update-product":
+                    case "PUT":
                         ProductUpdateRequestDTO productUpdate = objectMapper.readValue(requestBody, ProductUpdateRequestDTO.class);
                         log.info("Received product update: {}", productUpdate);
                         responseMessage = productService.handleUpdateProduct(responseId, productUpdate);
+                        break;
+                    case "DELETE":
+                        ProductDeleteRequestDTO productDeleteRequestDTO = objectMapper.readValue(requestBody, ProductDeleteRequestDTO.class);
+                        log.info("Received delete request for product with id: {}", productDeleteRequestDTO);
+                        responseMessage = productService.handleDeleteProduct(responseId, productDeleteRequestDTO);
                         break;
                     default:
                         log.warn("Unknown message type: {}", messageMethod);
