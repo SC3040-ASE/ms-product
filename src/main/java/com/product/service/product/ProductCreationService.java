@@ -31,8 +31,8 @@ public class ProductCreationService {
     @Transactional
     public ResponseMessageDTO createProduct(String messageId, ProductCreationRequestDTO productCreationRequestDTO) {
         try {
-            List<Tag> tags = tagService.saveTagsIfNotExists(productCreationRequestDTO.getTags());
             Category category = categoryService.saveCategoryIfNotExists(productCreationRequestDTO.getCategory());
+            List<Tag> tags = tagService.saveTagsIfNotExists(productCreationRequestDTO.getTags(), category);
 
             Product product = productMapper.mapToEntity(productCreationRequestDTO, tags, category);
             Product savedProduct = productRepository.saveAndFlush(product);

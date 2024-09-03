@@ -22,9 +22,15 @@ public class Tag {
     @Column(name = "tag_name", unique = true, nullable = false)
     private String tagName;
 
+    @ManyToOne(fetch = FetchType.EAGER, optional = false)
+    @JoinColumn(name = "category_id", nullable = false)
+    private Category category;
+
     @JsonIgnore
     @ManyToMany(mappedBy = "tags", fetch = FetchType.LAZY)
     private List<Product> products;
+
+
 
     public Tag(String tagName) {
         this.tagName = tagName;

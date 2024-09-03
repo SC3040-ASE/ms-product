@@ -11,10 +11,8 @@ import java.util.Optional;
 
 @Repository
 public interface TagRepository extends JpaRepository<Tag, Integer> {
-    @Query(value = "SELECT t FROM Tag t WHERE t.tagName = :targetTag")
-    Optional<Tag> findByName(@Param("targetTag") String targetCategory);
 
-    @Query("SELECT t FROM Tag t WHERE t.tagName IN :tagNames")
-    List<Tag> findTagsByTagNames(@Param("tagNames") List<String> tagNames);
+    @Query("SELECT t FROM Tag t WHERE t.tagName IN :tagNames AND t.category.id = :category")
+    List<Tag> findTagsByTagNamesAndCategory(@Param("tagNames") List<String> tagNames, @Param("category") Integer category);
 
 }

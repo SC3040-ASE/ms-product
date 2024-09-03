@@ -38,8 +38,8 @@ public class ProductUpdateService {
                 return new ResponseMessageDTO(messageId, 403, "Unauthorized");
             }
 
-            List<Tag> tags = tagService.saveTagsIfNotExists(productUpdateRequestDTO.getTags());
             Category category = categoryService.saveCategoryIfNotExists(productUpdateRequestDTO.getCategory());
+            List<Tag> tags = tagService.saveTagsIfNotExists(productUpdateRequestDTO.getTags(), category);
 
             Product updatedProduct = productMapper.updateProductFromDTO(product.get(), productUpdateRequestDTO, tags, category);
             Product savedProduct = productRepository.saveAndFlush(updatedProduct);
