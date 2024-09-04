@@ -75,6 +75,7 @@ public class ProductRepositoryTest {
 
         testTag = new Tag();
         testTag.setTagName("New");
+        testTag.setCategory(testCategory);
         tagRepository.save(testTag);
 
         testProduct = new Product();
