@@ -55,6 +55,7 @@ public class ProductRepositoryTest {
         user1.setUsername("user1");
         user1.setPassword("pass1");
         user1.setEmail("user1@example.com");
+        user1.setTelegramHandle("user1");
         user1.setIsAdmin(false);
         user1.setCreatedOn(LocalDateTime.now());
         user1.setUpdatedOn(LocalDateTime.now());
@@ -64,6 +65,7 @@ public class ProductRepositoryTest {
         user2.setUsername("user2");
         user2.setPassword("pass2");
         user2.setEmail("user2@example.com");
+        user2.setTelegramHandle("user2");
         user2.setIsAdmin(false);
         user2.setCreatedOn(LocalDateTime.now());
         user2.setUpdatedOn(LocalDateTime.now());
