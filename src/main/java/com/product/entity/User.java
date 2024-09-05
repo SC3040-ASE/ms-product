@@ -1,6 +1,8 @@
 package com.product.entity;
 
 import jakarta.persistence.*;
+import jakarta.validation.constraints.NotNull;
+import jakarta.validation.constraints.Size;
 import lombok.Getter;
 import lombok.Setter;
 
@@ -32,6 +34,11 @@ public class User {
 
     @Column(name = "updated_on", nullable = false)
     private LocalDateTime updatedOn;
+
+    @Size(max = 255)
+    @NotNull
+    @Column(name = "telegram_handle", nullable = false)
+    private String telegramHandle;
 
     @PrePersist
     protected void onCreate() {
