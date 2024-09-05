@@ -1,6 +1,5 @@
 package com.product.config;
 
-
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;

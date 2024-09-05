@@ -1,25 +1,19 @@
-package com.product.service;
+package com.product.service.blob;
 
 import com.azure.storage.blob.BlobContainerClient;
-import com.azure.storage.blob.models.BlobItem;
 import com.azure.storage.blob.specialized.BlockBlobClient;
-import org.springframework.beans.factory.annotation.Autowired;
+import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
-import org.springframework.web.multipart.MultipartFile;
 
-import java.io.BufferedInputStream;
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
-import java.io.IOException;
-import java.util.ArrayList;
 import java.util.Base64;
-import java.util.List;
 
 @Service
+@RequiredArgsConstructor
 public class PictureBlobStorageService {
 
-    @Autowired
-    private BlobContainerClient pictureContainerClient;
+    private final BlobContainerClient pictureContainerClient;
 
     public void saveImage(byte[] imageByte, String imgName) {
         BlockBlobClient blobClient = pictureContainerClient
@@ -30,11 +24,19 @@ public class PictureBlobStorageService {
         blobClient.upload(dataStream, imageByte.length, true);
     }
 
+    public void deleteImage(String imgName) {
+        BlockBlobClient blobClient = pictureContainerClient
+                .getBlobClient(imgName)
+                .getBlockBlobClient();
+
+        blobClient.delete();
+    }
+
     public String getImage(String imgName) {
         BlockBlobClient blobClient = pictureContainerClient
                 .getBlobClient(imgName)
                 .getBlockBlobClient();
-        
+
         ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
         blobClient.downloadStream(outputStream);
 

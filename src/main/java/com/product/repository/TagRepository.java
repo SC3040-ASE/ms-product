@@ -8,13 +8,11 @@ import org.springframework.stereotype.Repository;
 
 import java.util.List;
 import java.util.Optional;
-import java.util.Set;
 
 @Repository
-public interface TagRepository extends JpaRepository<Tag, Long> {
-    @Query(value = "SELECT t FROM Tag t WHERE t.tagName = :targetTag")
-    Optional<Tag> findByName(@Param("targetTag") String targetCategory);
+public interface TagRepository extends JpaRepository<Tag, Integer> {
 
-    @Query("SELECT t FROM Tag t WHERE t.tagName IN :tagNames")
-    List<Tag> findTagsByTagNames(@Param("tagNames") List<String> tagNames);
+    @Query("SELECT t FROM Tag t WHERE t.tagName IN :tagNames AND t.category.id = :category")
+    List<Tag> findTagsByTagNamesAndCategory(@Param("tagNames") List<String> tagNames, @Param("category") Integer category);
+
 }

@@ -5,8 +5,9 @@ import lombok.Data;
 import java.math.BigDecimal;
 
 @Data
-public class ProductSearchResultDTO {
-    private Integer productId;
+public class ProductSearchResponseDTO {
+    private Integer id;
+    private Integer ownerId;
     private String productName;
     private BigDecimal price;
     private String[] tags;
