@@ -30,7 +30,7 @@ public class ProductDeleteService {
                 return new ResponseMessageDTO(messageId, 403, "Unauthorized");
             }
             productRepository.deleteById(productId);
-            pictureBlobStorageService.deleteImage(product.get().getProductImage());
+            pictureBlobStorageService.deleteDirectory(productId);
             return new ResponseMessageDTO(messageId, 200, "Product deleted successfully");
         } else {
             return new ResponseMessageDTO(messageId, 404, "Product not found");

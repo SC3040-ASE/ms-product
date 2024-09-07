@@ -50,9 +50,6 @@ public class Product {
     @Column(name = "updated_on", nullable = false)
     private Timestamp updatedOn;
 
-    @Column(name = "product_image")
-    private String productImage;
-
     @Column(name = "total_quantity", nullable = false)
     private Integer totalQuantity;
 

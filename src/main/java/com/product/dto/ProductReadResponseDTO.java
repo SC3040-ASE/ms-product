@@ -14,7 +14,7 @@ public class ProductReadResponseDTO {
     private BigDecimal price;
     private List<String> tags;
     private String condition;
-    private String ImageBase64;
+    private List<ImageDTO> images;
     private Integer totalQuantity;
     private Integer currentQuantity;
     private String categoryName;
