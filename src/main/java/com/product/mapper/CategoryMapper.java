@@ -41,12 +41,10 @@ public class CategoryMapper {
         List<CategorySearchResponseDTO> searchResults = new ArrayList<>();
         for (Object[] row: results) {
             try {
-                Product[] productArray = (Product[]) row[2];
                 CategorySearchResponseDTO result = CategorySearchResponseDTO
                     .builder()
                     .id((Integer) row[0])
                     .categoryName((String) row[1])
-                    .products(Arrays.asList(productArray))
                     .build();
                 searchResults.add(result);
             } catch (Exception e) {
