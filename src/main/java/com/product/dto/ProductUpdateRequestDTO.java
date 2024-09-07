@@ -13,7 +13,8 @@ public class ProductUpdateRequestDTO {
     private BigDecimal price;
     private List<String> tags;
     private String condition;
-    private String imageBase64;
+    private List<String> deleteImageList;
+    private List<String> newImageBase64List;
     private Integer totalQuantity;
     private String category;
     private String description;

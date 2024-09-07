@@ -1,5 +1,6 @@
 package com.product.service.product;
 
+import com.product.dto.ImageDTO;
 import com.product.dto.ResponseMessageDTO;
 import com.product.dto.ProductSearchRequestDTO;
 import com.product.dto.ProductSearchResponseDTO;
@@ -27,9 +28,8 @@ public class ProductSearchService {
         List<ProductSearchResponseDTO> productSearchResults = productMapper.mapToSearchResults(results);
 
         for (ProductSearchResponseDTO productSearchResponseDTO : productSearchResults) {
-            String imageFilename = productSearchResponseDTO.getProductImage();
-            String imageBase64 = pictureBlobStorageService.getImage(imageFilename);
-            productSearchResponseDTO.setProductImage(imageBase64);
+            List<ImageDTO> images = pictureBlobStorageService.retrieveProductImages(productSearchResponseDTO.getId());
+            productSearchResponseDTO.setImages(images);
         }
 
         return new ResponseMessageDTO(messageId, 200, productSearchResults);

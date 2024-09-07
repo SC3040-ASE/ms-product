@@ -1,9 +1,6 @@
 package com.product.mapper;
 
-import com.product.dto.ProductCreationRequestDTO;
-import com.product.dto.ProductReadResponseDTO;
-import com.product.dto.ProductSearchResponseDTO;
-import com.product.dto.ProductUpdateRequestDTO;
+import com.product.dto.*;
 import com.product.entity.Category;
 import com.product.entity.Product;
 import com.product.entity.Tag;
@@ -57,12 +54,11 @@ public class ProductMapper {
             result.setPrice((BigDecimal) row[3]);
             result.setTags((String[]) row[4]);
             result.setCondition((String) row[5]);
-            result.setProductImage((String) row[6]);
-            result.setTotalQuantity((Integer) row[7]);
-            result.setCurrentQuantity((Integer) row[8]);
-            result.setCategoryName((String) row[9]);
-            result.setDescription((String) row[10]);
-            result.setScore((Float) row[11]);
+            result.setTotalQuantity((Integer) row[6]);
+            result.setCurrentQuantity((Integer) row[7]);
+            result.setCategoryName((String) row[8]);
+            result.setDescription((String) row[9]);
+            result.setScore((Float) row[10]);
 
             searchResults.add(result);
         }
@@ -70,7 +66,7 @@ public class ProductMapper {
         return searchResults;
     }
 
-    public ProductReadResponseDTO mapToProductReadResponse(Product product, String base64Image) {
+    public ProductReadResponseDTO mapToProductReadResponse(Product product, List<ImageDTO> images) {
         ProductReadResponseDTO productReadResponseDTO = new ProductReadResponseDTO();
         productReadResponseDTO.setId(product.getId());
         productReadResponseDTO.setOwnerId(product.getOwnerId());
@@ -82,7 +78,7 @@ public class ProductMapper {
         }
         productReadResponseDTO.setTags(tags);
         productReadResponseDTO.setCondition(product.getCondition());
-        productReadResponseDTO.setImageBase64(base64Image);
+        productReadResponseDTO.setImages(images);
         productReadResponseDTO.setTotalQuantity(product.getTotalQuantity());
         productReadResponseDTO.setCategoryName(product.getCategory().getCategoryName());
         productReadResponseDTO.setDescription(product.getDescription());

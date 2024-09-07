@@ -47,13 +47,14 @@ public class InboundConfiguration {
     public MessageHandler messageReceiver() {
         return message -> {
             String payload = new String((byte[]) message.getPayload());
+            String responseId = null;
             try {
                 RequestMessageDTO requestMessage = objectMapper.readValue(payload, RequestMessageDTO.class);
                 log.info("Received message: {}", requestMessage);
                 String messageMethod = requestMessage.getMethod();
                 String messagePath = requestMessage.getPath();
                 String requestBody = requestMessage.getBody();
-                String responseId = requestMessage.getId();
+                responseId = requestMessage.getId();
 
                 ResponseMessageDTO responseMessage;
                 switch (messageMethod) {
@@ -101,6 +102,13 @@ public class InboundConfiguration {
 
             } catch (Exception e) {
                 log.error("Error: {}", e.getMessage());
+                try{
+                    ResponseMessageDTO responseMessage = new ResponseMessageDTO(responseId, 500, "Internal server error");
+                    String responsePayload = objectMapper.writeValueAsString(responseMessage);
+                    messagingGateway.sendToPubSub(responsePayload);
+                } catch (Exception ex) {
+                    log.error("Error: {}", ex.getMessage());
+                }
             } finally {
                 BasicAcknowledgeablePubsubMessage originalMessage = message.getHeaders().get(GcpPubSubHeaders.ORIGINAL_MESSAGE, BasicAcknowledgeablePubsubMessage.class);
                 originalMessage.ack();

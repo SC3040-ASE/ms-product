@@ -12,7 +12,7 @@ public class ProductCreationRequestDTO {
     private BigDecimal price;
     private List<String> tags;
     private String condition;
-    private String imageBase64;
+    private List<String> imageBase64List;
     private Integer totalQuantity;
     private String category;
     private String description;

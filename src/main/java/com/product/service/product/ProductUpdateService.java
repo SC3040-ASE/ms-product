@@ -11,16 +11,19 @@ import com.product.service.category.CategoryService;
 import com.product.service.blob.PictureBlobStorageService;
 import com.product.service.tag.TagService;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
 import jakarta.transaction.Transactional;
 
+import java.util.ArrayList;
 import java.util.Base64;
 import java.util.List;
 import java.util.Optional;
 
 @Service
 @RequiredArgsConstructor
+@Slf4j
 public class ProductUpdateService {
 
     private final ProductRepository productRepository;
@@ -44,16 +47,12 @@ public class ProductUpdateService {
             Product updatedProduct = productMapper.updateProductFromDTO(product.get(), productUpdateRequestDTO, tags, category);
             Product savedProduct = productRepository.saveAndFlush(updatedProduct);
 
-            String imageFilename = "product_" + savedProduct.getId() + ".jpg";
-            byte[] imageBytes = Base64.getDecoder().decode(productUpdateRequestDTO.getImageBase64());
-            pictureBlobStorageService.saveImage(imageBytes, imageFilename);
+            pictureBlobStorageService.updateProductImages(savedProduct.getId(), productUpdateRequestDTO.getDeleteImageList(), productUpdateRequestDTO.getNewImageBase64List());
 
-            savedProduct.setProductImage(imageFilename);
-            productRepository.save(savedProduct);
-
-            return new ResponseMessageDTO(messageId, 200, updatedProduct);
+            return new ResponseMessageDTO(messageId, 200, "Product updated successfully");
         } else {
             return new ResponseMessageDTO(messageId, 404, "Product not found");
         }
+
     }
 }

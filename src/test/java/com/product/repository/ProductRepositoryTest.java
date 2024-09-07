@@ -22,7 +22,7 @@ import java.time.LocalDateTime;
 import java.util.List;
 
 @ExtendWith(SpringExtension.class)
-@SpringBootTest(classes = Application.class)  // Ensure context creation with the main application
+@SpringBootTest(classes = Application.class)
 @ActiveProfiles("dev")
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
 public class ProductRepositoryTest {
