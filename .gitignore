@@ -34,4 +34,6 @@ build/
 
 .DS_Store
 
-.aplication.properties
+/src/main/resources/application.properties
+/src/main/resources/config/certs.json
+/.env
