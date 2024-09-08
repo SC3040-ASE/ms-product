@@ -1,6 +1,6 @@
 # ms-product
 
-Product Microservice
+Product microservice
 
 ## Configuration
 
