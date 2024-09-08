@@ -11,12 +11,11 @@ import java.util.List;
 import java.util.Optional;
 
 @Repository
+@Transactional
 public interface CategoryRepository extends JpaRepository<Category, Integer> {
-    @Transactional
     @Query(value = "SELECT c FROM Category c WHERE c.categoryName = :targetCategory AND c.Id = :targetId")
     Optional<Category> findByNameAndId(@Param("targetCategory") String targetCategory, @Param("targetId") Integer targetId);
 
-    @Transactional
     @Query(value = "SELECT c FROM Category c WHERE c.categoryName = :targetCategory")
     Optional<Category> findByName(@Param("targetCategory") String targetCategory);
 
