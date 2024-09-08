@@ -48,7 +48,6 @@ public class CategoryRepositoryTest {
 
     @BeforeAll
     public void setup() throws JsonProcessingException {
-        System.out.println("Its a fucking set up.");
         cat1 = new Category();
         cat1.setCategoryName("homework");
 

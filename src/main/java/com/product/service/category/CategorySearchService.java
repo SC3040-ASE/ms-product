@@ -25,6 +25,5 @@ public class CategorySearchService {
         );
         List<CategorySearchResponseDTO> categorySearchResults = categoryMapper.mapToSearchResults(results);
         return new ResponseMessageDTO(messageId, 200, categorySearchResults);
-
     }
 }
