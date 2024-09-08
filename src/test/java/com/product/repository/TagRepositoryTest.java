@@ -4,6 +4,7 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.product.Application;
 import com.product.entity.Category;
 import com.product.entity.Tag;
+import lombok.extern.slf4j.Slf4j;
 import org.junit.jupiter.api.*;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -18,6 +19,7 @@ import java.util.Optional;
 @ExtendWith(SpringExtension.class)
 @SpringBootTest(classes = Application.class)
 @ActiveProfiles("dev")
+@Slf4j
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
 public class TagRepositoryTest {
     private static final ObjectMapper objectMapper = new ObjectMapper();
@@ -47,17 +49,17 @@ public class TagRepositoryTest {
         tag3.setTagName("rabbit");
         tag3.setCategory(mainCat);
 
-        System.out.println("Before");
-        System.out.println("Category: " + savedCat);
-        System.out.println("tag1: " + tag1);
-        System.out.println("tag2: " + tag2);
-        System.out.println("tag3: " + tag3);
+        log.info("Before");
+        log.info("Category: " + savedCat);
+        log.info("tag1: " + tag1);
+        log.info("tag2: " + tag2);
+        log.info("tag3: " + tag3);
 
         tag1 = tagRepository.saveAndFlush(tag1);
         tag3 = tagRepository.saveAndFlush(tag3);
-        System.out.println("After");
-        System.out.println("tag1: " + tag1);
-        System.out.println("tag3: " + tag3);
+        log.info("After");
+        log.info("tag1: " + tag1);
+        log.info("tag3: " + tag3);
     }
 
     @AfterAll

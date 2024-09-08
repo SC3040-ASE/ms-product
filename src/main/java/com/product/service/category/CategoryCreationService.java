@@ -7,10 +7,12 @@ import com.product.mapper.CategoryMapper;
 import com.product.repository.CategoryRepository;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
 @Service
 @RequiredArgsConstructor
+@Slf4j
 public class CategoryCreationService {
     private final CategoryRepository categoryRepository;
     private final CategoryMapper categoryMapper;
@@ -21,7 +23,7 @@ public class CategoryCreationService {
         Category savedCategory;
         try {
             category = categoryMapper.mapToEntity(categoryCreationRequestDTO);
-            System.out.println("Saving " + category.getCategoryName() + " to repository");
+            log.info("Saving " + category.getCategoryName() + " to repository");
             savedCategory = categoryRepository.saveAndFlush(category);
         } catch (Exception e) {
             return new ResponseMessageDTO(messageId, 500, "Error creating category.");

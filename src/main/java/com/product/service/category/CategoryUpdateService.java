@@ -7,12 +7,14 @@ import com.product.mapper.CategoryMapper;
 import com.product.repository.CategoryRepository;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
 import java.util.Optional;
 
 @Service
 @RequiredArgsConstructor
+@Slf4j
 public class CategoryUpdateService {
     private final CategoryRepository categoryRepository;
     private final CategoryMapper categoryMapper;
@@ -26,7 +28,7 @@ public class CategoryUpdateService {
                 Category updatedCategory = categoryMapper.mapCategoryDTOToCategory(optionalCategory.get(), categoryUpdateRequestDTO);
                 Category savedCategory = categoryRepository.saveAndFlush(updatedCategory);
                 categoryRepository.save(savedCategory);
-                System.out.println("Successfully updated category.");
+                log.info("Successfully updated category.");
                 return new ResponseMessageDTO(messageId, 200, savedCategory);
             } else {
                 return new ResponseMessageDTO(messageId, 403, "Forbidden Update Request.");

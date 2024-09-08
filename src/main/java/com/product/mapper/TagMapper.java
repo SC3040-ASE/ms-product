@@ -6,12 +6,14 @@ import com.product.dto.tag.TagSearchResponseDTO;
 import com.product.dto.tag.TagUpdateRequestDTO;
 import com.product.entity.Category;
 import com.product.entity.Tag;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
 
 import java.util.ArrayList;
 import java.util.List;
 
 @Component
+@Slf4j
 public class TagMapper {
     public Tag mapTagDTOToTag(TagCreationRequestDTO tagCreationRequestDTO) {
         Tag tag = new Tag();
@@ -22,7 +24,7 @@ public class TagMapper {
 
     public TagReadResponseDTO mapTagToTagDTO(Tag tag) {
         if (!tag.getProducts().isEmpty()) {
-            System.out.println("product not empty");
+            log.info("product not empty");
             return TagReadResponseDTO
                 .builder()
                 .id(tag.getId())
@@ -31,7 +33,7 @@ public class TagMapper {
                 .products(tag.getProducts())
                 .build();
         } else {
-            System.out.println("product empty");
+            log.info("product empty");
             return TagReadResponseDTO
                 .builder()
                 .id(tag.getId())
@@ -61,7 +63,7 @@ public class TagMapper {
                     .build();
                 searchResults.add(result);
             } catch (Exception e) {
-                System.out.println("Error converting tag search results to DTO.");
+                log.error("Error converting tag search results to DTO.");
             }
         }
         return searchResults;

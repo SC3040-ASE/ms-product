@@ -6,12 +6,14 @@ import com.product.entity.Category;
 import com.product.repository.CategoryRepository;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
 import java.util.Optional;
 
 @Service
 @RequiredArgsConstructor
+@Slf4j
 public class CategoryDeleteService {
     private final CategoryRepository categoryRepository;
 
@@ -29,12 +31,12 @@ public class CategoryDeleteService {
                 return new ResponseMessageDTO(messageId, 403, "Forbidden Delete Request.");
             } else {
                 if (!optionalCategory.get().getProducts().isEmpty()) {
-                    System.out.println("There are products tied to this category. Rejecting delete request.");
+                    log.info("There are products tied to this category. Rejecting delete request.");
                     return new ResponseMessageDTO(messageId, 403, "Forbidden Delete Request.");
                 }
                 try {
                     categoryRepository.deleteById(categoryDeleteRequestDTO.getId());
-                    System.out.println("Successfully deleted category.");
+                    log.info("Successfully deleted category.");
                     return new ResponseMessageDTO(messageId, 200, "Category Deleted Successfully.");
                 } catch (Exception e) {
                     return new ResponseMessageDTO(messageId, 500, "Internal Server Error.");

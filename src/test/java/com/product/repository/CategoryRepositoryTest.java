@@ -6,6 +6,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.product.Application;
 import com.product.entity.Category;
 import com.product.entity.Product;
+import lombok.extern.slf4j.Slf4j;
 import org.junit.jupiter.api.*;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -22,6 +23,7 @@ import java.util.Optional;
 @SpringBootTest(classes = Application.class)
 @ActiveProfiles("dev")
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
+@Slf4j
 public class CategoryRepositoryTest {
     private static final ObjectMapper objectMapper = new ObjectMapper();
     @Autowired
@@ -60,17 +62,17 @@ public class CategoryRepositoryTest {
         cat4 = new Category();
         cat4.setCategoryName("animal");
 
-        System.out.println("Before");
-        System.out.println("cat1: " + cat1);
-        System.out.println("cat2: " + cat2);
-        System.out.println("cat3: " + cat3);
-        System.out.println("cat4: " + cat4);
+        log.info("Before");
+        log.info("cat1: " + cat1);
+        log.info("cat2: " + cat2);
+        log.info("cat3: " + cat3);
+        log.info("cat4: " + cat4);
 
         Category savedCat1 = categoryRepository.saveAndFlush(cat1);
         Category savedCat4 = categoryRepository.saveAndFlush(cat4);
-        System.out.println("After");
-        System.out.println("cat1: " + savedCat1);
-        System.out.println("cat4: " + savedCat4);
+        log.info("After");
+        log.info("cat1: " + savedCat1);
+        log.info("cat4: " + savedCat4);
     }
 
     @AfterAll
@@ -82,15 +84,15 @@ public class CategoryRepositoryTest {
     @DisplayName("Test create category")
     @Rollback(value = false)
     public void CreateCategoryTest() {
-        System.out.println("cat1: " + cat1);
-        System.out.println("cat2: " + cat2);
-        System.out.println("cat3: " + cat3);
+        log.info("cat1: " + cat1);
+        log.info("cat2: " + cat2);
+        log.info("cat3: " + cat3);
 
         Category savedCat2 = categoryRepository.saveAndFlush(cat2);
         Category savedCat3 = categoryRepository.saveAndFlush(cat3);
 
-        System.out.println("savedCat2: " + savedCat2);
-        System.out.println("savedCat3: " + savedCat3);
+        log.info("savedCat2: " + savedCat2);
+        log.info("savedCat3: " + savedCat3);
 
         Assertions.assertNotNull(savedCat2);
         Assertions.assertNotNull(savedCat3);
