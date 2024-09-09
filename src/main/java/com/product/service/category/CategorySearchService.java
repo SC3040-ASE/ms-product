@@ -7,12 +7,14 @@ import com.product.mapper.CategoryMapper;
 import com.product.repository.CategoryRepository;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
 
 @Service
 @RequiredArgsConstructor
+@Slf4j
 public class CategorySearchService {
     private final CategoryRepository categoryRepository;
     private final CategoryMapper categoryMapper;
@@ -25,6 +27,5 @@ public class CategorySearchService {
         );
         List<CategorySearchResponseDTO> categorySearchResults = categoryMapper.mapToSearchResults(results);
         return new ResponseMessageDTO(messageId, 200, categorySearchResults);
-
     }
 }

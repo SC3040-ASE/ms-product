@@ -6,6 +6,7 @@ import com.product.dto.category.CategorySearchResponseDTO;
 import com.product.dto.category.CategoryUpdateRequestDTO;
 import com.product.entity.Category;
 import com.product.entity.Product;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
 
 import java.util.ArrayList;
@@ -13,14 +14,15 @@ import java.util.Arrays;
 import java.util.List;
 
 @Component
+@Slf4j
 public class CategoryMapper {
     public Category mapToEntity(CategoryCreationRequestDTO categoryCreationRequestDTO) {
-        System.out.println("Mapping to entity: " + categoryCreationRequestDTO);
+        log.info("Mapping to entity: " + categoryCreationRequestDTO);
         Category category = new Category();
         category.setCategoryName(categoryCreationRequestDTO.getCategoryName());
-        System.out.println("Map category name success");
+        log.info("Map category name success");
         category.setProducts(categoryCreationRequestDTO.getProducts());
-        System.out.println("Map products success");
+        log.info("Map products success");
         return category;
     }
 
@@ -45,10 +47,11 @@ public class CategoryMapper {
                     .builder()
                     .id((Integer) row[0])
                     .categoryName((String) row[1])
+                    // TODO: Add the embedding pointed to list of products? Need to check if im supposed to do that for both category and tag first.
                     .build();
                 searchResults.add(result);
             } catch (Exception e) {
-                System.out.println("Failed to convert category search results to DTO.");
+                log.error("Failed to convert category search results to DTO.");
             }
         }
         return searchResults;

@@ -1,0 +1,41 @@
+package com.product.service.tag;
+
+import com.product.dto.ResponseMessageDTO;
+import com.product.dto.tag.TagReadResponseDTO;
+import com.product.dto.tag.TagUpdateRequestDTO;
+import com.product.entity.Tag;
+import com.product.mapper.TagMapper;
+import com.product.repository.CategoryRepository;
+import com.product.repository.TagRepository;
+import jakarta.transaction.Transactional;
+import lombok.RequiredArgsConstructor;
+import org.springframework.stereotype.Service;
+
+import java.util.Optional;
+
+@Service
+@RequiredArgsConstructor
+public class TagUpdateService {
+    private final TagRepository tagRepository;
+    private final TagMapper tagMapper;
+
+    @Transactional
+    public ResponseMessageDTO updateTag(String messageId, TagUpdateRequestDTO tagUpdateRequestDTO) {
+        if (tagUpdateRequestDTO.getId() == null) {
+            return new ResponseMessageDTO(messageId, 401, "Bad Request. Missing tag information.");
+        }
+        Optional<Tag> optionalTag = tagRepository.findById(tagUpdateRequestDTO.getId());
+        if (optionalTag.isEmpty()) {
+            return new ResponseMessageDTO(messageId, 404, "Tag not found.");
+        }
+        if (tagUpdateRequestDTO.getId().equals(optionalTag.get().getId())) {
+            Tag updatedTag = tagMapper.mapUpdatedTagDTOToTag(optionalTag.get(), tagUpdateRequestDTO);
+            Tag savedTag = tagRepository.saveAndFlush(updatedTag);
+            System.out.println("Successfully updated tag: " + savedTag);
+            TagReadResponseDTO newTag = tagMapper.mapTagToTagDTO(savedTag);
+            return new ResponseMessageDTO(messageId, 200, newTag);
+        } else {
+            return new ResponseMessageDTO(messageId, 403, "Forbidden Update Request.");
+        }
+    }
+}
