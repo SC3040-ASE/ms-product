@@ -37,6 +37,6 @@ public class ProductCreationService {
 
         pictureBlobStorageService.saveImages(savedProduct.getId(), productCreationRequestDTO.getImageBase64List());
 
-        return new ResponseMessageDTO(messageId, 200, savedProduct);
+        return new ResponseMessageDTO(messageId, 200, "Product created successfully");
     }
 }

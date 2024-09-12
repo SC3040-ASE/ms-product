@@ -2,7 +2,6 @@ package com.product.service.product;
 
 import com.product.dto.ImageDTO;
 import com.product.dto.ResponseMessageDTO;
-import com.product.dto.ProductSearchRequestDTO;
 import com.product.dto.ProductSearchResponseDTO;
 import com.product.repository.ProductRepository;
 import com.product.mapper.ProductMapper;
@@ -23,8 +22,8 @@ public class ProductSearchService {
     private final PictureBlobStorageService pictureBlobStorageService;
 
     @Transactional
-    public ResponseMessageDTO searchProduct(String messageId, ProductSearchRequestDTO productSearchRequestDTO) {
-        List<Object[]> results = productRepository.searchProducts(productSearchRequestDTO.getQuery(), productSearchRequestDTO.getNumberOfResults());
+    public ResponseMessageDTO searchProduct(String messageId, String query, int numberOfResults) {
+        List<Object[]> results = productRepository.searchProducts(query, numberOfResults);
         List<ProductSearchResponseDTO> productSearchResults = productMapper.mapToSearchResults(results);
 
         for (ProductSearchResponseDTO productSearchResponseDTO : productSearchResults) {
