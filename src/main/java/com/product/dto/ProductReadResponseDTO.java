@@ -1,6 +1,5 @@
 package com.product.dto;
 
-import jakarta.persistence.criteria.CriteriaBuilder;
 import lombok.Data;
 
 import java.math.BigDecimal;

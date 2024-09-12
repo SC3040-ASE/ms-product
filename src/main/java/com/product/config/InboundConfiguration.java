@@ -23,6 +23,8 @@ import org.springframework.integration.channel.DirectChannel;
 import org.springframework.messaging.MessageChannel;
 import org.springframework.messaging.MessageHandler;
 
+import java.util.Map;
+
 @Configuration
 @Slf4j
 @RequiredArgsConstructor
@@ -59,7 +61,7 @@ public class InboundConfiguration {
                 RequestMessageDTO requestMessage = objectMapper.readValue(payload, RequestMessageDTO.class);
                 log.info("request message: {}", requestMessage);
                 responseId = requestMessage.getId();
-                ResponseMessageDTO responseMessage = newHandler(requestMessage);
+                ResponseMessageDTO responseMessage = handler(requestMessage);
 
                 String responsePayload = objectMapper.writeValueAsString(responseMessage);
                 // Do we need different topics for product / category / tag?
@@ -81,7 +83,7 @@ public class InboundConfiguration {
         };
     }
 
-    public ResponseMessageDTO newHandler(RequestMessageDTO requestMessage) throws JsonProcessingException {
+    public ResponseMessageDTO handler(RequestMessageDTO requestMessage) throws JsonProcessingException {
         String messagePath = requestMessage.getPath();
         ResponseMessageDTO responseMessageDTO;
         if (messagePath.contains("product")) {
@@ -101,20 +103,42 @@ public class InboundConfiguration {
     }
 
     public ResponseMessageDTO handleProductRequests(RequestMessageDTO requestMessageDTO) throws JsonProcessingException {
+        log.info("Handling product request: {}", requestMessageDTO);
         ResponseMessageDTO responseMessageDTO;
+        Map<String,String> headers = requestMessageDTO.getHeaders();
+        String body = requestMessageDTO.getBody();
         switch (requestMessageDTO.getMethod()) {
             case "GET":
                 switch (requestMessageDTO.getPath()) {
-                    case "/product":
-                        Integer readProductId = objectMapper.readValue(requestMessageDTO.getBody(), Integer.class);
-                        log.info("Received read request for product with id: {}", readProductId);
+                    case "/product/read":
+                        if(!headers.containsKey("X-id")){
+                            log.info("Missing id");
+                            responseMessageDTO = new ResponseMessageDTO(requestMessageDTO.getId(), 400, "Missing id");
+                            break;
+                        }
+                        Integer readProductId = objectMapper.readValue(headers.get("X-id"), Integer.class);
                         responseMessageDTO = productService.handleReadProduct(requestMessageDTO.getId(), readProductId);
                         break;
                     case "/product/search":
-                        ProductSearchRequestDTO productSearchRequestDTO = objectMapper.readValue(requestMessageDTO.getBody(), ProductSearchRequestDTO.class);
-                        log.info("Received search request: {}", requestMessageDTO.getBody());
-                        responseMessageDTO = productService.handleSearchProduct(requestMessageDTO.getId(), productSearchRequestDTO);
+                        if(!headers.containsKey("X-query") || !headers.containsKey("X-numberOfResults")){
+                            log.info("Missing query or numberOfResults header");
+                            responseMessageDTO = new ResponseMessageDTO(requestMessageDTO.getId(), 400, "Missing query or numberOfResults header");
+                            break;
+                        }
+                        String searchQuery = objectMapper.readValue(headers.get("X-query"), String.class);
+                        Integer numberOfResults = objectMapper.readValue(headers.get("X-numberOfResults"), Integer.class);
+                        responseMessageDTO = productService.handleSearchProduct(requestMessageDTO.getId(), searchQuery, numberOfResults);
                         break;
+                    case "/product/searchRange":
+                        if(!headers.containsKey("X-query") || !headers.containsKey("X-startRank") || !headers.containsKey("X-endRank")){
+                            log.info("Missing query, startRank or endRank");
+                            responseMessageDTO = new ResponseMessageDTO(requestMessageDTO.getId(), 400, "Missing query, startRank or endRank");
+                            break;
+                        }
+                        String searchRangeQuery = objectMapper.readValue(headers.get("X-query"), String.class);
+                        Integer startRank = objectMapper.readValue(headers.get("X-startRank"), Integer.class);
+                        Integer endRank = objectMapper.readValue(headers.get("X-endRank"), Integer.class);
+
                     default:
                         log.warn("Unknown message path: {}", requestMessageDTO.getPath());
                         responseMessageDTO = new ResponseMessageDTO(requestMessageDTO.getId(), 404, null);
@@ -132,9 +156,16 @@ public class InboundConfiguration {
                 responseMessageDTO = productService.handleUpdateProduct(requestMessageDTO.getId(), productUpdate);
                 break;
             case "DELETE":
-                ProductDeleteRequestDTO productDeleteRequestDTO = objectMapper.readValue(requestMessageDTO.getBody(), ProductDeleteRequestDTO.class);
-                log.info("Received delete request for product with id: {}", productDeleteRequestDTO);
-                responseMessageDTO = productService.handleDeleteProduct(requestMessageDTO.getId(), productDeleteRequestDTO);
+                if(!headers.containsKey("X-id")){
+                    log.info("Missing id");
+                    responseMessageDTO = new ResponseMessageDTO(requestMessageDTO.getId(), 400, "Missing id");
+                    break;
+                }
+                Integer deleteProductId = objectMapper.readValue(headers.get("X-id"), Integer.class);
+                Integer ownerId = objectMapper.readValue(headers.get("X-User-Id"), Integer.class);
+                Boolean isAdmin = objectMapper.readValue(headers.get("X-Is-Admin"), Boolean.class);
+                log.info("Received delete request for product with id: {}", deleteProductId);
+                responseMessageDTO = productService.handleDeleteProduct(requestMessageDTO.getId(), deleteProductId, ownerId, isAdmin);
                 break;
             default:
                 log.warn("Unknown message type: {}", requestMessageDTO.getMethod());

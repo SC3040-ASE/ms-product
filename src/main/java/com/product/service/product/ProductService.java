@@ -27,12 +27,12 @@ public class ProductService {
         return productUpdateService.updateProduct(messageId, productUpdateRequestDTO);
     }
 
-    public ResponseMessageDTO handleDeleteProduct(String messageId, ProductDeleteRequestDTO targetProduct) {
-        return productDeleteService.deleteProduct(messageId, targetProduct);
+    public ResponseMessageDTO handleDeleteProduct(String messageId, Integer productId, Integer ownerId, boolean isAdmin) {
+        return productDeleteService.deleteProduct(messageId, productId, ownerId, isAdmin);
     }
 
-    public ResponseMessageDTO handleSearchProduct(String messageId, ProductSearchRequestDTO productSearchRequestDTO) {
-        return productSearchService.searchProduct(messageId, productSearchRequestDTO);
+    public ResponseMessageDTO handleSearchProduct(String messageId, String query, int numberOfResults) {
+        return productSearchService.searchProduct(messageId, query, numberOfResults);
     }
 
 

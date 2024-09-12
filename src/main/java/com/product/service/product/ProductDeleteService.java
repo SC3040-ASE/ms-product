@@ -1,6 +1,5 @@
 package com.product.service.product;
 
-import com.product.dto.ProductDeleteRequestDTO;
 import com.product.dto.ResponseMessageDTO;
 import com.product.entity.Product;
 import com.product.repository.ProductRepository;
@@ -20,14 +19,12 @@ public class ProductDeleteService {
     private final PictureBlobStorageService pictureBlobStorageService;
 
     @Transactional
-    public ResponseMessageDTO deleteProduct(String messageId, ProductDeleteRequestDTO targetProduct) {
-        Integer productId = targetProduct.getProductId();
-        Integer ownerId = targetProduct.getOwnerId();
+    public ResponseMessageDTO deleteProduct(String messageId, Integer productId, Integer ownerId, boolean isAdmin) {
         Optional<Product> product = productRepository.findById(productId);
 
         if (product.isPresent()) {
-            if (!product.get().getOwnerId().equals(ownerId)) {
-                return new ResponseMessageDTO(messageId, 403, "Unauthorized");
+            if (!product.get().getOwnerId().equals(ownerId) && !isAdmin) {
+                return new ResponseMessageDTO(messageId, 403, "Forbidden");
             }
             productRepository.deleteById(productId);
             pictureBlobStorageService.deleteDirectory(productId);

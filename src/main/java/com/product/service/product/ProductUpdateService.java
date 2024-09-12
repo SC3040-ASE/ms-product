@@ -38,7 +38,7 @@ public class ProductUpdateService {
 
         if (product.isPresent()) {
             if (!product.get().getOwnerId().equals(productUpdateRequestDTO.getOwnerId())) {
-                return new ResponseMessageDTO(messageId, 403, "Unauthorized");
+                return new ResponseMessageDTO(messageId, 403, "Forbidden");
             }
 
             Category category = categoryService.saveCategoryIfNotExists(productUpdateRequestDTO.getCategory());
