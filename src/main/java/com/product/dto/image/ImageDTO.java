@@ -1,4 +1,4 @@
-package com.product.dto;
+package com.product.dto.image;
 
 import lombok.Data;
 

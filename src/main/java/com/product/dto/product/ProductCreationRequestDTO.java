@@ -1,4 +1,4 @@
-package com.product.dto;
+package com.product.dto.product;
 
 import lombok.Data;
 
@@ -6,17 +6,14 @@ import java.math.BigDecimal;
 import java.util.List;
 
 @Data
-public class ProductSearchResponseDTO {
-    private Integer id;
+public class ProductCreationRequestDTO {
     private Integer ownerId;
     private String productName;
     private BigDecimal price;
-    private String[] tags;
+    private List<String> tags;
     private String condition;
-    private List<ImageDTO> images;
+    private List<String> imageBase64List;
     private Integer totalQuantity;
-    private Integer currentQuantity;
-    private String categoryName;
+    private String category;
     private String description;
-    private Float score;
 }
