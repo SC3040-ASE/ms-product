@@ -1,6 +1,5 @@
 package com.product.repository;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
 import com.product.Application;
 import com.product.entity.Category;
 import com.product.entity.Tag;
@@ -32,7 +31,7 @@ public class TagRepositoryTest {
     private Tag tag3;
 
     @BeforeAll
-    public void setup() throws JsonProcessingException {
+    public void setup() throws Exception {
         Category mainCat = new Category();
         mainCat.setCategoryName("FakeAnimal");
         Category savedCat = categoryRepository.save(mainCat);
