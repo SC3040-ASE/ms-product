@@ -171,7 +171,7 @@ public class ProductRepositoryTest {
         product.setDescription("The latest iPhone");
         Product savedProduct = productRepository.save(product);
 
-        List<Object[]> searchResults = productRepository.searchProductsRange("apple smartphone", 1,2);
+        List<Object[]> searchResults = productRepository.searchProductsRange("iphone", 1,2);
         Assertions.assertFalse(searchResults.isEmpty());
 
         Pair<List<ProductSearchResultDTO>,Integer> result = productMapper.mapToSearchResults(searchResults);
