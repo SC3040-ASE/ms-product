@@ -8,12 +8,14 @@ import com.product.repository.CategoryRepository;
 import com.product.repository.TagRepository;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
 import java.util.Optional;
 
 @Service
 @RequiredArgsConstructor
+@Slf4j
 public class TagDeleteService {
     private final TagRepository tagRepository;
 
@@ -35,12 +37,12 @@ public class TagDeleteService {
             return new ResponseMessageDTO(messageId, 403, "Forbidden Delete Request.");
         } else {
             if (!optionalTag.get().getProducts().isEmpty()) {
-                System.out.println("There are products tied to this tag.");
+                log.info("There are products tied to this tag.");
                 return new ResponseMessageDTO(messageId, 403, "Forbidden Delete Request.");
             }
             try {
                 tagRepository.deleteById(tagDeleteRequestDTO.getId());
-                System.out.println("Successfully deleted tag.");
+                log.info("Successfully deleted tag.");
                 return new ResponseMessageDTO(messageId, 200, "Successfully deleted tag.");
             } catch (Exception e) {
                 return new ResponseMessageDTO(messageId, 500, "Internal Server Error.");

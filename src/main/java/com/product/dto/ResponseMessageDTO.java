@@ -6,7 +6,7 @@ import lombok.Data;
 @Data
 @AllArgsConstructor
 public class ResponseMessageDTO {
-    private String ID;
-    private Integer Status;
-    private Object Body;
+    private String id;
+    private Integer status;
+    private String body;
 }
