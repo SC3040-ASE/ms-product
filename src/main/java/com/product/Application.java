@@ -36,6 +36,5 @@ public class Application {
                 .header("Content-Type", "application/yaml")
                 .body(content);
     }
-
 }
 
