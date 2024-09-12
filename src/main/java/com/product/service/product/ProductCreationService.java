@@ -1,6 +1,6 @@
 package com.product.service.product;
 
-import com.product.dto.ProductCreationRequestDTO;
+import com.product.dto.product.ProductCreationRequestDTO;
 import com.product.dto.ResponseMessageDTO;
 import com.product.entity.Category;
 import com.product.entity.Product;

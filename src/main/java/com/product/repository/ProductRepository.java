@@ -11,7 +11,6 @@ import java.util.List;
 @Repository
 public interface ProductRepository extends JpaRepository<Product, Integer> {
 
-    @Query(value = "SELECT * FROM product_search(:query, :numberOfResults)", nativeQuery = true)
-    List<Object[]> searchProducts(@Param("query") String searchQuery, @Param("numberOfResults") int numResults);
-
+    @Query(value = "SELECT * FROM product_search_range(:query, :startRank, :endRank)", nativeQuery = true)
+    List<Object[]> searchProductsRange(@Param("query") String searchQuery, @Param("startRank") int startRank, @Param("endRank") int endRank);
 }

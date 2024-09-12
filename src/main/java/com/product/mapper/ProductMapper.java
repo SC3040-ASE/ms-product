@@ -1,10 +1,15 @@
 package com.product.mapper;
 
-import com.product.dto.*;
+import com.product.dto.image.ImageDTO;
+import com.product.dto.product.ProductCreationRequestDTO;
+import com.product.dto.product.ProductReadResponseDTO;
+import com.product.dto.product.ProductSearchResultDTO;
+import com.product.dto.product.ProductUpdateRequestDTO;
 import com.product.entity.Category;
 import com.product.entity.Product;
 import com.product.entity.Tag;
 import org.springframework.stereotype.Component;
+import org.apache.commons.lang3.tuple.Pair;
 
 import java.math.BigDecimal;
 import java.util.ArrayList;
@@ -29,46 +34,48 @@ public class ProductMapper {
     }
 
     public Product updateProductFromDTO(Product product, ProductUpdateRequestDTO productUpdateRequestDTO, List<Tag> existingTags, Category category) {
-        product.setId(productUpdateRequestDTO.getId());
+        product.setId(productUpdateRequestDTO.getProductId());
         product.setOwnerId(productUpdateRequestDTO.getOwnerId());
         product.setProductName(productUpdateRequestDTO.getProductName());
         product.setPrice(productUpdateRequestDTO.getPrice());
         product.setTags(existingTags);
         product.setCondition(productUpdateRequestDTO.getCondition());
         product.setTotalQuantity(productUpdateRequestDTO.getTotalQuantity());
-        product.setCurrentQuantity(productUpdateRequestDTO.getTotalQuantity()); // Assuming current quantity is same as total initially
+        product.setCurrentQuantity(productUpdateRequestDTO.getCurrentQuantity());
         product.setCategory(category);
         product.setDescription(productUpdateRequestDTO.getDescription());
 
         return product;
     }
 
-    public List<ProductSearchResponseDTO> mapToSearchResults(List<Object[]> results) {
+    public Pair<List<ProductSearchResultDTO>,Integer> mapToSearchResults(List<Object[]> results) {
+        List<ProductSearchResultDTO> searchResults = new ArrayList<>();
+        int totalResults = 0;
+        if(results.size()>0){
+            totalResults = (Integer) results.get(0)[9];
+        }
 
-        List<ProductSearchResponseDTO> searchResults = new ArrayList<>();
         for (Object[] row : results) {
-            ProductSearchResponseDTO result = new ProductSearchResponseDTO();
-            result.setId((Integer) row[0]);
+            ProductSearchResultDTO result = new ProductSearchResultDTO();
+            result.setProductId((Integer) row[0]);
             result.setOwnerId((Integer) row[1]);
-            result.setProductName((String) row[2]);
-            result.setPrice((BigDecimal) row[3]);
-            result.setTags((String[]) row[4]);
+            result.setOwnerUsername((String) row[2]);
+            result.setProductName((String) row[3]);
+            result.setPrice((BigDecimal) row[4]);
             result.setCondition((String) row[5]);
-            result.setTotalQuantity((Integer) row[6]);
-            result.setCurrentQuantity((Integer) row[7]);
-            result.setCategoryName((String) row[8]);
-            result.setDescription((String) row[9]);
-            result.setScore((Float) row[10]);
-
+            result.setCurrentQuantity((Integer) row[6]);
+            result.setCreatedOn((java.sql.Timestamp) row[7]);
+            result.setScore((Float) row[8]);
             searchResults.add(result);
         }
 
-        return searchResults;
+
+        return Pair.of(searchResults, totalResults);
     }
 
     public ProductReadResponseDTO mapToProductReadResponse(Product product, List<ImageDTO> images) {
         ProductReadResponseDTO productReadResponseDTO = new ProductReadResponseDTO();
-        productReadResponseDTO.setId(product.getId());
+        productReadResponseDTO.setProductId(product.getId());
         productReadResponseDTO.setOwnerId(product.getOwnerId());
         productReadResponseDTO.setProductName(product.getProductName());
         productReadResponseDTO.setPrice(product.getPrice());

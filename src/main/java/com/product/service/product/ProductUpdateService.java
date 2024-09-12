@@ -1,7 +1,7 @@
 package com.product.service.product;
 
 import com.product.dto.ResponseMessageDTO;
-import com.product.dto.ProductUpdateRequestDTO;
+import com.product.dto.product.ProductUpdateRequestDTO;
 import com.product.entity.Category;
 import com.product.entity.Product;
 import com.product.entity.Tag;
@@ -16,8 +16,6 @@ import org.springframework.stereotype.Service;
 
 import jakarta.transaction.Transactional;
 
-import java.util.ArrayList;
-import java.util.Base64;
 import java.util.List;
 import java.util.Optional;
 
@@ -34,10 +32,10 @@ public class ProductUpdateService {
 
     @Transactional
     public ResponseMessageDTO updateProduct(String messageId, ProductUpdateRequestDTO productUpdateRequestDTO) {
-        Optional<Product> product = productRepository.findById(productUpdateRequestDTO.getId());
+        Optional<Product> product = productRepository.findById(productUpdateRequestDTO.getProductId());
 
         if (product.isPresent()) {
-            if (!product.get().getOwnerId().equals(productUpdateRequestDTO.getOwnerId())) {
+            if (!product.get().getOwnerId().equals(productUpdateRequestDTO.getOwnerId()) && !productUpdateRequestDTO.getIsAdmin()) {
                 return new ResponseMessageDTO(messageId, 403, "Forbidden");
             }
 

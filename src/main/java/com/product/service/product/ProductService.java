@@ -1,6 +1,8 @@
 package com.product.service.product;
 
 import com.product.dto.*;
+import com.product.dto.product.ProductCreationRequestDTO;
+import com.product.dto.product.ProductUpdateRequestDTO;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
@@ -13,13 +15,13 @@ public class ProductService {
     private final ProductReadService productReadService;
     private final ProductUpdateService productUpdateService;
     private final ProductDeleteService productDeleteService;
-    private final ProductSearchService productSearchService;
+    private final ProductSearchRangeService productSearchRangeService;
 
     public ResponseMessageDTO handleCreateProduct(String messageId, ProductCreationRequestDTO productCreationRequestDTO) {
         return productCreationService.createProduct(messageId, productCreationRequestDTO);
     }
 
-    public ResponseMessageDTO handleReadProduct(String messageId, Integer id) {
+    public ResponseMessageDTO handleReadProduct(String messageId, Integer id) throws Exception {
         return productReadService.readProduct(messageId, id);
     }
 
@@ -31,9 +33,8 @@ public class ProductService {
         return productDeleteService.deleteProduct(messageId, productId, ownerId, isAdmin);
     }
 
-    public ResponseMessageDTO handleSearchProduct(String messageId, String query, int numberOfResults) {
-        return productSearchService.searchProduct(messageId, query, numberOfResults);
+    public ResponseMessageDTO handleSearchRangeProduct(String messageId, String query, int startRank, int endRank) throws Exception{
+        return productSearchRangeService.searchRangeProduct(messageId, query, startRank, endRank);
     }
-
 
 }

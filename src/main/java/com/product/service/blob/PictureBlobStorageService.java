@@ -4,7 +4,7 @@ import com.azure.storage.blob.BlobClient;
 import com.azure.storage.blob.BlobContainerClient;
 import com.azure.storage.blob.models.BlobItem;
 import com.azure.storage.blob.specialized.BlockBlobClient;
-import com.product.dto.ImageDTO;
+import com.product.dto.image.ImageDTO;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
@@ -12,6 +12,7 @@ import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.util.ArrayList;
 import java.util.Base64;
+import java.util.Iterator;
 import java.util.List;
 
 @Service
@@ -63,6 +64,27 @@ public class PictureBlobStorageService {
 
         return images;
     }
+
+    public ImageDTO retrieveOneProductImage(int productId) {
+        String directory = "product_" + productId + "/";
+        ImageDTO image = null;
+
+        Iterator<BlobItem> blobItemIterator = pictureContainerClient.listBlobsByHierarchy(directory).iterator();
+        if (blobItemIterator.hasNext()) {
+            BlobItem blobItem = blobItemIterator.next();
+            BlobClient blobClient = pictureContainerClient.getBlobClient(blobItem.getName());
+            ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
+            blobClient.downloadStream(outputStream);
+            byte[] imageBytes = outputStream.toByteArray();
+            image = new ImageDTO();
+            image.setImageBase64(Base64.getEncoder().encodeToString(imageBytes));
+            image.setImageName(blobItem.getName());
+        }
+
+        return image;
+    }
+
+
 
     public void updateProductImages(int productId, List<String> imagesToDelete, List<String> base64ImagesToAdd) {
         String directory = "product_" + productId + "/";
