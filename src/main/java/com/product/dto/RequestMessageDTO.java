@@ -11,6 +11,6 @@ public class RequestMessageDTO {
     private String id;
     private String method;
     private String path;
-    private String headers;
+    private Map<String,String> headers;
     private String body;
 }
