@@ -9,7 +9,7 @@ servers:
     description: Main (production) server
 
 paths:
-  /product?id={id}:
+  /product:
     get:
       summary: Get a product details by ID
       tags:
@@ -23,31 +23,31 @@ paths:
             type: integer
             example: 1
       responses:
-        '200':
+        "200":
           description: Product found
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/Product'
-        '400':
+                $ref: "#/components/schemas/Product"
+        "400":
           description: Bad Request
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/BadRequest'
+                $ref: "#/components/schemas/BadRequest"
 
-        '404':
+        "404":
           description: Product not found
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/NotFound'
-        '500':
+                $ref: "#/components/schemas/NotFound"
+        "500":
           description: Internal server error
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/InternalServerError'
+                $ref: "#/components/schemas/InternalServerError"
     delete:
       summary: Delete a product
       operationId: deleteProduct
@@ -62,7 +62,7 @@ paths:
             type: integer
             example: 1
       responses:
-        '200':
+        "200":
           description: Product deleted successfully
           content:
             application/json:
@@ -73,26 +73,100 @@ paths:
                     type: string
                     example: "Product deleted successfully"
 
-        '403':
+        "403":
           description: Unauthorized
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/Unauthorized'
-        '404':
+                $ref: "#/components/schemas/Unauthorized"
+        "404":
           description: Product Not found
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/NotFound'
-        '500':
+                $ref: "#/components/schemas/NotFound"
+        "500":
           description: Internal server error
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/InternalServerError'
+                $ref: "#/components/schemas/InternalServerError"
+    post:
+      summary: Create a new product
+      operationId: createProduct
+      tags:
+        - Product
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/ProductCreationRequest"
+      responses:
+        "201":
+          description: Product created successfully
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    example: "Product created successfully"
+        "403":
+          description: Bad Request
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/BadRequest"
+        "500":
+          description: Internal server error
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/InternalServerError"
+    put:
+      summary: Update an existing product
+      operationId: updateProduct
+      tags:
+        - Product
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/ProductUpdateRequest"
+      responses:
+        "200":
+          description: Product updated successfully
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    example: "Product updated successfully"
+        "403":
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Unauthorized"
+        "404":
+          description: Product Not found
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/NotFound"
+        "500":
+          description: Internal server error
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/InternalServerError"
 
-  /product/searchRange?query={query}&startRank={startRank}&endRank={endRank}:
+  /product/searchRange:
     get:
       summary: Search for products in a range
       operationId: searchProducts
@@ -118,106 +192,27 @@ paths:
           description: end index
           required: true
           schema:
-              type: integer
-              example: 10
+            type: integer
+            example: 10
       responses:
-        '200':
+        "200":
           description: Search results
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/ProductSearchRangeResponse'
-        '400':
+                $ref: "#/components/schemas/ProductSearchRangeResponse"
+        "400":
           description: Bad Request
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/BadRequest'
-        '500':
+                $ref: "#/components/schemas/BadRequest"
+        "500":
           description: Internal server error
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/InternalServerError'
-
-  /product:
-    post:
-      summary: Create a new product
-      operationId: createProduct
-      tags:
-        - Product
-      requestBody:
-        required: true
-        content:
-          application/json:
-            schema:
-              $ref: '#/components/schemas/ProductCreationRequest'
-      responses:
-        '201':
-          description: Product created successfully
-          content:
-            application/json:
-              schema:
-                type: object
-                properties:
-                  message:
-                    type: string
-                    example: "Product created successfully"
-        '403':
-          description: Bad Request
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/BadRequest'
-        '500':
-          description: Internal server error
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/InternalServerError'
-    put:
-      summary: Update an existing product
-      operationId: updateProduct
-      tags:
-        - Product
-      requestBody:
-        required: true
-        content:
-          application/json:
-            schema:
-              $ref: '#/components/schemas/ProductUpdateRequest'
-      responses:
-        '200':
-          description: Product updated successfully
-          content:
-            application/json:
-              schema:
-                type: object
-                properties:
-                  message:
-                    type: string
-                    example: "Product updated successfully"
-        '403':
-          description: Unauthorized
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/Unauthorized'
-        '404':
-          description: Product Not found
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/NotFound'
-        '500':
-          description: Internal server error
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/InternalServerError'
-
-
-
+                $ref: "#/components/schemas/InternalServerError"
 
 components:
   schemas:
@@ -231,7 +226,7 @@ components:
           format: byte
           description: Base64 encoded image string
           example: "/9j/4AAQSkZJRgABAQAAAQABAAD/2wBDAAoHBwkHBgoJG..."
-    
+
     Product:
       type: object
       properties:
@@ -259,13 +254,17 @@ components:
         images:
           type: array
           items:
-            $ref: '#/components/schemas/ImageDTO'
+            $ref: "#/components/schemas/ImageDTO"
         totalQuantity:
           type: integer
           example: 100
         currentQuantity:
           type: integer
           example: 50
+        createdOn:
+          tupe: string
+          format: date-time
+          example: "2024-09-12 12:20:35.655023"
         categoryName:
           type: string
           example: "Electronics"
@@ -279,7 +278,7 @@ components:
         products:
           type: array
           items:
-            $ref: '#/components/schemas/ProductSearch'
+            $ref: "#/components/schemas/ProductSearch"
           description: List of found products in the range
         total_count:
           type: integer
@@ -309,7 +308,7 @@ components:
           type: array
           items:
             type: string
-          example: [ "apple", "watch" ]
+          example: ["apple", "watch"]
         condition:
           type: string
           example: "New"
@@ -325,7 +324,7 @@ components:
           format: float
           example: 0.15
         image:
-          $ref: '#/components/schemas/ImageDTO'
+          $ref: "#/components/schemas/ImageDTO"
 
     ProductCreationRequest:
       type: object
@@ -349,7 +348,11 @@ components:
           type: array
           items:
             type: string
-          example: ["/9j/4AAQSkZJRgABAQAAAQABAAD/2wBDAAoHBwkHBgoJG...", "/9j/4AAQSkZJRgABAQAAAQABAAD/2wBDAAoHBwkHBgoJG..."]
+          example:
+            [
+              "/9j/4AAQSkZJRgABAQAAAQABAAD/2wBDAAoHBwkHBgoJG...",
+              "/9j/4AAQSkZJRgABAQAAAQABAAD/2wBDAAoHBwkHBgoJG...",
+            ]
         totalQuantity:
           type: integer
           example: 10
@@ -359,10 +362,6 @@ components:
         description:
           type: string
           example: "Latest Apple Watch."
-
-          
-
-        
 
     ProductUpdateRequest:
       type: object
@@ -394,7 +393,11 @@ components:
           type: array
           items:
             type: string
-          example: ["/9j/4AAQSkZJRgABAQAAAQABAAD/2wBDAAoHBwkHBgoJG...", "/9j/4AAQSkZJRgABAQAAAQABAAD/2wBDAAoHBwkHBgoJG..."]
+          example:
+            [
+              "/9j/4AAQSkZJRgABAQAAAQABAAD/2wBDAAoHBwkHBgoJG...",
+              "/9j/4AAQSkZJRgABAQAAAQABAAD/2wBDAAoHBwkHBgoJG...",
+            ]
         totalQuantity:
           type: integer
           example: 10
