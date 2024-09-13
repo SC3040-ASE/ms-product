@@ -1,21 +1,22 @@
-package com.product.dto;
+package com.product.dto.product;
 
+import com.product.dto.image.ImageDTO;
 import lombok.Data;
 
 import java.math.BigDecimal;
 import java.util.List;
 
 @Data
-public class ProductUpdateRequestDTO {
-    private Integer id;
+public class ProductReadResponseDTO {
+    private Integer productId;
     private Integer ownerId;
     private String productName;
     private BigDecimal price;
     private List<String> tags;
     private String condition;
-    private List<String> deleteImageList;
-    private List<String> newImageBase64List;
+    private List<ImageDTO> images;
     private Integer totalQuantity;
-    private String category;
+    private Integer currentQuantity;
+    private String categoryName;
     private String description;
 }

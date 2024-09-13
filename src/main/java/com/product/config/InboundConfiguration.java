@@ -1,6 +1,5 @@
 package com.product.config;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.cloud.spring.pubsub.core.PubSubTemplate;
 import com.google.cloud.spring.pubsub.integration.AckMode;
@@ -9,6 +8,8 @@ import com.google.cloud.spring.pubsub.support.BasicAcknowledgeablePubsubMessage;
 import com.google.cloud.spring.pubsub.support.GcpPubSubHeaders;
 import com.product.dto.*;
 import com.product.dto.category.*;
+import com.product.dto.product.ProductCreationRequestDTO;
+import com.product.dto.product.ProductUpdateRequestDTO;
 import com.product.dto.tag.*;
 import com.product.service.category.CategoryService;
 import com.product.service.product.ProductService;
@@ -83,7 +84,7 @@ public class InboundConfiguration {
         };
     }
 
-    public ResponseMessageDTO handler(RequestMessageDTO requestMessage) throws JsonProcessingException {
+    public ResponseMessageDTO handler(RequestMessageDTO requestMessage) throws Exception {
         String messagePath = requestMessage.getPath();
         ResponseMessageDTO responseMessageDTO;
         if (messagePath.contains("product")) {
@@ -102,43 +103,37 @@ public class InboundConfiguration {
         return responseMessageDTO;
     }
 
-    public ResponseMessageDTO handleProductRequests(RequestMessageDTO requestMessageDTO) throws JsonProcessingException {
+    public ResponseMessageDTO handleProductRequests(RequestMessageDTO requestMessageDTO) throws Exception {
         log.info("Handling product request: {}", requestMessageDTO);
         ResponseMessageDTO responseMessageDTO;
         Map<String,String> headers = requestMessageDTO.getHeaders();
         String body = requestMessageDTO.getBody();
+        Integer ownerId = objectMapper.readValue(headers.get("X-User-Id"), Integer.class);
+        Boolean isAdmin = objectMapper.readValue(headers.get("X-Is-Admin"), Boolean.class);
+
         switch (requestMessageDTO.getMethod()) {
             case "GET":
                 switch (requestMessageDTO.getPath()) {
-                    case "/product/read":
+                    case "/product":
                         if(!headers.containsKey("X-id")){
                             log.info("Missing id");
-                            responseMessageDTO = new ResponseMessageDTO(requestMessageDTO.getId(), 400, "Missing id");
+                            responseMessageDTO = new ResponseMessageDTO(requestMessageDTO.getId(), 400, "Bad request");
                             break;
                         }
                         Integer readProductId = objectMapper.readValue(headers.get("X-id"), Integer.class);
                         responseMessageDTO = productService.handleReadProduct(requestMessageDTO.getId(), readProductId);
                         break;
-                    case "/product/search":
-                        if(!headers.containsKey("X-query") || !headers.containsKey("X-numberOfResults")){
-                            log.info("Missing query or numberOfResults header");
-                            responseMessageDTO = new ResponseMessageDTO(requestMessageDTO.getId(), 400, "Missing query or numberOfResults header");
-                            break;
-                        }
-                        String searchQuery = objectMapper.readValue(headers.get("X-query"), String.class);
-                        Integer numberOfResults = objectMapper.readValue(headers.get("X-numberOfResults"), Integer.class);
-                        responseMessageDTO = productService.handleSearchProduct(requestMessageDTO.getId(), searchQuery, numberOfResults);
-                        break;
                     case "/product/searchRange":
                         if(!headers.containsKey("X-query") || !headers.containsKey("X-startRank") || !headers.containsKey("X-endRank")){
                             log.info("Missing query, startRank or endRank");
-                            responseMessageDTO = new ResponseMessageDTO(requestMessageDTO.getId(), 400, "Missing query, startRank or endRank");
+                            responseMessageDTO = new ResponseMessageDTO(requestMessageDTO.getId(), 400, "Bad Request");
                             break;
                         }
                         String searchRangeQuery = objectMapper.readValue(headers.get("X-query"), String.class);
                         Integer startRank = objectMapper.readValue(headers.get("X-startRank"), Integer.class);
                         Integer endRank = objectMapper.readValue(headers.get("X-endRank"), Integer.class);
-
+                        responseMessageDTO = productService.handleSearchRangeProduct(requestMessageDTO.getId(), searchRangeQuery, startRank, endRank);
+                        break;
                     default:
                         log.warn("Unknown message path: {}", requestMessageDTO.getPath());
                         responseMessageDTO = new ResponseMessageDTO(requestMessageDTO.getId(), 404, null);
@@ -147,23 +142,24 @@ public class InboundConfiguration {
                 break;
             case "POST":
                 ProductCreationRequestDTO productCreationRequestDTO = objectMapper.readValue(requestMessageDTO.getBody(), ProductCreationRequestDTO.class);
+                productCreationRequestDTO.setOwnerId(ownerId);
                 log.info("Received product: {}", productCreationRequestDTO);
                 responseMessageDTO = productService.handleCreateProduct(requestMessageDTO.getId(), productCreationRequestDTO);
                 break;
             case "PUT":
                 ProductUpdateRequestDTO productUpdate = objectMapper.readValue(requestMessageDTO.getBody(), ProductUpdateRequestDTO.class);
+                productUpdate.setOwnerId(ownerId);
+                productUpdate.setIsAdmin(isAdmin);
                 log.info("Received product update: {}", productUpdate);
                 responseMessageDTO = productService.handleUpdateProduct(requestMessageDTO.getId(), productUpdate);
                 break;
             case "DELETE":
                 if(!headers.containsKey("X-id")){
                     log.info("Missing id");
-                    responseMessageDTO = new ResponseMessageDTO(requestMessageDTO.getId(), 400, "Missing id");
+                    responseMessageDTO = new ResponseMessageDTO(requestMessageDTO.getId(), 400, "Bad request");
                     break;
                 }
                 Integer deleteProductId = objectMapper.readValue(headers.get("X-id"), Integer.class);
-                Integer ownerId = objectMapper.readValue(headers.get("X-User-Id"), Integer.class);
-                Boolean isAdmin = objectMapper.readValue(headers.get("X-Is-Admin"), Boolean.class);
                 log.info("Received delete request for product with id: {}", deleteProductId);
                 responseMessageDTO = productService.handleDeleteProduct(requestMessageDTO.getId(), deleteProductId, ownerId, isAdmin);
                 break;
@@ -175,7 +171,7 @@ public class InboundConfiguration {
         return responseMessageDTO;
     }
 
-    public ResponseMessageDTO handleCategoryRequests(RequestMessageDTO requestMessageDTO) throws JsonProcessingException {
+    public ResponseMessageDTO handleCategoryRequests(RequestMessageDTO requestMessageDTO) throws Exception {
         ResponseMessageDTO responseMessageDTO = null;
         switch (requestMessageDTO.getMethod()) {
             case "GET":
@@ -254,7 +250,7 @@ public class InboundConfiguration {
         return responseMessageDTO;
     }
 
-    public ResponseMessageDTO handleTagRequests(RequestMessageDTO requestMessageDTO) throws JsonProcessingException {
+    public ResponseMessageDTO handleTagRequests(RequestMessageDTO requestMessageDTO) throws Exception {
         ResponseMessageDTO responseMessageDTO;
         switch (requestMessageDTO.getMethod()) {
             case "GET":

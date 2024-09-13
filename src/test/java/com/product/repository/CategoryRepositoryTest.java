@@ -1,6 +1,5 @@
 package com.product.repository;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.product.Application;
@@ -34,7 +33,7 @@ public class CategoryRepositoryTest {
     private Category cat3;
     private Category cat4;
 
-    public List<Product> createProducts(String productString) throws JsonProcessingException {
+    public List<Product> createProducts(String productString) throws Exception {
         List<Product> catProducts = new ArrayList<>();
         List<Integer> productIds = objectMapper.readValue(productString, new TypeReference<>() {
         });
@@ -49,7 +48,7 @@ public class CategoryRepositoryTest {
     }
 
     @BeforeAll
-    public void setup() throws JsonProcessingException {
+    public void setup() throws Exception {
         cat1 = new Category();
         cat1.setCategoryName("homework");
 
@@ -134,7 +133,7 @@ public class CategoryRepositoryTest {
 
     @Test
     @DisplayName("Test update category")
-    public void UpdateCategoryTest() throws JsonProcessingException {
+    public void UpdateCategoryTest() throws Exception {
         Optional<Category> optionalCategory1 = categoryRepository.findByName(cat1.getCategoryName());
 
         Assertions.assertTrue(optionalCategory1.isPresent());

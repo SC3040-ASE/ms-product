@@ -20,15 +20,15 @@ public class CategoryService {
     private final CategoryDeleteService categoryDeleteService;
     private final CategoryRepository categoryRepository;
 
-    public ResponseMessageDTO handleCreateCategory(String messageId, CategoryCreationRequestDTO categoryCreationRequestDTO) {
+    public ResponseMessageDTO handleCreateCategory(String messageId, CategoryCreationRequestDTO categoryCreationRequestDTO) throws Exception {
         return categoryCreationService.createCategory(messageId, categoryCreationRequestDTO);
     }
 
-    public ResponseMessageDTO handleReadCategory(String messageId, CategoryReadRequestDTO categoryReadRequestDTO) {
+    public ResponseMessageDTO handleReadCategory(String messageId, CategoryReadRequestDTO categoryReadRequestDTO) throws Exception {
         return categoryReadService.readCategory(messageId, categoryReadRequestDTO);
     }
 
-    public ResponseMessageDTO handleUpdateCategory(String messageId, CategoryUpdateRequestDTO categoryUpdateRequestDTO) {
+    public ResponseMessageDTO handleUpdateCategory(String messageId, CategoryUpdateRequestDTO categoryUpdateRequestDTO) throws Exception {
         return categoryUpdateService.updateCategory(messageId, categoryUpdateRequestDTO);
     }
 
@@ -36,7 +36,7 @@ public class CategoryService {
         return categoryDeleteService.deleteCategory(messageId, categoryDeleteRequestDTO);
     }
 
-    public ResponseMessageDTO handleSearchCategory(String messageId, CategorySearchRequestDTO categorySearchRequestDTO) {
+    public ResponseMessageDTO handleSearchCategory(String messageId, CategorySearchRequestDTO categorySearchRequestDTO) throws Exception {
         return categorySearchService.searchCategory(messageId, categorySearchRequestDTO);
     }
 

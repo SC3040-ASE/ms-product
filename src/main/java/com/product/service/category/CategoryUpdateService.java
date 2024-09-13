@@ -1,5 +1,6 @@
 package com.product.service.category;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.product.dto.ResponseMessageDTO;
 import com.product.dto.category.CategoryUpdateRequestDTO;
 import com.product.entity.Category;
@@ -18,9 +19,10 @@ import java.util.Optional;
 public class CategoryUpdateService {
     private final CategoryRepository categoryRepository;
     private final CategoryMapper categoryMapper;
+    private final ObjectMapper objectMapper;
 
     @Transactional
-    public ResponseMessageDTO updateCategory(String messageId, CategoryUpdateRequestDTO categoryUpdateRequestDTO) {
+    public ResponseMessageDTO updateCategory(String messageId, CategoryUpdateRequestDTO categoryUpdateRequestDTO) throws Exception {
         Optional<Category> optionalCategory = categoryRepository.findById(categoryUpdateRequestDTO.getId());
 
         if (optionalCategory.isPresent()) {
@@ -29,7 +31,7 @@ public class CategoryUpdateService {
                 Category savedCategory = categoryRepository.saveAndFlush(updatedCategory);
                 categoryRepository.save(savedCategory);
                 log.info("Successfully updated category.");
-                return new ResponseMessageDTO(messageId, 200, savedCategory);
+                return new ResponseMessageDTO(messageId, 200, objectMapper.writeValueAsString(savedCategory));
             } else {
                 return new ResponseMessageDTO(messageId, 403, "Forbidden Update Request.");
             }

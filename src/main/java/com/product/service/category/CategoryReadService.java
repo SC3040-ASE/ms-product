@@ -1,5 +1,6 @@
 package com.product.service.category;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.product.dto.ResponseMessageDTO;
 import com.product.dto.category.CategoryReadRequestDTO;
 import com.product.dto.category.CategoryReadResponseDTO;
@@ -19,8 +20,9 @@ import java.util.Optional;
 public class CategoryReadService {
     private final CategoryRepository categoryRepository;
     private final CategoryMapper categoryMapper;
+    private final ObjectMapper objectMapper;
 
-    public ResponseMessageDTO readCategory(String messageId, CategoryReadRequestDTO categoryReadRequestDTO) {
+    public ResponseMessageDTO readCategory(String messageId, CategoryReadRequestDTO categoryReadRequestDTO) throws Exception {
         Optional<Category> optionalCategory;
         log.info("Begin search for {}", categoryReadRequestDTO.getCategoryName());
         if (categoryReadRequestDTO.getId() != null && !categoryReadRequestDTO.getCategoryName().isEmpty()) {
@@ -38,7 +40,7 @@ public class CategoryReadService {
         if (optionalCategory.isPresent()) {
             CategoryReadResponseDTO categoryReadResponseDTO = categoryMapper.mapToCategoryReadResponse(optionalCategory.get());
             log.info("Successfully retrieved category: {}", categoryReadResponseDTO.getCategoryName());
-            return new ResponseMessageDTO(messageId, 200, categoryReadResponseDTO);
+            return new ResponseMessageDTO(messageId, 200, objectMapper.writeValueAsString(categoryReadResponseDTO));
         } else {
             return new ResponseMessageDTO(messageId, 404, "Product Not Found.");
         }

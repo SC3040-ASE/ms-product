@@ -1,7 +1,7 @@
 openapi: 3.0.0
 info:
   title: Product API
-  description: API for managing products
+  description: API for managing and searching products
   version: 1.0.0
 
 servers:
@@ -9,40 +9,138 @@ servers:
     description: Main (production) server
 
 paths:
-  /product/get:
-    post:
-      summary: Get a product by ID
-      operationId: getProduct
+  /product?id={id}:
+    get:
+      summary: Get a product details by ID
       tags:
         - Product
-      requestBody:
-        required: true
-        content:
-          application/json:
-            schema:
-              $ref: '#/components/schemas/ProductReadRequest'
+      parameters:
+        - name: id
+          in: query
+          description: ID of the product to get
+          required: true
+          schema:
+            type: integer
+            example: 1
       responses:
         '200':
           description: Product found
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/ProductReadResponse'
+                $ref: '#/components/schemas/Product'
+        '400':
+          description: Bad Request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/BadRequest'
+
         '404':
           description: Product not found
           content:
             application/json:
               schema:
                 $ref: '#/components/schemas/NotFound'
-        
         '500':
           description: Internal server error
           content:
             application/json:
               schema:
                 $ref: '#/components/schemas/InternalServerError'
-  
-  /product/create:
+    delete:
+      summary: Delete a product
+      operationId: deleteProduct
+      tags:
+        - Product
+      parameters:
+        - name: id
+          in: query
+          description: ID of the product to delete
+          required: true
+          schema:
+            type: integer
+            example: 1
+      responses:
+        '200':
+          description: Product deleted successfully
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    example: "Product deleted successfully"
+
+        '403':
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Unauthorized'
+        '404':
+          description: Product Not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/NotFound'
+        '500':
+          description: Internal server error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/InternalServerError'
+
+  /product/searchRange?query={query}&startRank={startRank}&endRank={endRank}:
+    get:
+      summary: Search for products in a range
+      operationId: searchProducts
+      tags:
+        - Product
+      parameters:
+        - name: query
+          in: query
+          description: search query
+          required: true
+          schema:
+            type: string
+            example: iphone
+        - name: startRank
+          in: query
+          description: start index (index start from 1)
+          required: true
+          schema:
+            type: integer
+            example: 1
+        - name: endRank
+          in: query
+          description: end index
+          required: true
+          schema:
+              type: integer
+              example: 10
+      responses:
+        '200':
+          description: Search results
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ProductSearchRangeResponse'
+        '400':
+          description: Bad Request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/BadRequest'
+        '500':
+          description: Internal server error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/InternalServerError'
+
+  /product:
     post:
       summary: Create a new product
       operationId: createProduct
@@ -60,22 +158,24 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/ProductCreateResponse'
+                type: object
+                properties:
+                  message:
+                    type: string
+                    example: "Product created successfully"
         '403':
           description: Bad Request
           content:
             application/json:
               schema:
-                  $ref: '#/components/schemas/BadRequest'
+                $ref: '#/components/schemas/BadRequest'
         '500':
           description: Internal server error
           content:
             application/json:
               schema:
                 $ref: '#/components/schemas/InternalServerError'
-          
-  /product/update:
-    post:
+    put:
       summary: Update an existing product
       operationId: updateProduct
       tags:
@@ -92,58 +192,23 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/ProductUpdateResponse'
+                type: object
+                properties:
+                  message:
+                    type: string
+                    example: "Product updated successfully"
         '403':
           description: Unauthorized
           content:
             application/json:
               schema:
-                  $ref: '#/components/schemas/Forbidden'
+                $ref: '#/components/schemas/Unauthorized'
         '404':
           description: Product Not found
           content:
             application/json:
               schema:
-                  $ref: '#/components/schemas/NotFound'
-        '500':
-          description: Internal server error
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/InternalServerError'
-          
-  /product/delete:
-    post:
-      summary: Delete a product
-      operationId: deleteProduct
-      tags:
-        - Product
-      requestBody:
-        required: true
-        content:
-          application/json:
-            schema:
-              $ref: '#/components/schemas/ProductDeleteRequest'
-      responses:
-        '200':
-          description: Product deleted successfully
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/ProductDeleteResponse'
-        
-        '403':
-          description: Forbidden
-          content:
-            application/json:
-              schema:
-                  $ref: '#/components/schemas/Forbidden'
-        '404':
-          description: Product Not found
-          content:
-            application/json:
-              schema:
-                  $ref: '#/components/schemas/NotFound'
+                $ref: '#/components/schemas/NotFound'
         '500':
           description: Internal server error
           content:
@@ -151,71 +216,11 @@ paths:
               schema:
                 $ref: '#/components/schemas/InternalServerError'
 
-  /product/search:
-    post:
-      summary: Search for products
-      operationId: searchProducts
-      tags:
-        - Product
-      requestBody:
-        required: true
-        content:
-          application/json:
-            schema:
-              $ref: '#/components/schemas/ProductSearchRequest'
-      responses:
-        '200':
-          description: Search results
-          content:
-            application/json:
-              schema:
-                type: object
-                items:
-                  $ref: '#/components/schemas/ProductSearchResponse'
-        '400':
-          description: Bad Request
-          content:
-            application/json:
-              schema:
-                  $ref: '#/components/schemas/BadRequest'
-        '500':
-          description: Internal server error
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/InternalServerError'
+
+
 
 components:
   schemas:
-    ProductId:
-      type: object
-      properties:
-        id:
-          type: integer
-          example: 1
-  
-    ProductReadRequest:
-      type: object
-      properties:
-        id:
-          type: string
-          example: "unique-request-id"
-        method:
-          type: string
-          example: "GET"
-        path:
-          type: string
-          example: "/products/get"
-        headers:
-          type: object
-          additionalProperties:
-            type: string
-          example:
-            "header_1": "val_1"
-            "header_2": "val_1"
-        body:
-          $ref: '#/components/schemas/ProductId'
-          
     ImageDTO:
       type: object
       properties:
@@ -230,7 +235,7 @@ components:
     Product:
       type: object
       properties:
-        id:
+        productId:
           type: integer
           example: 123
         ownerId:
@@ -267,61 +272,76 @@ components:
         description:
           type: string
           example: "This is a sample product description."
-  
-    ProductReadResponse:
-      type: object
-      properties:
-        ID:
-          type: string
-          description: Unique identifier for the response message
-          example: "unique-response-id"
-        Status:
-          type: integer
-          description: HTTP status code of the response
-          example: 200
-        Body:
-          $ref: '#/components/schemas/Product'
 
-    ProductCreationRequest:
+    ProductSearchRangeResponse:
       type: object
       properties:
-        id:
-          type: string
-          example: "unique-request-id"
-        method:
-          type: string
-          example: "POST"
-        path:
-          type: string
-          example: "/products/create"
-        headers:
-          type: object
-          additionalProperties:
-            type: string
-          example:
-            "header_1": "val_1"
-            "header_2": "val_1"
-        body:
-          $ref: '#/components/schemas/ProductCreate'
-    
-    ProductCreate:
+        products:
+          type: array
+          items:
+            $ref: '#/components/schemas/ProductSearch'
+          description: List of found products in the range
+        total_count:
+          type: integer
+          description: Total count of matched products
+          example: 100
+
+    ProductSearch:
       type: object
       properties:
+        productId:
+          type: integer
+          example: 2
         ownerId:
           type: integer
-          example: 123
+          example: 4
+        ownerUsername:
+          type: string
+          example: "john_doe"
         productName:
           type: string
-          example: "Sample Product"
+          example: "Apple watch"
         price:
           type: number
           format: double
-          example: 19.99
+          example: 499.99
         tags:
           type: array
           items:
             type: string
-          example: ["Tag1", "Tag2"]
+          example: [ "apple", "watch" ]
+        condition:
+          type: string
+          example: "New"
+        currentQuantity:
+          type: integer
+          example: 50
+        createdOn:
+          type: string
+          format: date-time
+          example: "2024-09-12 12:20:35.655023"
+        score:
+          type: number
+          format: float
+          example: 0.15
+        image:
+          $ref: '#/components/schemas/ImageDTO'
+
+    ProductCreationRequest:
+      type: object
+      properties:
+        productName:
+          type: string
+          example: "Apple Watch"
+        price:
+          type: number
+          format: double
+          example: 499.99
+        tags:
+          type: array
+          items:
+            type: string
+          example: ["apple", "watch"]
         condition:
           type: string
           example: "New"
@@ -329,74 +349,39 @@ components:
           type: array
           items:
             type: string
-          example: ["image_base64_string1", "image_base64_string2"]
+          example: ["/9j/4AAQSkZJRgABAQAAAQABAAD/2wBDAAoHBwkHBgoJG...", "/9j/4AAQSkZJRgABAQAAAQABAAD/2wBDAAoHBwkHBgoJG..."]
         totalQuantity:
           type: integer
-          example: 100
+          example: 10
         category:
           type: string
           example: "Electronics"
         description:
           type: string
-          example: "This is a sample product description."
-    
-    ProductCreateResponse:
-      type: object
-      properties:
-        ID:
-          type: string
-          description: Unique identifier for the response message
-          example: "unique-response-id"
-        Status:
-          type: integer
-          example: 200
-        Body:
-          type: string
-          example: "Product created successfully"
+          example: "Latest Apple Watch."
+
           
+
+        
+
     ProductUpdateRequest:
       type: object
       properties:
-        id:
-          type: string
-          example: "unique-request-id"
-        method:
-          type: string
-          example: "PUT"
-        path:
-          type: string
-          example: "/products/update"
-        headers:
-          type: object
-          additionalProperties:
-            type: string
-          example:
-            "header_1": "val_1"
-            "header_2": "val_1"
-        body:
-          $ref: '#/components/schemas/ProductUpdate'
-        
-    ProductUpdate:
-      type: object
-      properties:
-        id:
+        productId:
           type: integer
-          example: 123
-        ownerId:
-          type: integer
-          example: 456
+          example: 12
         productName:
           type: string
-          example: "Updated Product Name"
+          example: "Apple watch"
         price:
           type: number
           format: double
-          example: 29.99
+          example: 499.99
         tags:
           type: array
           items:
             type: string
-          example: ["tag1", "tag2"]
+          example: ["apple", "watch"]
         condition:
           type: string
           example: "Used"
@@ -409,220 +394,44 @@ components:
           type: array
           items:
             type: string
-          example: ["new_image_base64_string1", "new_image_base64_string2"]
+          example: ["/9j/4AAQSkZJRgABAQAAAQABAAD/2wBDAAoHBwkHBgoJG...", "/9j/4AAQSkZJRgABAQAAAQABAAD/2wBDAAoHBwkHBgoJG..."]
         totalQuantity:
-          type: integer
-          example: 80
-        category:
-          type: string
-          example: "Home Appliances"
-        description:
-          type: string
-          example: "This is an updated product description."
-          
-    ProductUpdateResponse:
-      type: object
-      properties:
-        ID:
-          type: string
-          description: Unique identifier for the response message
-          example: "unique-response-id"
-        Status:
-          type: integer
-          example: 200
-        Body:
-          type: string
-          example: "Product updated successfully"
-
-    ProductDeleteRequest:
-      type: object
-      properties:
-        id:
-          type: string
-          example: "unique-request-id"
-        method:
-          type: string
-          example: "DELETE"
-        path:
-          type: string
-          example: "/products/delete"
-        headers:
-          type: object
-          additionalProperties:
-            type: string
-          example:
-            "header_1": "val_1"
-            "header_2": "val_1"
-        body:
-          $ref: '#/components/schemas/ProductDelete'
-          
-    ProductDelete:
-      type: object
-      properties:
-        ownerId:
-          type: integer
-          example: 1
-        productId:
-          type: integer
-          example: 2
-          
-    ProductDeleteResponse:
-      type: object
-      properties:
-        ID:
-          type: string
-          description: Unique identifier for the response message
-          example: "unique-response-id"
-        Status:
-          type: integer
-          example: 200
-        Body:
-          type: string
-          example: "Product deleted successfully"
-          
-    ProductSearchRequest:
-      type: object
-      properties:
-        id:
-          type: string
-          example: "unique-request-id"
-        method:
-          type: string
-          example: "POST"
-        path:
-          type: string
-          example: "/products/search"
-        headers:
-          type: object
-          additionalProperties:
-            type: string
-          example:
-            "header_1": "val_1"
-            "header_2": "val_1"
-        body:
-          $ref: '#/components/schemas/ProductSearchQuery'
-          
-    ProductSearchQuery:
-      type: object
-      properties:
-        query:
-          type: string
-          example: "iphone"
-        numberOfResults:
           type: integer
           example: 10
-          
-    ProductSearchResponse:
-      type: object
-      properties:
-        ID:
-          type: string
-          description: Unique identifier for the response message
-          example: "unique-response-id"
-        Status:
-          type: integer
-          description: HTTP status code of the response
-          example: 200
-        Body:
-          $ref: '#/components/schemas/ProductSearch'
-    
-    ProductSearch:
-      type: object
-      properties:
-        id:
-          type: integer
-          example: 123
-        ownerId:
-          type: integer
-          example: 456
-        productName:
-          type: string
-          example: "Sample Product"
-        price:
-          type: number
-          format: double
-          example: 19.99
-        tags:
-          type: array
-          items:
-            type: string
-          example: ["Tag1", "Tag2"]
-        condition:
-          type: string
-          example: "New"
-        images:
-          type: array
-          items:
-            $ref: '#/components/schemas/ImageDTO'
-        totalQuantity:
-          type: integer
-          example: 100
         currentQuantity:
           type: integer
-          example: 50
-        categoryName:
+          example: 5
+        category:
           type: string
           example: "Electronics"
         description:
           type: string
-          example: "This is a sample product description."
-        score:
-          type: number
-          format: float
-          example: 4.5
+          example: "Latest Apple Watch."
 
     BadRequest:
       type: object
       properties:
-        ID:
-          type: string
-          description: Unique identifier for the response message
-          example: "unique-response-id"
-        Status:
-          type: integer
-          example: 400
-        Body:
+        message:
           type: string
           example: "Bad request"
-          
+
     NotFound:
       type: object
       properties:
-        ID:
+        message:
           type: string
-          description: Unique identifier for the response message
-          example: "unique-response-id"
-        Status:
-          type: integer
-          example: 404
-        Body:
-          type: string
-          example: "NotFound"
-          
+          example: "Product Not Found"
+
     InternalServerError:
       type: object
       properties:
-        ID:
-          type: string
-          description: Unique identifier for the response message
-          example: "unique-response-id"
-        Status:
-          type: integer
-          example: 500
-        Body:
+        message:
           type: string
           example: "Internal Server Error"
-          
-    Forbidden:
+
+    Unauthorized:
       type: object
       properties:
-        ID:
+        message:
           type: string
-          description: Unique identifier for the response message
-          example: "unique-response-id"
-        Status:
-          type: integer
-          example: 403
-        Body:
-          type: string
-          example: "Forbidden"
+          example: "Unauthorized"

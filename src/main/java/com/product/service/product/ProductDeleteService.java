@@ -1,5 +1,4 @@
 package com.product.service.product;
-
 import com.product.dto.ResponseMessageDTO;
 import com.product.entity.Product;
 import com.product.repository.ProductRepository;
@@ -24,7 +23,7 @@ public class ProductDeleteService {
 
         if (product.isPresent()) {
             if (!product.get().getOwnerId().equals(ownerId) && !isAdmin) {
-                return new ResponseMessageDTO(messageId, 403, "Forbidden");
+                return new ResponseMessageDTO(messageId, 403, "Unauthorized");
             }
             productRepository.deleteById(productId);
             pictureBlobStorageService.deleteDirectory(productId);

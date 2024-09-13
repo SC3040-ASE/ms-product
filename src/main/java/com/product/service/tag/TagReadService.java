@@ -1,5 +1,6 @@
 package com.product.service.tag;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.product.dto.ResponseMessageDTO;
 import com.product.dto.tag.TagReadRequestDTO;
 import com.product.dto.tag.TagReadResponseDTO;
@@ -9,19 +10,21 @@ import com.product.repository.CategoryRepository;
 import com.product.repository.TagRepository;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
 import java.util.Optional;
 
 @Service
 @RequiredArgsConstructor
+@Slf4j
 public class TagReadService {
     private final TagRepository tagRepository;
-
     private final TagMapper tagMapper;
+    private final ObjectMapper objectMapper;
 
     @Transactional
-    public ResponseMessageDTO readTag(String messageId, TagReadRequestDTO tagReadRequestDTO) {
+    public ResponseMessageDTO readTag(String messageId, TagReadRequestDTO tagReadRequestDTO) throws Exception {
         Optional<Tag> optionalTag;
         if (
             tagReadRequestDTO.getId() != null
@@ -54,9 +57,9 @@ public class TagReadService {
         }
 
         if (optionalTag.isPresent()) {
-            System.out.println("Mapping tag to DTO");
+            log.info("Mapping tag to DTO");
             TagReadResponseDTO tagReadResponseDTO = tagMapper.mapTagToTagDTO(optionalTag.get());
-            return new ResponseMessageDTO(messageId, 200, tagReadResponseDTO);
+            return new ResponseMessageDTO(messageId, 200, objectMapper.writeValueAsString(tagReadResponseDTO));
         } else {
             return new ResponseMessageDTO(messageId, 404, "Tag not found.");
         }

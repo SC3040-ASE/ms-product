@@ -1,12 +1,13 @@
 package com.product.repository;
 
 import com.product.Application;
-import com.product.dto.ProductSearchResponseDTO;
+import com.product.dto.product.ProductSearchResultDTO;
 import com.product.entity.Category;
 import com.product.entity.Product;
 import com.product.entity.Tag;
 import com.product.entity.User;
 import com.product.mapper.ProductMapper;
+import org.apache.commons.lang3.tuple.Pair;
 import org.junit.jupiter.api.*;
 
 import static org.junit.jupiter.api.Assertions.assertTrue;
@@ -170,20 +171,17 @@ public class ProductRepositoryTest {
         product.setDescription("The latest iPhone");
         Product savedProduct = productRepository.save(product);
 
-        List<Object[]> searchResults = productRepository.searchProducts("apple smartphone", 1);
+        List<Object[]> searchResults = productRepository.searchProductsRange("iphone", 1,2);
         Assertions.assertFalse(searchResults.isEmpty());
 
-        List<ProductSearchResponseDTO> searchResult = productMapper.mapToSearchResults(searchResults);
+        Pair<List<ProductSearchResultDTO>,Integer> result = productMapper.mapToSearchResults(searchResults);
+        List<ProductSearchResultDTO> searchResult = result.getKey();
         Assertions.assertFalse(searchResult.isEmpty());
-        Assertions.assertEquals(1, searchResult.size());
-        Assertions.assertEquals(savedProduct.getId(), searchResult.get(0).getId());
+        Assertions.assertEquals(savedProduct.getId(), searchResult.get(0).getProductId());
         Assertions.assertEquals(savedProduct.getProductName(), searchResult.get(0).getProductName());
         Assertions.assertEquals(savedProduct.getPrice(), searchResult.get(0).getPrice());
         Assertions.assertEquals(savedProduct.getCondition(), searchResult.get(0).getCondition());
-        Assertions.assertEquals(savedProduct.getTotalQuantity(), searchResult.get(0).getTotalQuantity());
         Assertions.assertEquals(savedProduct.getCurrentQuantity(), searchResult.get(0).getCurrentQuantity());
-        Assertions.assertEquals(savedProduct.getCategory().getCategoryName(), searchResult.get(0).getCategoryName());
-        Assertions.assertEquals(savedProduct.getDescription(), searchResult.get(0).getDescription());
     }
 
     @Test

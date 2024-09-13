@@ -43,11 +43,11 @@ public class TagService {
         return tagCreationService.createTag(messageId, tagCreationRequestDTO);
     }
 
-    public ResponseMessageDTO handleReadTag(String messageId, TagReadRequestDTO tagReadRequestDTO) {
+    public ResponseMessageDTO handleReadTag(String messageId, TagReadRequestDTO tagReadRequestDTO) throws Exception {
         return tagReadService.readTag(messageId, tagReadRequestDTO);
     }
 
-    public ResponseMessageDTO handleUpdateTag(String messageId, TagUpdateRequestDTO tagUpdateRequestDTO) {
+    public ResponseMessageDTO handleUpdateTag(String messageId, TagUpdateRequestDTO tagUpdateRequestDTO) throws Exception {
         return tagUpdateService.updateTag(messageId, tagUpdateRequestDTO);
     }
 
@@ -55,7 +55,7 @@ public class TagService {
         return tagDeleteService.deleteTag(messageId, tagDeleteRequestDTO);
     }
 
-    public ResponseMessageDTO handleSearchTag(String messageId, TagSearchRequestDTO tagSearchRequestDTO) {
+    public ResponseMessageDTO handleSearchTag(String messageId, TagSearchRequestDTO tagSearchRequestDTO) throws Exception {
         return tagSearchService.searchTag(messageId, tagSearchRequestDTO);
     }
 }
