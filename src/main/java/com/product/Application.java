@@ -27,14 +27,5 @@ public class Application {
         return "pong";
     }
 
-    @GetMapping("/api-docs.yaml")
-    public ResponseEntity<String> getApiDocs() throws IOException {
-        ClassPathResource resource = new ClassPathResource("docs/api-docs.yaml");
-        Path path = resource.getFile().toPath();
-        String content = Files.readString(path);
-        return ResponseEntity.ok()
-                .header("Content-Type", "application/yaml")
-                .body(content);
-    }
 }
 
