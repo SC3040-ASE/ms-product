@@ -4,6 +4,7 @@ import com.product.dto.image.ImageDTO;
 import lombok.Data;
 
 import java.math.BigDecimal;
+import java.sql.Timestamp;
 import java.util.List;
 
 @Data
@@ -17,6 +18,7 @@ public class ProductReadResponseDTO {
     private List<ImageDTO> images;
     private Integer totalQuantity;
     private Integer currentQuantity;
+    private Timestamp createdOn;
     private String categoryName;
     private String description;
 }
