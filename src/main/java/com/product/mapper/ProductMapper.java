@@ -87,6 +87,7 @@ public class ProductMapper {
         productReadResponseDTO.setCondition(product.getCondition());
         productReadResponseDTO.setImages(images);
         productReadResponseDTO.setTotalQuantity(product.getTotalQuantity());
+        productReadResponseDTO.setCreatedOn(product.getCreatedOn());
         productReadResponseDTO.setCategoryName(product.getCategory().getCategoryName());
         productReadResponseDTO.setDescription(product.getDescription());
 
