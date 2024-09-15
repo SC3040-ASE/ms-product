@@ -12,7 +12,6 @@ import org.springframework.messaging.MessageHandler;
 @Configuration
 @RequiredArgsConstructor
 public class OutboundConfiguration {
-
     private final PubSubConfiguration pubSubConfiguration;
 
     @Bean
@@ -25,5 +24,4 @@ public class OutboundConfiguration {
     public interface PubsubOutboundGateway {
         void sendToPubSub(String text);
     }
-
 }

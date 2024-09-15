@@ -39,9 +39,10 @@ public class InboundConfiguration {
 
     @Bean
     public PubSubInboundChannelAdapter messageChannelAdapter(
-        @Qualifier("pubsubInputChannel") MessageChannel inputChannel,
-        PubSubTemplate pubSubTemplate) {
-        PubSubInboundChannelAdapter adapter = new PubSubInboundChannelAdapter(pubSubTemplate, pubSubConfiguration.getSubscription());
+            @Qualifier("pubsubInputChannel") MessageChannel inputChannel,
+            PubSubTemplate pubSubTemplate) {
+        PubSubInboundChannelAdapter adapter = new PubSubInboundChannelAdapter(pubSubTemplate,
+                pubSubConfiguration.getSubscription());
         adapter.setOutputChannel(inputChannel);
         adapter.setAckMode(AckMode.MANUAL);
         return adapter;
@@ -67,18 +68,19 @@ public class InboundConfiguration {
                 String responsePayload = objectMapper.writeValueAsString(responseMessage);
                 // Do we need different topics for product / category / tag?
                 messagingGateway.sendToPubSub(responsePayload);
-
             } catch (Exception e) {
                 log.error("Error: {}", e.getMessage());
                 try {
-                    ResponseMessageDTO responseMessage = new ResponseMessageDTO(responseId, 500, "Internal server error");
+                    ResponseMessageDTO responseMessage = new ResponseMessageDTO(responseId, 500,
+                            "Internal server error");
                     String responsePayload = objectMapper.writeValueAsString(responseMessage);
                     messagingGateway.sendToPubSub(responsePayload);
                 } catch (Exception ex) {
                     log.error("Error: {}", ex.getMessage());
                 }
             } finally {
-                BasicAcknowledgeablePubsubMessage originalMessage = message.getHeaders().get(GcpPubSubHeaders.ORIGINAL_MESSAGE, BasicAcknowledgeablePubsubMessage.class);
+                BasicAcknowledgeablePubsubMessage originalMessage = message.getHeaders()
+                        .get(GcpPubSubHeaders.ORIGINAL_MESSAGE, BasicAcknowledgeablePubsubMessage.class);
                 originalMessage.ack();
             }
         };
@@ -87,7 +89,7 @@ public class InboundConfiguration {
     public ResponseMessageDTO handler(RequestMessageDTO requestMessage) throws Exception {
         String messagePath = requestMessage.getPath();
         ResponseMessageDTO responseMessageDTO;
-        if (messagePath.contains("product")) {
+        if (messagePath.contains("products")) {
             log.info("Going to product.");
             responseMessageDTO = handleProductRequests(requestMessage);
         } else if (messagePath.contains("category")) {
@@ -106,7 +108,7 @@ public class InboundConfiguration {
     public ResponseMessageDTO handleProductRequests(RequestMessageDTO requestMessageDTO) throws Exception {
         log.info("Handling product request: {}", requestMessageDTO);
         ResponseMessageDTO responseMessageDTO;
-        Map<String,String> headers = requestMessageDTO.getHeaders();
+        Map<String, String> headers = requestMessageDTO.getHeaders();
         String body = requestMessageDTO.getBody();
         Integer ownerId = objectMapper.readValue(headers.get("X-User-Id"), Integer.class);
         Boolean isAdmin = objectMapper.readValue(headers.get("X-Is-Admin"), Boolean.class);
@@ -114,8 +116,8 @@ public class InboundConfiguration {
         switch (requestMessageDTO.getMethod()) {
             case "GET":
                 switch (requestMessageDTO.getPath()) {
-                    case "/product":
-                        if(!headers.containsKey("X-id")){
+                    case "/products":
+                        if (!headers.containsKey("X-id")) {
                             log.info("Missing id");
                             responseMessageDTO = new ResponseMessageDTO(requestMessageDTO.getId(), 400, "Bad request");
                             break;
@@ -123,8 +125,9 @@ public class InboundConfiguration {
                         Integer readProductId = objectMapper.readValue(headers.get("X-id"), Integer.class);
                         responseMessageDTO = productService.handleReadProduct(requestMessageDTO.getId(), readProductId);
                         break;
-                    case "/product/searchRange":
-                        if(!headers.containsKey("X-query") || !headers.containsKey("X-startRank") || !headers.containsKey("X-endRank")){
+                    case "/products/searchRange":
+                        if (!headers.containsKey("X-query") || !headers.containsKey("X-startRank")
+                                || !headers.containsKey("X-endRank")) {
                             log.info("Missing query, startRank or endRank");
                             responseMessageDTO = new ResponseMessageDTO(requestMessageDTO.getId(), 400, "Bad Request");
                             break;
@@ -132,7 +135,8 @@ public class InboundConfiguration {
                         String searchRangeQuery = objectMapper.readValue(headers.get("X-query"), String.class);
                         Integer startRank = objectMapper.readValue(headers.get("X-startRank"), Integer.class);
                         Integer endRank = objectMapper.readValue(headers.get("X-endRank"), Integer.class);
-                        responseMessageDTO = productService.handleSearchRangeProduct(requestMessageDTO.getId(), searchRangeQuery, startRank, endRank);
+                        responseMessageDTO = productService.handleSearchRangeProduct(requestMessageDTO.getId(),
+                                searchRangeQuery, startRank, endRank);
                         break;
                     default:
                         log.warn("Unknown message path: {}", requestMessageDTO.getPath());
@@ -141,27 +145,31 @@ public class InboundConfiguration {
                 }
                 break;
             case "POST":
-                ProductCreationRequestDTO productCreationRequestDTO = objectMapper.readValue(requestMessageDTO.getBody(), ProductCreationRequestDTO.class);
+                ProductCreationRequestDTO productCreationRequestDTO = objectMapper
+                        .readValue(requestMessageDTO.getBody(), ProductCreationRequestDTO.class);
                 productCreationRequestDTO.setOwnerId(ownerId);
                 log.info("Received product: {}", productCreationRequestDTO);
-                responseMessageDTO = productService.handleCreateProduct(requestMessageDTO.getId(), productCreationRequestDTO);
+                responseMessageDTO = productService.handleCreateProduct(requestMessageDTO.getId(),
+                        productCreationRequestDTO);
                 break;
             case "PUT":
-                ProductUpdateRequestDTO productUpdate = objectMapper.readValue(requestMessageDTO.getBody(), ProductUpdateRequestDTO.class);
+                ProductUpdateRequestDTO productUpdate = objectMapper.readValue(requestMessageDTO.getBody(),
+                        ProductUpdateRequestDTO.class);
                 productUpdate.setOwnerId(ownerId);
                 productUpdate.setIsAdmin(isAdmin);
                 log.info("Received product update: {}", productUpdate);
                 responseMessageDTO = productService.handleUpdateProduct(requestMessageDTO.getId(), productUpdate);
                 break;
             case "DELETE":
-                if(!headers.containsKey("X-id")){
+                if (!headers.containsKey("X-id")) {
                     log.info("Missing id");
                     responseMessageDTO = new ResponseMessageDTO(requestMessageDTO.getId(), 400, "Bad request");
                     break;
                 }
                 Integer deleteProductId = objectMapper.readValue(headers.get("X-id"), Integer.class);
                 log.info("Received delete request for product with id: {}", deleteProductId);
-                responseMessageDTO = productService.handleDeleteProduct(requestMessageDTO.getId(), deleteProductId, ownerId, isAdmin);
+                responseMessageDTO = productService.handleDeleteProduct(requestMessageDTO.getId(), deleteProductId,
+                        ownerId, isAdmin);
                 break;
             default:
                 log.warn("Unknown message type: {}", requestMessageDTO.getMethod());
@@ -179,68 +187,59 @@ public class InboundConfiguration {
                     case "/category/search":
                         log.info("Read body into Category Search Request");
                         CategorySearchRequestDTO categorySearchRequestDTO = objectMapper.readValue(
-                            requestMessageDTO.getBody(),
-                            CategorySearchRequestDTO.class
-                        );
+                                requestMessageDTO.getBody(),
+                                CategorySearchRequestDTO.class);
                         log.info("Received Search Request: {}", categorySearchRequestDTO.getQuery());
                         responseMessageDTO = categoryService.handleSearchCategory(
-                            requestMessageDTO.getId(),
-                            categorySearchRequestDTO
-                        );
+                                requestMessageDTO.getId(),
+                                categorySearchRequestDTO);
                         break;
                     case "/category":
                         log.info("Read body into Category Read Request");
                         CategoryReadRequestDTO categoryReadRequestDTO = objectMapper.readValue(
-                            requestMessageDTO.getBody(),
-                            CategoryReadRequestDTO.class
-                        );
+                                requestMessageDTO.getBody(),
+                                CategoryReadRequestDTO.class);
                         log.info("Received Read Request for category: {}", categoryReadRequestDTO.getCategoryName());
                         responseMessageDTO = categoryService.handleReadCategory(
-                            requestMessageDTO.getId(),
-                            categoryReadRequestDTO
-                        );
+                                requestMessageDTO.getId(),
+                                categoryReadRequestDTO);
                         break;
                     default:
                         log.warn("Unknown message path: {}", requestMessageDTO.getPath());
-                        responseMessageDTO = new ResponseMessageDTO(requestMessageDTO.getId(), 404, "Unknown message path.");
+                        responseMessageDTO = new ResponseMessageDTO(requestMessageDTO.getId(), 404,
+                                "Unknown message path.");
                         break;
                 }
                 break;
             case "POST":
                 log.info("Read body into Category Create Request");
                 CategoryCreationRequestDTO categoryCreationRequestDTO = objectMapper.readValue(
-                    requestMessageDTO.getBody(),
-                    CategoryCreationRequestDTO.class
-                );
+                        requestMessageDTO.getBody(),
+                        CategoryCreationRequestDTO.class);
                 log.info("Received Create Request for category: {}", categoryCreationRequestDTO.getCategoryName());
                 responseMessageDTO = categoryService.handleCreateCategory(
-                    requestMessageDTO.getId(),
-                    categoryCreationRequestDTO
-                );
+                        requestMessageDTO.getId(),
+                        categoryCreationRequestDTO);
                 break;
             case "PUT":
                 log.info("Read body into Category Update Request");
                 CategoryUpdateRequestDTO categoryUpdateRequestDTO = objectMapper.readValue(
-                    requestMessageDTO.getBody(),
-                    CategoryUpdateRequestDTO.class
-                );
+                        requestMessageDTO.getBody(),
+                        CategoryUpdateRequestDTO.class);
                 log.info("Received Update Request for category: {}", categoryUpdateRequestDTO.getCategoryName());
                 responseMessageDTO = categoryService.handleUpdateCategory(
-                    requestMessageDTO.getId(),
-                    categoryUpdateRequestDTO
-                );
+                        requestMessageDTO.getId(),
+                        categoryUpdateRequestDTO);
                 break;
             case "DELETE":
                 log.info("Read body into Category Delete Request");
                 CategoryDeleteRequestDTO categoryDeleteRequestDTO = objectMapper.readValue(
-                    requestMessageDTO.getBody(),
-                    CategoryDeleteRequestDTO.class
-                );
+                        requestMessageDTO.getBody(),
+                        CategoryDeleteRequestDTO.class);
                 log.info("Received Delete Request for category: {}", categoryDeleteRequestDTO.getCategoryName());
                 responseMessageDTO = categoryService.handleDeleteCategory(
-                    requestMessageDTO.getId(),
-                    categoryDeleteRequestDTO
-                );
+                        requestMessageDTO.getId(),
+                        categoryDeleteRequestDTO);
                 break;
             default:
                 log.warn("Unknown message type: {}", requestMessageDTO.getMethod());
@@ -258,68 +257,59 @@ public class InboundConfiguration {
                     case "/tag/search":
                         log.info("Read body into Tag Search Request");
                         TagSearchRequestDTO tagSearchRequestDTO = objectMapper.readValue(
-                            requestMessageDTO.getBody(),
-                            TagSearchRequestDTO.class
-                        );
+                                requestMessageDTO.getBody(),
+                                TagSearchRequestDTO.class);
                         log.info("Received Search Request: {}", tagSearchRequestDTO.getQuery());
                         responseMessageDTO = tagService.handleSearchTag(
-                            requestMessageDTO.getId(),
-                            tagSearchRequestDTO
-                        );
+                                requestMessageDTO.getId(),
+                                tagSearchRequestDTO);
                         break;
                     case "/tag":
                         log.info("Read body into Tag Read Request");
                         TagReadRequestDTO tagReadRequestDTO = objectMapper.readValue(
-                            requestMessageDTO.getBody(),
-                            TagReadRequestDTO.class
-                        );
+                                requestMessageDTO.getBody(),
+                                TagReadRequestDTO.class);
                         log.info("Received Read Request for tag: {}", tagReadRequestDTO.getTagName());
                         responseMessageDTO = tagService.handleReadTag(
-                            requestMessageDTO.getId(),
-                            tagReadRequestDTO
-                        );
+                                requestMessageDTO.getId(),
+                                tagReadRequestDTO);
                         break;
                     default:
                         log.warn("Unknown message path: {}", requestMessageDTO.getPath());
-                        responseMessageDTO = new ResponseMessageDTO(requestMessageDTO.getId(), 404, "Unknown message path.");
+                        responseMessageDTO = new ResponseMessageDTO(requestMessageDTO.getId(), 404,
+                                "Unknown message path.");
                         break;
                 }
                 break;
             case "POST":
                 log.info("Read body into Tag Create Request");
                 TagCreationRequestDTO tagCreationRequestDTO = objectMapper.readValue(
-                    requestMessageDTO.getBody(),
-                    TagCreationRequestDTO.class
-                );
+                        requestMessageDTO.getBody(),
+                        TagCreationRequestDTO.class);
                 log.info("Received Create Request for tag: {}", tagCreationRequestDTO.getTagName());
                 responseMessageDTO = tagService.handleCreateTag(
-                    requestMessageDTO.getId(),
-                    tagCreationRequestDTO
-                );
+                        requestMessageDTO.getId(),
+                        tagCreationRequestDTO);
                 break;
             case "PUT":
                 log.info("Read body into Tag Update Request");
                 TagUpdateRequestDTO tagUpdateRequestDTO = objectMapper.readValue(
-                    requestMessageDTO.getBody(),
-                    TagUpdateRequestDTO.class
-                );
+                        requestMessageDTO.getBody(),
+                        TagUpdateRequestDTO.class);
                 log.info("Received Update Request for tag: {}", tagUpdateRequestDTO.getTagName());
                 responseMessageDTO = tagService.handleUpdateTag(
-                    requestMessageDTO.getId(),
-                    tagUpdateRequestDTO
-                );
+                        requestMessageDTO.getId(),
+                        tagUpdateRequestDTO);
                 break;
             case "DELETE":
                 log.info("Read body into Tag Delete Request");
                 TagDeleteRequestDTO tagDeleteRequestDTO = objectMapper.readValue(
-                    requestMessageDTO.getBody(),
-                    TagDeleteRequestDTO.class
-                );
+                        requestMessageDTO.getBody(),
+                        TagDeleteRequestDTO.class);
                 log.info("Received Delete Request for tag: {}", tagDeleteRequestDTO.getTagName());
                 responseMessageDTO = tagService.handleDeleteTag(
-                    requestMessageDTO.getId(),
-                    tagDeleteRequestDTO
-                );
+                        requestMessageDTO.getId(),
+                        tagDeleteRequestDTO);
                 break;
             default:
                 log.warn("Unknown message type: {}", requestMessageDTO.getMethod());
