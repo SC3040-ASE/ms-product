@@ -1,0 +1,414 @@
+swagger: "2.0"
+info:
+  title: Product API
+  description: API for managing and searching products
+  version: 1.0.0
+
+host: localhost:8001
+basePath: /products
+schemes:
+  - http
+
+tags:
+  - name: Products
+    description: The product service API
+
+definitions:
+  ImageDTO:
+    type: object
+    properties:
+      imageName:
+        type: string
+        example: "image_name_1"
+      imageBase64:
+        format: byte
+        description: Base64 encoded image string
+        example: "/9j/4AAQSkZJRgABAQAAAQABAAD/2wBDAAoHBwkHBgoJG..."
+
+  Product:
+    type: object
+    properties:
+      productId:
+        type: integer
+        example: 123
+      ownerId:
+        type: integer
+        example: 456
+      productName:
+        type: string
+        example: "Sample Product"
+      price:
+        type: number
+        format: double
+        example: 19.99
+      tags:
+        type: array
+        items:
+          type: string
+        example: ["Tag1", "Tag2"]
+      condition:
+        type: string
+        example: "New"
+      images:
+        type: array
+        items:
+          $ref: "#/definitions/ImageDTO"
+      totalQuantity:
+        type: integer
+        example: 100
+      currentQuantity:
+        type: integer
+        example: 50
+      createdOn:
+        tupe: string
+        format: date-time
+        example: "2024-09-12 12:20:35.655023"
+      categoryName:
+        type: string
+        example: "Electronics"
+      description:
+        type: string
+        example: "This is a sample product description."
+
+  ProductSearchRangeResponse:
+    type: object
+    properties:
+      products:
+        type: array
+        items:
+          $ref: "#/definitions/ProductSearch"
+        description: List of found products in the range
+      total_count:
+        type: integer
+        description: Total count of matched products
+        example: 100
+
+  ProductSearch:
+    type: object
+    properties:
+      productId:
+        type: integer
+        example: 2
+      ownerId:
+        type: integer
+        example: 4
+      ownerUsername:
+        type: string
+        example: "john_doe"
+      productName:
+        type: string
+        example: "Apple watch"
+      price:
+        type: number
+        format: double
+        example: 499.99
+      tags:
+        type: array
+        items:
+          type: string
+        example: ["apple", "watch"]
+      condition:
+        type: string
+        example: "New"
+      currentQuantity:
+        type: integer
+        example: 50
+      createdOn:
+        type: string
+        format: date-time
+        example: "2024-09-12 12:20:35.655023"
+      score:
+        type: number
+        format: float
+        example: 0.15
+      image:
+        $ref: "#/definitions/ImageDTO"
+
+  ProductCreationRequest:
+    type: object
+    properties:
+      productName:
+        type: string
+        example: "Apple Watch"
+      price:
+        type: number
+        format: double
+        example: 499.99
+      tags:
+        type: array
+        items:
+          type: string
+        example: ["apple", "watch"]
+      condition:
+        type: string
+        example: "New"
+      imageBase64List:
+        type: array
+        items:
+          type: string
+        example:
+          [
+            "/9j/4AAQSkZJRgABAQAAAQABAAD/2wBDAAoHBwkHBgoJG...",
+            "/9j/4AAQSkZJRgABAQAAAQABAAD/2wBDAAoHBwkHBgoJG...",
+          ]
+      totalQuantity:
+        type: integer
+        example: 10
+      category:
+        type: string
+        example: "Electronics"
+      description:
+        type: string
+        example: "Latest Apple Watch."
+
+  ProductUpdateRequest:
+    type: object
+    properties:
+      productId:
+        type: integer
+        example: 12
+      productName:
+        type: string
+        example: "Apple watch"
+      price:
+        type: number
+        format: double
+        example: 499.99
+      tags:
+        type: array
+        items:
+          type: string
+        example: ["apple", "watch"]
+      condition:
+        type: string
+        example: "Used"
+      deleteImageList:
+        type: array
+        items:
+          type: string
+        example: ["image_name_to_delete_1", "image_name_to_delete_2"]
+      newImageBase64List:
+        type: array
+        items:
+          type: string
+        example:
+          [
+            "/9j/4AAQSkZJRgABAQAAAQABAAD/2wBDAAoHBwkHBgoJG...",
+            "/9j/4AAQSkZJRgABAQAAAQABAAD/2wBDAAoHBwkHBgoJG...",
+          ]
+      totalQuantity:
+        type: integer
+        example: 10
+      currentQuantity:
+        type: integer
+        example: 5
+      category:
+        type: string
+        example: "Electronics"
+      description:
+        type: string
+        example: "Latest Apple Watch."
+
+  BadRequest:
+    type: object
+    properties:
+      message:
+        type: string
+        example: "Bad request"
+
+  NotFound:
+    type: object
+    properties:
+      message:
+        type: string
+        example: "Product Not Found"
+
+  InternalServerError:
+    type: object
+    properties:
+      message:
+        type: string
+        example: "Internal Server Error"
+
+  Unauthorized:
+    type: object
+    properties:
+      message:
+        type: string
+        example: "Unauthorized"
+
+paths:
+  /products:
+    get:
+      summary: Get product details
+      description: Get product details by ID
+      tags:
+        - Products
+      parameters:
+        - name: id
+          in: query
+          description: ID of the product to get
+          required: true
+          schema:
+            type: integer
+            example: 1
+      responses:
+        200:
+          description: Product found
+          schema:
+            $ref: "#/definitions/Product"
+        400:
+          description: Bad Request
+          schema:
+            $ref: "#/definitions/BadRequest"
+
+        404:
+          description: Product not found
+          schema:
+            $ref: "#/definitions/NotFound"
+        500:
+          description: Internal server error
+          schema:
+            $ref: "#/definitions/InternalServerError"
+
+    delete:
+      summary: Delete product
+      description: Delete a product by ID
+      tags:
+        - Products
+      parameters:
+        - name: id
+          in: query
+          description: ID of the product to delete
+          required: true
+          schema:
+            type: integer
+            example: 1
+      responses:
+        200:
+          description: Product deleted successfully
+          schema:
+            type: object
+            properties:
+              message:
+                type: string
+                example: "Product deleted successfully"
+
+        403:
+          description: Unauthorized
+          schema:
+            $ref: "#/definitions/Unauthorized"
+        404:
+          description: Product Not found
+          schema:
+            $ref: "#/definitions/NotFound"
+        500:
+          description: Internal server error
+          schema:
+            $ref: "#/definitions/InternalServerError"
+
+    post:
+      summary: Create product
+      description: Create a new product
+      tags:
+        - Products
+      parameters:
+        - in: body
+          name: product
+          description: Product to create
+          required: true
+          schema:
+            $ref: "#/definitions/ProductCreationRequest"
+      responses:
+        201:
+          description: Product created successfully
+          schema:
+            type: object
+            properties:
+              message:
+                type: string
+                example: "Product created successfully"
+        403:
+          description: Bad Request
+          schema:
+            $ref: "#/definitions/BadRequest"
+        500:
+          description: Internal server error
+          schema:
+            $ref: "#/definitions/InternalServerError"
+
+    put:
+      summary: Update product
+      description: Update an existing product
+      tags:
+        - Products
+      parameters:
+        - in: body
+          name: product
+          description: Product to update
+          required: true
+          schema:
+            $ref: "#/definitions/ProductUpdateRequest"
+      responses:
+        200:
+          description: Product updated successfully
+          schema:
+            type: object
+            properties:
+              message:
+                type: string
+                example: "Product updated successfully"
+        403:
+          description: Unauthorized
+          schema:
+            $ref: "#/definitions/Unauthorized"
+        404:
+          description: Product Not found
+          schema:
+            $ref: "#/definitions/NotFound"
+        500:
+          description: Internal server error
+          schema:
+            $ref: "#/definitions/InternalServerError"
+
+  /products/searchRange:
+    get:
+      summary: Search for products
+      description: Search for products in a range
+      tags:
+        - Products
+      parameters:
+        - name: query
+          in: query
+          description: search query
+          required: true
+          schema:
+            type: string
+            example: iphone
+        - name: startRank
+          in: query
+          description: start index (index start from 1)
+          required: true
+          schema:
+            type: integer
+            example: 1
+        - name: endRank
+          in: query
+          description: end index
+          required: true
+          schema:
+            type: integer
+            example: 10
+      responses:
+        200:
+          description: Search results
+          schema:
+            $ref: "#/definitions/ProductSearchRangeResponse"
+        400:
+          description: Bad Request
+          schema:
+            $ref: "#/definitions/BadRequest"
+        500:
+          description: Internal server error
+          schema:
+            $ref: "#/definitions/InternalServerError"
