@@ -22,8 +22,8 @@ FROM openjdk:17-jdk-alpine
 # Set the working directory
 WORKDIR /app
 
-# Expose the port your application is running on
-EXPOSE 8080
+# Install curl
+RUN apk add --no-cache curl
 
 # Copy the JAR file from the build stage
 COPY --from=MAVEN_BUILD /build/target/*.jar app.jar
