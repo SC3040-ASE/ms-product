@@ -37,4 +37,8 @@ public class ProductService {
         return productSearchRangeService.searchRangeProduct(messageId, query, startRank, endRank);
     }
 
+    public void handleUpdateProductQuantity(Integer productId, Integer quantityDiff) {
+        productUpdateService.updateProductQuantity(productId, quantityDiff);
+    }
+
 }
