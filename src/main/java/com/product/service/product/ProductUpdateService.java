@@ -35,6 +35,7 @@ public class ProductUpdateService {
         Optional<Product> product = productRepository.findById(productUpdateRequestDTO.getProductId());
 
         if (product.isPresent()) {
+            
             if (!product.get().getOwnerId().equals(productUpdateRequestDTO.getOwnerId()) && !productUpdateRequestDTO.getIsAdmin()) {
                 return new ResponseMessageDTO(messageId, 403, "Forbidden");
             }
