@@ -13,6 +13,8 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Optional;
 
 @Service
@@ -22,6 +24,17 @@ public class TagReadService {
     private final TagRepository tagRepository;
     private final TagMapper tagMapper;
     private final ObjectMapper objectMapper;
+
+
+    @Transactional
+    public List<Tag> fetchTags (List<Integer> tagIDs) {
+        List<Tag> tags = new ArrayList<>();
+        for(Integer id: tagIDs){
+            tags.add(tagRepository.findById(id).orElse(null));
+        }
+        return tags;
+    }
+
 
     @Transactional
     public ResponseMessageDTO readTag(String messageId, TagReadRequestDTO tagReadRequestDTO) throws Exception {

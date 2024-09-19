@@ -58,4 +58,8 @@ public class TagService {
     public ResponseMessageDTO handleSearchTag(String messageId, TagSearchRequestDTO tagSearchRequestDTO) throws Exception {
         return tagSearchService.searchTag(messageId, tagSearchRequestDTO);
     }
+
+    public List<Tag> fetchTags(List<Integer> tagIDs) {
+        return tagReadService.fetchTags(tagIDs);
+    }
 }
