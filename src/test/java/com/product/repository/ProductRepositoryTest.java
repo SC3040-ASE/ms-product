@@ -7,7 +7,6 @@ import com.product.entity.Product;
 import com.product.entity.Tag;
 import com.product.entity.User;
 import com.product.mapper.ProductMapper;
-import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.tuple.Pair;
 import org.junit.jupiter.api.*;
 
