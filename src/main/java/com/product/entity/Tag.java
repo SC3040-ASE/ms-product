@@ -30,8 +30,6 @@ public class Tag {
     @ManyToMany(mappedBy = "tags", fetch = FetchType.LAZY)
     private List<Product> products;
 
-
-
     public Tag(String tagName) {
         this.tagName = tagName;
     }

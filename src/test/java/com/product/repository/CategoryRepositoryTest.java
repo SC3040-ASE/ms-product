@@ -29,9 +29,6 @@ public class CategoryRepositoryTest {
     private CategoryRepository categoryRepository;
 
     private Category cat1;
-    private Category cat2;
-    private Category cat3;
-    private Category cat4;
 
     public List<Product> createProducts(String productString) throws Exception {
         List<Product> catProducts = new ArrayList<>();
@@ -50,84 +47,43 @@ public class CategoryRepositoryTest {
     @BeforeAll
     public void setup() throws Exception {
         cat1 = new Category();
-        cat1.setCategoryName("homework");
-
-        cat2 = new Category();
-        cat2.setCategoryName("electronics");
-
-        cat3 = new Category();
-        cat3.setCategoryName("clothes");
-
-        cat4 = new Category();
-        cat4.setCategoryName("animal");
-
-        log.info("Before");
-        log.info("cat1: " + cat1);
-        log.info("cat2: " + cat2);
-        log.info("cat3: " + cat3);
-        log.info("cat4: " + cat4);
+        cat1.setCategoryName("testCat1");
 
         Category savedCat1 = categoryRepository.saveAndFlush(cat1);
-        Category savedCat4 = categoryRepository.saveAndFlush(cat4);
-        log.info("After");
-        log.info("cat1: " + savedCat1);
-        log.info("cat4: " + savedCat4);
     }
 
     @AfterAll
     public void tearDown() {
-        categoryRepository.deleteAll();
+        categoryRepository.delete(cat1);
     }
 
     @Test
     @DisplayName("Test create category")
     @Rollback(value = false)
     public void CreateCategoryTest() {
-        log.info("cat1: " + cat1);
-        log.info("cat2: " + cat2);
-        log.info("cat3: " + cat3);
+        Category createCat = new Category();
+        createCat.setCategoryName("testCat2");
+        categoryRepository.saveAndFlush(createCat);
 
-        Category savedCat2 = categoryRepository.saveAndFlush(cat2);
-        Category savedCat3 = categoryRepository.saveAndFlush(cat3);
+        Optional<Category> findCreatedCategory = categoryRepository.findById(createCat.getId());
 
-        log.info("savedCat2: " + savedCat2);
-        log.info("savedCat3: " + savedCat3);
+        Assertions.assertTrue(findCreatedCategory.isPresent());
+        Category createdCategory = findCreatedCategory.get();
+        Assertions.assertNotNull(createdCategory.getId());
+        Assertions.assertEquals(createCat.getCategoryName(), createdCategory.getCategoryName());
 
-        Assertions.assertNotNull(savedCat2);
-        Assertions.assertNotNull(savedCat3);
-
-        Assertions.assertNotNull(savedCat2.getId());
-        Assertions.assertNotNull(savedCat3.getId());
-
-        Assertions.assertEquals(cat2.getCategoryName(), savedCat2.getCategoryName());
-        Assertions.assertEquals(cat3.getCategoryName(), savedCat3.getCategoryName());
-        categoryRepository.delete(cat2);
-        categoryRepository.delete(cat3);
+        categoryRepository.delete(createdCategory);
     }
 
 
     @Test
     @DisplayName("Test read category")
     public void ReadCategoryTest() {
-        Category savedCat2 = categoryRepository.saveAndFlush(cat2);
-        Category savedCat3 = categoryRepository.saveAndFlush(cat3);
         Optional<Category> optionalCategory1 = categoryRepository.findByName(cat1.getCategoryName());
-        Optional<Category> optionalCategory2 = categoryRepository.findByName(cat2.getCategoryName());
-        Optional<Category> optionalCategory3 = categoryRepository.findByName(cat3.getCategoryName());
 
         Assertions.assertTrue(optionalCategory1.isPresent());
-        Assertions.assertTrue(optionalCategory2.isPresent());
-        Assertions.assertTrue(optionalCategory3.isPresent());
-
         Assertions.assertNotNull(optionalCategory1.get().getId());
-        Assertions.assertNotNull(optionalCategory2.get().getId());
-        Assertions.assertNotNull(optionalCategory3.get().getId());
-
         Assertions.assertEquals(cat1.getCategoryName(), optionalCategory1.get().getCategoryName());
-        Assertions.assertEquals(cat2.getCategoryName(), optionalCategory2.get().getCategoryName());
-        Assertions.assertEquals(cat3.getCategoryName(), optionalCategory3.get().getCategoryName());
-        categoryRepository.delete(cat2);
-        categoryRepository.delete(cat3);
     }
 
 
@@ -138,28 +94,30 @@ public class CategoryRepositoryTest {
 
         Assertions.assertTrue(optionalCategory1.isPresent());
 
-        optionalCategory1.get().setCategoryName("classwork");
+        optionalCategory1.get().setCategoryName("updateCat");
 
         categoryRepository.save(optionalCategory1.get());
-        Optional<Category> savedOptionalCategory1 = categoryRepository.findByName("classwork");
+        Optional<Category> savedOptionalCategory1 = categoryRepository.findByName("updateCat");
 
         Assertions.assertTrue(savedOptionalCategory1.isPresent());
 
-        Assertions.assertEquals("classwork", savedOptionalCategory1.get().getCategoryName());
+        Assertions.assertEquals("updateCat", savedOptionalCategory1.get().getCategoryName());
     }
 
 
     @Test
     @DisplayName("Test delete category")
     public void DeleteCategoryTest() {
-        Optional<Category> optionalCategory4 = categoryRepository.findByName(cat4.getCategoryName());
+        Category deleteCat = new Category();
+        deleteCat.setCategoryName("deleteCat");
+        categoryRepository.saveAndFlush(deleteCat);
 
+        Optional<Category> optionalCategory4 = categoryRepository.findByName(deleteCat.getCategoryName());
         Assertions.assertTrue(optionalCategory4.isPresent());
 
         categoryRepository.deleteById(optionalCategory4.get().getId());
 
-        Optional<Category> deletedCategory4 = categoryRepository.findByName(cat4.getCategoryName());
-
+        Optional<Category> deletedCategory4 = categoryRepository.findByName(deleteCat.getCategoryName());
         Assertions.assertTrue(deletedCategory4.isEmpty());
     }
 }

@@ -6,13 +6,14 @@ import com.product.dto.tag.TagReadRequestDTO;
 import com.product.dto.tag.TagReadResponseDTO;
 import com.product.entity.Tag;
 import com.product.mapper.TagMapper;
-import com.product.repository.CategoryRepository;
 import com.product.repository.TagRepository;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Optional;
 
 @Service
@@ -24,34 +25,38 @@ public class TagReadService {
     private final ObjectMapper objectMapper;
 
     @Transactional
+    public List<Tag> fetchTags(List<Integer> tagIDs) {
+        List<Tag> tags = new ArrayList<>();
+        for (Integer id : tagIDs) {
+            tags.add(tagRepository.findById(id).orElse(null));
+        }
+
+        for (Tag tag : tags) {
+            log.info(tag.getTagName());
+        }
+        return tags;
+    }
+
+    @Transactional
     public ResponseMessageDTO readTag(String messageId, TagReadRequestDTO tagReadRequestDTO) throws Exception {
         Optional<Tag> optionalTag;
-        if (
-            tagReadRequestDTO.getId() != null
+        if (tagReadRequestDTO.getId() != null
                 && tagReadRequestDTO.getTagName() != null
                 && !tagReadRequestDTO.getTagName().isEmpty()
-                && tagReadRequestDTO.getCategory().getId() != null
-        ) {
+                && tagReadRequestDTO.getCategory().getId() != null) {
             optionalTag = tagRepository.findTagByAllParams(
-                tagReadRequestDTO.getId(),
-                tagReadRequestDTO.getTagName(),
-                tagReadRequestDTO.getCategory().getId()
-            );
-        } else if (
-            tagReadRequestDTO.getId() != null
+                    tagReadRequestDTO.getId(),
+                    tagReadRequestDTO.getTagName(),
+                    tagReadRequestDTO.getCategory().getId());
+        } else if (tagReadRequestDTO.getId() != null
                 && tagReadRequestDTO.getTagName() != null
-                && !tagReadRequestDTO.getTagName().isEmpty()
-        ) {
+                && !tagReadRequestDTO.getTagName().isEmpty()) {
             optionalTag = tagRepository.findByIdAndTagName(
-                tagReadRequestDTO.getId(),
-                tagReadRequestDTO.getTagName()
-            );
-        } else if (
-            tagReadRequestDTO.getId() != null
-        ) {
+                    tagReadRequestDTO.getId(),
+                    tagReadRequestDTO.getTagName());
+        } else if (tagReadRequestDTO.getId() != null) {
             optionalTag = tagRepository.findById(
-                tagReadRequestDTO.getId()
-            );
+                    tagReadRequestDTO.getId());
         } else {
             return new ResponseMessageDTO(messageId, 401, "Bad Request. Missing tag ID.");
         }

@@ -47,7 +47,8 @@ public class TagService {
         return tagReadService.readTag(messageId, tagReadRequestDTO);
     }
 
-    public ResponseMessageDTO handleUpdateTag(String messageId, TagUpdateRequestDTO tagUpdateRequestDTO) throws Exception {
+    public ResponseMessageDTO handleUpdateTag(String messageId, TagUpdateRequestDTO tagUpdateRequestDTO)
+            throws Exception {
         return tagUpdateService.updateTag(messageId, tagUpdateRequestDTO);
     }
 
@@ -55,7 +56,16 @@ public class TagService {
         return tagDeleteService.deleteTag(messageId, tagDeleteRequestDTO);
     }
 
-    public ResponseMessageDTO handleSearchTag(String messageId, TagSearchRequestDTO tagSearchRequestDTO) throws Exception {
+    public ResponseMessageDTO handleSearchTag(String messageId, TagSearchRequestDTO tagSearchRequestDTO)
+            throws Exception {
         return tagSearchService.searchTag(messageId, tagSearchRequestDTO);
+    }
+
+    public List<TagReadInternalResponseDTO> fetchTags(List<Integer> tagIDs) {
+        return tagReadService.fetchTags(tagIDs).stream().map(tag -> {
+            TagReadInternalResponseDTO tagReadInternalResponseDTO = TagReadInternalResponseDTO.builder().id(tag.getId())
+                    .tagName(tag.getTagName()).build();
+            return tagReadInternalResponseDTO;
+        }).collect(Collectors.toList());
     }
 }

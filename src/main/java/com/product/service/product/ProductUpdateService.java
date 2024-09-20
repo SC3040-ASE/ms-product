@@ -31,6 +31,19 @@ public class ProductUpdateService {
     private final PictureBlobStorageService pictureBlobStorageService;
 
     @Transactional
+    public void updateProductQuantity(Integer productId, Integer quantityDiff) {
+        Optional<Product> product = productRepository.findById(productId);
+        if (product.isPresent()) {
+            if(product.get().getCurrentQuantity() + quantityDiff < 0){
+                log.error("Product quantity cannot be negative");
+                return;
+            }
+            product.get().setCurrentQuantity(product.get().getCurrentQuantity()+quantityDiff);
+            productRepository.save(product.get());
+        }
+    }
+
+    @Transactional
     public ResponseMessageDTO updateProduct(String messageId, ProductUpdateRequestDTO productUpdateRequestDTO) {
         Optional<Product> product = productRepository.findById(productUpdateRequestDTO.getProductId());
 
