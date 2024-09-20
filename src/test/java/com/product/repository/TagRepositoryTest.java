@@ -27,75 +27,53 @@ public class TagRepositoryTest {
     @Autowired
     private CategoryRepository categoryRepository;
     private Tag tag1;
-    private Tag tag2;
-    private Tag tag3;
+    private Category mainCat;
 
     @BeforeAll
     public void setup() throws Exception {
-        Category mainCat = new Category();
-        mainCat.setCategoryName("FakeAnimal");
-        Category savedCat = categoryRepository.save(mainCat);
+        mainCat = new Category();
+        mainCat.setCategoryName("testCat");
+        Category savedCat = categoryRepository.saveAndFlush(mainCat);
 
         tag1 = new Tag();
-        tag1.setTagName("fakedoggie");
+        tag1.setTagName("testTag1");
         tag1.setCategory(mainCat);
 
-        tag2 = new Tag();
-        tag2.setTagName("fakecat");
-        tag2.setCategory(mainCat);
-
-        tag3 = new Tag();
-        tag3.setTagName("rabbit");
-        tag3.setCategory(mainCat);
-
-        log.info("Before");
-        log.info("Category: " + savedCat);
-        log.info("tag1: " + tag1);
-        log.info("tag2: " + tag2);
-        log.info("tag3: " + tag3);
-
         tag1 = tagRepository.saveAndFlush(tag1);
-        tag3 = tagRepository.saveAndFlush(tag3);
-        log.info("After");
-        log.info("tag1: " + tag1);
-        log.info("tag3: " + tag3);
     }
 
     @AfterAll
     public void tearDown() {
-        tagRepository.deleteAll();
-        categoryRepository.deleteAll();
+        tagRepository.delete(tag1);
+        categoryRepository.delete(mainCat);
     }
 
     @Test
     @DisplayName("Test create tag")
     @Rollback(value = false)
     public void CreateTagTest() {
-        Tag savedTag2 = tagRepository.saveAndFlush(tag2);
+        Tag newTag = new Tag();
+        newTag.setTagName("newTag");
+        newTag.setCategory(mainCat);
+
+        Tag savedTag2 = tagRepository.saveAndFlush(newTag);
 
         Assertions.assertNotNull(savedTag2);
         Assertions.assertNotNull(savedTag2.getId());
-        Assertions.assertEquals(savedTag2.getTagName(), tag2.getTagName());
-        tagRepository.delete(tag2);
+        Assertions.assertEquals(savedTag2.getTagName(), newTag.getTagName());
+
+        tagRepository.delete(newTag);
     }
 
     @Test
     @DisplayName("Test read tag")
     public void ReadTagTest() {
-        Tag savedTag2 = tagRepository.saveAndFlush(tag2);
         Optional<Tag> optionalTag1 = tagRepository.findById(tag1.getId());
-        Optional<Tag> optionalTag2 = tagRepository.findById(tag2.getId());
 
         Assertions.assertTrue(optionalTag1.isPresent());
-        Assertions.assertTrue(optionalTag2.isPresent());
-
         Assertions.assertNotNull(optionalTag1.get().getId());
-        Assertions.assertNotNull(optionalTag2.get().getId());
-
         Assertions.assertEquals(optionalTag1.get().getTagName(), tag1.getTagName());
-        Assertions.assertEquals(optionalTag2.get().getTagName(), tag2.getTagName());
 
-        tagRepository.delete(tag2);
     }
 
     @Test
@@ -106,13 +84,13 @@ public class TagRepositoryTest {
         Optional<Tag> optionalTag1 = tagRepository.findById(tag1.getId());
         Assertions.assertTrue(optionalTag1.isPresent());
 
-        optionalTag1.get().setTagName("doggo");
+        optionalTag1.get().setTagName("updateTag");
         tagRepository.save(optionalTag1.get());
 
-        Optional<Tag> savedOptionalTag1 = tagRepository.findByIdAndTagName(tag1.getId(), "doggo");
+        Optional<Tag> savedOptionalTag1 = tagRepository.findByIdAndTagName(tag1.getId(), "updateTag");
 
         Assertions.assertTrue(savedOptionalTag1.isPresent());
-        Assertions.assertEquals("doggo", savedOptionalTag1.get().getTagName());
+        Assertions.assertEquals("updateTag", savedOptionalTag1.get().getTagName());
 
         tagRepository.save(storeTag1);
     }
@@ -120,11 +98,16 @@ public class TagRepositoryTest {
     @Test
     @DisplayName("Test delete tag")
     public void DeleteTagTest() {
-        Optional<Tag> optionalTag3 = tagRepository.findById(tag3.getId());
+        Tag deleteTag = new Tag();
+        deleteTag.setTagName("deleteTag");
+        deleteTag.setCategory(mainCat);
+        deleteTag = tagRepository.saveAndFlush(deleteTag);
+
+        Optional<Tag> optionalTag3 = tagRepository.findById(deleteTag.getId());
         Assertions.assertTrue(optionalTag3.isPresent());
 
-        tagRepository.deleteById(tag3.getId());
-        Optional<Tag> deletedTag3 = tagRepository.findByIdAndTagName(tag3.getId(), tag3.getTagName());
+        tagRepository.deleteById(deleteTag.getId());
+        Optional<Tag> deletedTag3 = tagRepository.findByIdAndTagName(deleteTag.getId(), deleteTag.getTagName());
         Assertions.assertTrue(deletedTag3.isEmpty());
     }
 }

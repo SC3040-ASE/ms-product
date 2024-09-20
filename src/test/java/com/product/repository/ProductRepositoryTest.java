@@ -53,31 +53,31 @@ public class ProductRepositoryTest {
     @BeforeAll
     public void setup() {
         user1 = new User();
-        user1.setUsername("user1");
-        user1.setPassword("pass1");
-        user1.setEmail("user1@example.com");
-        user1.setTelegramHandle("user1");
+        user1.setUsername("productTest1");
+        user1.setPassword("productTest1Pass");
+        user1.setEmail("productTest1@example.com");
+        user1.setTelegramHandle("productTest1Tele");
         user1.setIsAdmin(false);
         user1.setCreatedOn(LocalDateTime.now());
         user1.setUpdatedOn(LocalDateTime.now());
         user1 = userRepository.save(user1);
 
         user2 = new User();
-        user2.setUsername("user2");
-        user2.setPassword("pass2");
-        user2.setEmail("user2@example.com");
-        user2.setTelegramHandle("user2");
+        user2.setUsername("productTest2");
+        user2.setPassword("productTest2Pass");
+        user2.setEmail("productTest2@example.com");
+        user2.setTelegramHandle("productTest2Tele");
         user2.setIsAdmin(false);
         user2.setCreatedOn(LocalDateTime.now());
         user2.setUpdatedOn(LocalDateTime.now());
         user2 = userRepository.save(user2);
 
         testCategory = new Category();
-        testCategory.setCategoryName("Electronics");
+        testCategory.setCategoryName("Product Test Category");
         categoryRepository.save(testCategory);
 
         testTag = new Tag();
-        testTag.setTagName("New");
+        testTag.setTagName("testProductTag");
         testTag.setCategory(testCategory);
         tagRepository.save(testTag);
 
@@ -96,10 +96,12 @@ public class ProductRepositoryTest {
 
     @AfterAll
     public void tearDown() {
-        productRepository.deleteAll();
-        tagRepository.deleteAll();
-        categoryRepository.deleteAll();
-        userRepository.deleteAll();
+
+        productRepository.delete(testProduct);
+        tagRepository.delete(testTag);
+        categoryRepository.delete(testCategory);
+        userRepository.delete(user1);
+        userRepository.delete(user2);
     }
 
     @Test
@@ -182,13 +184,27 @@ public class ProductRepositoryTest {
         Assertions.assertEquals(savedProduct.getPrice(), searchResult.get(0).getPrice());
         Assertions.assertEquals(savedProduct.getCondition(), searchResult.get(0).getCondition());
         Assertions.assertEquals(savedProduct.getCurrentQuantity(), searchResult.get(0).getCurrentQuantity());
+
+        productRepository.delete(savedProduct);
     }
 
     @Test
     @DisplayName("Test delete product")
     public void testDeleteProduct() {
-        productRepository.deleteById(testProduct.getId());
-        Product deletedProduct = productRepository.findById(testProduct.getId()).orElse(null);
+        Product deleteProduct = new Product();
+        deleteProduct.setOwnerId(user1.getId());
+        deleteProduct.setProductName("Delete Product");
+        deleteProduct.setPrice(BigDecimal.valueOf(90.0));
+        deleteProduct.setTags(List.of(testTag));
+        deleteProduct.setCondition("NEW");
+        deleteProduct.setTotalQuantity(10);
+        deleteProduct.setCurrentQuantity(10);
+        deleteProduct.setCategory(testCategory);
+        deleteProduct.setDescription("A delete product");
+        deleteProduct = productRepository.save(deleteProduct);
+
+        productRepository.deleteById(deleteProduct.getId());
+        Product deletedProduct = productRepository.findById(deleteProduct.getId()).orElse(null);
         Assertions.assertNull(deletedProduct);
     }
 
