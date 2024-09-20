@@ -46,6 +46,7 @@ public class ProductRepositoryTest {
     private Category testCategory;
     private Tag testTag;
     private Product testProduct;
+    private Product searchProduct;
     private User user1;
     private User user2;
 
@@ -92,11 +93,23 @@ public class ProductRepositoryTest {
         testProduct.setCategory(testCategory);
         testProduct.setDescription("A test product");
         testProduct = productRepository.save(testProduct);
+
+        searchProduct = new Product();
+        searchProduct.setOwnerId(user1.getId());
+        searchProduct.setProductName("Test Search Product");
+        searchProduct.setPrice(BigDecimal.valueOf(5999.99));
+        searchProduct.setTags(List.of(testTag));
+        searchProduct.setCondition("NEW");
+        searchProduct.setTotalQuantity(5);
+        searchProduct.setCurrentQuantity(5);
+        searchProduct.setCategory(testCategory);
+        searchProduct.setDescription("The latest test product");
+        searchProduct = productRepository.save(searchProduct);
     }
 
     @AfterAll
     public void tearDown() {
-
+        productRepository.delete(searchProduct);
         productRepository.delete(testProduct);
         tagRepository.delete(testTag);
         categoryRepository.delete(testCategory);
@@ -161,31 +174,17 @@ public class ProductRepositoryTest {
     @Test
     @DisplayName("Test search products")
     public void testSearchProducts() {
-        Product product = new Product();
-        product.setOwnerId(user1.getId());
-        product.setProductName("iPhone 19 Pro Max");
-        product.setPrice(BigDecimal.valueOf(5999.99));
-        product.setTags(List.of(testTag));
-        product.setCondition("NEW");
-        product.setTotalQuantity(5);
-        product.setCurrentQuantity(5);
-        product.setCategory(testCategory);
-        product.setDescription("The latest iPhone");
-        Product savedProduct = productRepository.save(product);
-
-        List<Object[]> searchResults = productRepository.searchProductsRange("iphone", 1,2);
+        List<Object[]> searchResults = productRepository.searchProductsRange("Test Search Product", 1,1);
         Assertions.assertFalse(searchResults.isEmpty());
 
         Pair<List<ProductSearchResultDTO>,Integer> result = productMapper.mapToSearchResults(searchResults);
         List<ProductSearchResultDTO> searchResult = result.getKey();
         Assertions.assertFalse(searchResult.isEmpty());
-        Assertions.assertEquals(savedProduct.getId(), searchResult.get(0).getProductId());
-        Assertions.assertEquals(savedProduct.getProductName(), searchResult.get(0).getProductName());
-        Assertions.assertEquals(savedProduct.getPrice(), searchResult.get(0).getPrice());
-        Assertions.assertEquals(savedProduct.getCondition(), searchResult.get(0).getCondition());
-        Assertions.assertEquals(savedProduct.getCurrentQuantity(), searchResult.get(0).getCurrentQuantity());
-
-        productRepository.delete(savedProduct);
+        Assertions.assertEquals(searchProduct.getId(), searchResult.get(0).getProductId());
+        Assertions.assertEquals(searchProduct.getProductName(), searchResult.get(0).getProductName());
+        Assertions.assertEquals(searchProduct.getPrice(), searchResult.get(0).getPrice());
+        Assertions.assertEquals(searchProduct.getCondition(), searchResult.get(0).getCondition());
+        Assertions.assertEquals(searchProduct.getCurrentQuantity(), searchResult.get(0).getCurrentQuantity());
     }
 
     @Test
