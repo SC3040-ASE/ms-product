@@ -37,8 +37,22 @@ public class ProductSearchRangeService {
         }
 
         ProductSearchRangeResponseDTO productSearchRangeResponseDTO = new ProductSearchRangeResponseDTO(productSearchResults, totalResults);
+        return new ResponseMessageDTO(messageId, 200, objectMapper.writeValueAsString(productSearchRangeResponseDTO));
+    }
 
+    @Transactional
+    public ResponseMessageDTO searchRangeProduct(String messageId, String query, int startRank, int endRank, int sellerId) throws Exception {
+        List<Object[]> results = productRepository.searchProductsRange(query, startRank, endRank, sellerId);
+        Pair<List<ProductSearchResultDTO>, Integer> mapResult = productMapper.mapToSearchResults(results);
+        List<ProductSearchResultDTO> productSearchResults = mapResult.getKey();
+        Integer totalResults = mapResult.getValue();
 
+        for (ProductSearchResultDTO productSearchResultDTO : productSearchResults) {
+            ImageDTO image = pictureBlobStorageService.retrieveOneProductImage(productSearchResultDTO.getProductId());
+            productSearchResultDTO.setImage(image);
+        }
+
+        ProductSearchRangeResponseDTO productSearchRangeResponseDTO = new ProductSearchRangeResponseDTO(productSearchResults, totalResults);
         return new ResponseMessageDTO(messageId, 200, objectMapper.writeValueAsString(productSearchRangeResponseDTO));
     }
 }

@@ -37,6 +37,10 @@ public class ProductService {
         return productSearchRangeService.searchRangeProduct(messageId, query, startRank, endRank);
     }
 
+    public ResponseMessageDTO handleSearchRangeProduct(String messageId, String query, int startRank, int endRank, int sellerId) throws Exception{
+        return productSearchRangeService.searchRangeProduct(messageId, query, startRank, endRank, sellerId);
+    }
+
     public void handleUpdateProductQuantity(Integer productId, Integer quantityDiff) {
         productUpdateService.updateProductQuantity(productId, quantityDiff);
     }
