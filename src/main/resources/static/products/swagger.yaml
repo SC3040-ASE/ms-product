@@ -270,6 +270,7 @@ paths:
           description: Internal server error
           schema:
             $ref: "#/definitions/InternalServerError"
+
     delete:
       summary: Delete product
       description: Delete a product by ID
@@ -398,54 +399,6 @@ paths:
           schema:
             type: integer
             example: 10
-      responses:
-        200:
-          description: Search results
-          schema:
-            $ref: "#/definitions/ProductSearchRangeResponse"
-        400:
-          description: Bad Request
-          schema:
-            $ref: "#/definitions/BadRequest"
-        500:
-          description: Internal server error
-          schema:
-            $ref: "#/definitions/InternalServerError"
-  /products/searchRangeBySeller:
-    get:
-      summary: Search for products by a seller
-      description: Search for products in a range by a seller
-      tags:
-        - Products
-      parameters:
-        - name: query
-          in: query
-          description: search query
-          required: true
-          schema:
-            type: string
-            example: iphone
-        - name: startRank
-          in: query
-          description: start index (index start from 1)
-          required: true
-          schema:
-            type: integer
-            example: 1
-        - name: endRank
-          in: query
-          description: end index
-          required: true
-          schema:
-            type: integer
-            example: 10
-        - name: sellerId
-          in: query
-          description: ID of the seller
-          required: true
-          schema:
-              type: integer
-              example: 1
       responses:
         200:
           description: Search results
