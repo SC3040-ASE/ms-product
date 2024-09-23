@@ -132,27 +132,12 @@ public class InboundConfiguration {
                             responseMessageDTO = new ResponseMessageDTO(requestMessageDTO.getId(), 400, "Bad Request");
                             break;
                         }
-                        String searchRangeQuery = headers.get("X-query");
+                        String searchRangeQuery = objectMapper.readValue(headers.get("X-query"), String.class);
                         Integer startRank = objectMapper.readValue(headers.get("X-startRank"), Integer.class);
                         Integer endRank = objectMapper.readValue(headers.get("X-endRank"), Integer.class);
                         responseMessageDTO = productService.handleSearchRangeProduct(requestMessageDTO.getId(),
                                 searchRangeQuery, startRank, endRank);
                         break;
-                    case "/products/searchRangeBySeller":
-                        if (!headers.containsKey("X-query") || !headers.containsKey("X-startRank")
-                                || !headers.containsKey("X-endRank") || !headers.containsKey("X-sellerId")) {
-                            log.info("Missing query, startRank or endRank");
-                            responseMessageDTO = new ResponseMessageDTO(requestMessageDTO.getId(), 400, "Bad Request");
-                            break;
-                        }
-                        String searchRangeBySellerQuery = headers.get("X-query");
-                        Integer startRankBySeller = objectMapper.readValue(headers.get("X-startRank"), Integer.class);
-                        Integer endRankBySeller = objectMapper.readValue(headers.get("X-endRank"), Integer.class);
-                        Integer sellerId = objectMapper.readValue(headers.get("X-sellerId"), Integer.class);
-                        responseMessageDTO = productService.handleSearchRangeProduct(requestMessageDTO.getId(),
-                                searchRangeBySellerQuery, startRankBySeller, endRankBySeller,sellerId);
-                        break;
-
                     default:
                         log.warn("Unknown message path: {}", requestMessageDTO.getPath());
                         responseMessageDTO = new ResponseMessageDTO(requestMessageDTO.getId(), 404, null);
