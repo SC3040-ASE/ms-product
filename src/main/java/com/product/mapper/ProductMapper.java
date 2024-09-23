@@ -1,10 +1,7 @@
 package com.product.mapper;
 
 import com.product.dto.image.ImageDTO;
-import com.product.dto.product.ProductCreationRequestDTO;
-import com.product.dto.product.ProductReadResponseDTO;
-import com.product.dto.product.ProductSearchResultDTO;
-import com.product.dto.product.ProductUpdateRequestDTO;
+import com.product.dto.product.*;
 import com.product.entity.Category;
 import com.product.entity.Product;
 import com.product.entity.Tag;
@@ -94,4 +91,20 @@ public class ProductMapper {
         return productReadResponseDTO;
     }
 
+
+    public List<ProductReadPreviewDTO> mapToReadPreviewResults(List<Product> products){
+        List<ProductReadPreviewDTO> productReadPreviewResponseDTOs = new ArrayList<>();
+        for (Product product : products) {
+            ProductReadPreviewDTO productReadPreviewDTO = new ProductReadPreviewDTO();
+            productReadPreviewDTO.setProductId(product.getId());
+            productReadPreviewDTO.setOwnerId(product.getOwnerId());
+            productReadPreviewDTO.setProductName(product.getProductName());
+            productReadPreviewDTO.setPrice(product.getPrice());
+            productReadPreviewDTO.setCondition(product.getCondition());
+            productReadPreviewDTO.setCurrentQuantity(product.getCurrentQuantity());
+            productReadPreviewDTO.setCreatedOn(product.getCreatedOn());
+            productReadPreviewResponseDTOs.add(productReadPreviewDTO);
+        }
+        return productReadPreviewResponseDTOs;
+    }
 }
