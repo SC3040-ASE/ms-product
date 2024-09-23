@@ -35,7 +35,8 @@ public class ProductCreationService {
         Product product = productMapper.mapToEntity(productCreationRequestDTO, tags, category);
         Product savedProduct = productRepository.saveAndFlush(product);
 
-        pictureBlobStorageService.saveImages(savedProduct.getId(), productCreationRequestDTO.getImageBase64List());
+        if(productCreationRequestDTO.getImageBase64List() != null)
+            pictureBlobStorageService.saveImages(savedProduct.getId(), productCreationRequestDTO.getImageBase64List());
 
         return new ResponseMessageDTO(messageId, 200, "Product created successfully");
     }

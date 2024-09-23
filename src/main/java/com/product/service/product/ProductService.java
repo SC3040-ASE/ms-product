@@ -25,6 +25,10 @@ public class ProductService {
         return productReadService.readProduct(messageId, id);
     }
 
+    public ResponseMessageDTO handleReadProductsByOwnerId(String messageId, Integer ownerId, Integer startRank, Integer endRank) throws Exception {
+        return productReadService.readProductsByOwnerId(messageId, ownerId, startRank, endRank);
+    }
+
     public ResponseMessageDTO handleUpdateProduct(String messageId, ProductUpdateRequestDTO productUpdateRequestDTO) {
         return productUpdateService.updateProduct(messageId, productUpdateRequestDTO);
     }

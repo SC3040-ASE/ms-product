@@ -125,6 +125,18 @@ public class InboundConfiguration {
                         Integer readProductId = objectMapper.readValue(headers.get("X-id"), Integer.class);
                         responseMessageDTO = productService.handleReadProduct(requestMessageDTO.getId(), readProductId);
                         break;
+                    case "/products/owner":
+                        if (!headers.containsKey("X-startIndex") || !headers.containsKey("X-endIndex") || !headers.containsKey("X-sellerId")) {
+                            log.info("Missing startIndex, endIndex or sellerId");
+                            responseMessageDTO = new ResponseMessageDTO(requestMessageDTO.getId(), 400, "Bad Request");
+                            break;
+                        }
+                        Integer startIndex = objectMapper.readValue(headers.get("X-startIndex"), Integer.class);
+                        Integer endIndex = objectMapper.readValue(headers.get("X-endIndex"), Integer.class);
+                        Integer sellerId = objectMapper.readValue(headers.get("X-sellerId"), Integer.class);
+                        responseMessageDTO = productService.handleReadProductsByOwnerId(requestMessageDTO.getId(),
+                                sellerId, startIndex, endIndex);
+                        break;
                     case "/products/searchRange":
                         if (!headers.containsKey("X-query") || !headers.containsKey("X-startRank")
                                 || !headers.containsKey("X-endRank")) {
@@ -132,7 +144,7 @@ public class InboundConfiguration {
                             responseMessageDTO = new ResponseMessageDTO(requestMessageDTO.getId(), 400, "Bad Request");
                             break;
                         }
-                        String searchRangeQuery = objectMapper.readValue(headers.get("X-query"), String.class);
+                        String searchRangeQuery = headers.get("X-query");
                         Integer startRank = objectMapper.readValue(headers.get("X-startRank"), Integer.class);
                         Integer endRank = objectMapper.readValue(headers.get("X-endRank"), Integer.class);
                         responseMessageDTO = productService.handleSearchRangeProduct(requestMessageDTO.getId(),

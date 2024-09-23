@@ -2,6 +2,8 @@ package com.product.service.product;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.product.dto.image.ImageDTO;
+import com.product.dto.product.ProductReadPreviewDTO;
+import com.product.dto.product.ProductReadPreviewResponseDTO;
 import com.product.dto.product.ProductReadResponseDTO;
 import com.product.dto.ResponseMessageDTO;
 import com.product.entity.Product;
@@ -13,6 +15,8 @@ import org.springframework.stereotype.Service;
 
 import jakarta.transaction.Transactional;
 
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.List;
 import java.util.Optional;
 
@@ -38,4 +42,32 @@ public class ProductReadService {
             return new ResponseMessageDTO(messageId, 404, "Product not found");
         }
     }
+
+    @Transactional
+    public ResponseMessageDTO readProductsByOwnerId(String messageId, Integer ownerId, Integer startIndex, Integer endIndex) throws Exception {
+        List<Product> products = productRepository.findProductsByOwnerId(ownerId);
+        products.sort((a,b)-> b.getCreatedOn().compareTo(a.getCreatedOn()));
+        List<Product> subListProduct;
+        if(startIndex > products.size()){
+            subListProduct = Collections.emptyList();
+        }else if(endIndex > products.size()){
+            subListProduct = products.subList(startIndex-1, products.size());
+        }else{
+            subListProduct = products.subList(startIndex-1, endIndex-1);
+        }
+
+        List<ProductReadPreviewDTO> productsPreview = productMapper.mapToReadPreviewResults(subListProduct);
+
+        for(ProductReadPreviewDTO productPreview : productsPreview){
+            ImageDTO image = pictureBlobStorageService.retrieveOneProductImage(productPreview.getProductId());
+            productPreview.setImage(image);
+        }
+
+        ProductReadPreviewResponseDTO productReadPreviewResponseDTO = new ProductReadPreviewResponseDTO();
+        productReadPreviewResponseDTO.setProducts(productsPreview);
+        productReadPreviewResponseDTO.setTotalProducts(products.size());
+        return new ResponseMessageDTO(messageId, 200, objectMapper.writeValueAsString(productReadPreviewResponseDTO));
+    }
+
+
 }

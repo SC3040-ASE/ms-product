@@ -102,11 +102,6 @@ definitions:
         type: number
         format: double
         example: 499.99
-      tags:
-        type: array
-        items:
-          type: string
-        example: ["apple", "watch"]
       condition:
         type: string
         example: "New"
@@ -123,6 +118,48 @@ definitions:
         example: 0.15
       image:
         $ref: "#/definitions/ImageDTO"
+
+  ProductReadPreview:
+    type: object
+    properties:
+      productId:
+        type: integer
+        example: 2
+      ownerId:
+        type: integer
+        example: 4
+      productName:
+        type: string
+        example: "Apple watch"
+      price:
+        type: number
+        format: double
+        example: 499.99
+      condition:
+        type: string
+        example: "New"
+      currentQuantity:
+        type: integer
+        example: 50
+      createdOn:
+        type: string
+        format: date-time
+        example: "2024-09-12 12:20:35.655023"
+      image:
+        $ref: "#/definitions/ImageDTO"
+
+  ProductReadOwnerResponse:
+    type: object
+    properties:
+      products:
+        type: array
+        items:
+          $ref: "#/definitions/ProductReadPreview"
+        description: List of found products in the range
+      total_count:
+        type: integer
+        description: Total count of matched products
+        example: 100
 
   ProductCreationRequest:
     type: object
@@ -404,6 +441,48 @@ paths:
           description: Search results
           schema:
             $ref: "#/definitions/ProductSearchRangeResponse"
+        400:
+          description: Bad Request
+          schema:
+            $ref: "#/definitions/BadRequest"
+        500:
+          description: Internal server error
+          schema:
+            $ref: "#/definitions/InternalServerError"
+
+  /products/owner:
+    get:
+      summary: Search for products of a seller
+      description: Search for products of a seller in a range
+      tags:
+        - Products
+      parameters:
+        - name: startIndex
+          in: query
+          description: start index (index start from 1)
+          required: true
+          schema:
+            type: integer
+            example: 1
+        - name: endIndex
+          in: query
+          description: end index
+          required: true
+          schema:
+            type: integer
+            example: 10
+        - name: sellerId
+          in: query
+          description: ID of the seller
+          required: true
+          schema:
+              type: integer
+              example: 1
+      responses:
+        200:
+          description: Search results
+          schema:
+            $ref: "#/definitions/ProductReadOwnerResponse"
         400:
           description: Bad Request
           schema:
