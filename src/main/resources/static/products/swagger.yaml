@@ -60,7 +60,7 @@ definitions:
         type: integer
         example: 50
       createdOn:
-        tupe: string
+        type: string
         format: date-time
         example: "2024-09-12 12:20:35.655023"
       categoryName:
@@ -246,6 +246,40 @@ definitions:
         type: string
         example: "Latest Apple Watch."
 
+  Category:
+    type: object
+    properties:
+      id:
+        type: integer
+        example: 1
+      categoryName:
+        type: string
+        example: "Book"
+      products:
+        type: object
+
+  Tag:
+    type: object
+    properties:
+      id:
+        type: integer
+        example: 1
+      tagName:
+        type: string
+        example: "tag"
+      category:
+        type: object
+
+  MultipleTagDTO:
+    type: object
+    properties:
+      category:
+        type: object
+      tagNames:
+        type: array
+        items:
+          type: string
+
   BadRequest:
     type: object
     properties:
@@ -286,9 +320,7 @@ paths:
           in: query
           description: ID of the product to get
           required: true
-          schema:
-            type: integer
-            example: 1
+          type: integer
       responses:
         200:
           description: Product found
@@ -318,9 +350,7 @@ paths:
           in: query
           description: ID of the product to delete
           required: true
-          schema:
-            type: integer
-            example: 1
+          type: integer
       responses:
         200:
           description: Product deleted successfully
@@ -419,23 +449,17 @@ paths:
           in: query
           description: search query
           required: true
-          schema:
-            type: string
-            example: iphone
+          type: string
         - name: startRank
           in: query
           description: start index (index start from 1)
           required: true
-          schema:
-            type: integer
-            example: 1
+          type: integer
         - name: endRank
           in: query
           description: end index
           required: true
-          schema:
-            type: integer
-            example: 10
+          type: integer
       responses:
         200:
           description: Search results
@@ -461,23 +485,17 @@ paths:
           in: query
           description: start index (index start from 1)
           required: true
-          schema:
-            type: integer
-            example: 1
+          type: integer
         - name: endIndex
           in: query
           description: end index
           required: true
-          schema:
-            type: integer
-            example: 10
+          type: integer
         - name: sellerId
           in: query
           description: ID of the seller
           required: true
-          schema:
-              type: integer
-              example: 1
+          type: integer
       responses:
         200:
           description: Search results
@@ -491,3 +509,207 @@ paths:
           description: Internal server error
           schema:
             $ref: "#/definitions/InternalServerError"
+
+  /tag:
+    post:
+      summary: Create tag
+      description: Create a new tag
+      parameters:
+        - in: body
+          name: tag
+          description: tag to create
+          required: true
+          schema:
+            $ref:   "#/definitions/Tag"
+      responses:
+        200:
+          description: Tag created successfully
+          schema:
+            type: object
+            properties:
+              message:
+                type: string
+                example: "Tag created successfully"
+
+    put:
+      summary: Update tag
+      description: Update an existing tag
+      parameters:
+        - in: body
+          name: tag
+          description: tag to update
+          required: true
+          schema:
+            $ref: "#/definitions/Tag"
+      responses:
+        200:
+          description: Tag updated successfully
+          schema:
+            type: object
+            properties:
+              message:
+                type: string
+                example: "Tag updated successfully"
+
+    delete:
+      summary: Delete tag
+      description: Delete a tag
+      parameters:
+        - in: body
+          name: tag
+          description: tag to delete
+          required: true
+          schema:
+            $ref: "#/definitions/Tag"
+      responses:
+        200:
+          description: Tag deleted successfully
+          schema:
+            type: object
+            properties:
+              message:
+                type: string
+                example: "Tag deleted successfully"
+
+    get:
+      summary: Get tag
+      description: Get a tag
+      parameters:
+        - in: body
+          name: tag
+          description: tag to get
+          required: true
+          schema:
+            $ref: "#/definitions/Tag"
+      responses:
+        200:
+          description: Tag retrieved successfully
+          schema:
+            type: object
+            properties:
+              message:
+                type: string
+                example: "Tag retrieved successfully"
+
+  /category:
+    post:
+      summary: Create category
+      description: Create a new category
+      parameters:
+        - in: body
+          name: category
+          description: category to create
+          required: true
+          schema:
+            $ref: "#/definitions/Category"
+      responses:
+        200:
+          description: Category created successfully
+          schema:
+            type: object
+            properties:
+              message:
+                type: string
+                example: "Category created successfully"
+
+    put:
+      summary: Update category
+      description: Update an existing category
+      parameters:
+        - in: body
+          name: category
+          description: category to update
+          required: true
+          schema:
+            $ref: "#/definitions/Category"
+      responses:
+        200:
+          description: Category updated successfully
+          schema:
+            type: object
+            properties:
+              message:
+                type: string
+                example: "Category updated successfully"
+
+    delete:
+      summary: Delete category
+      description: Delete a category
+      parameters:
+        - in: body
+          name: category
+          description: category to delete
+          required: true
+          schema:
+            $ref: "#/definitions/Category"
+      responses:
+        200:
+          description: Category deleted successfully
+          schema:
+            type: object
+            properties:
+              message:
+                type: string
+                example: "Category deleted successfully"
+
+    get:
+      summary: Get category
+      description: Get a category
+      parameters:
+        - in: body
+          name: category
+          description: category to get
+          required: true
+          schema:
+            $ref: "#/definitions/Category"
+      responses:
+        200:
+          description: Category retrieved successfully
+          schema:
+            type: object
+            properties:
+              message:
+                type: string
+                example: "Category retrieved successfully"
+
+  /category/findCategoryById:
+    get:
+      summary: Get category
+      description: Get a category
+      parameters:
+        - in: body
+          name: id
+          description: category ID to retrieve
+          required: true
+          schema:
+            $ref: "#/definitions/Category"
+      responses:
+        200:
+          description: Category retrieved successfully
+          schema:
+            type: object
+            properties:
+              message:
+                type: string
+                example: "Category retrieved successfully"
+
+  /tags/createMultipleTagsPerCategory:
+    post:
+      summary: Create multiple tags
+      description: Create a list of tags for a category
+      parameters:
+        - in: body
+          name: tag
+          description: tag to create
+          required: true
+          schema:
+            $ref: "#/definitions/MultipleTagDTO"
+      responses:
+        200:
+          description: Tags created successfully
+          schema:
+            type: object
+            properties:
+              message:
+                type: string
+                example: "Tags created successfully"
