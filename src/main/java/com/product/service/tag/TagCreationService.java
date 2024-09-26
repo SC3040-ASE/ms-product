@@ -2,6 +2,8 @@ package com.product.service.tag;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.product.dto.ResponseMessageDTO;
+import com.product.dto.tag.MultipleTagCreationRequestDTO;
+import com.product.dto.tag.MultipleTagCreationResponseDTO;
 import com.product.dto.tag.TagCreationRequestDTO;
 import com.product.entity.Category;
 import com.product.entity.Tag;
@@ -13,7 +15,10 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
@@ -26,7 +31,9 @@ public class TagCreationService {
 
     @Transactional
     public ResponseMessageDTO createTag(String messageId, TagCreationRequestDTO tagCreationRequestDTO) {
-        Optional<Category> optionalCategory = categoryRepository.findById(tagCreationRequestDTO.getCategory().getId());
+        Optional<Category> optionalCategory = categoryRepository.findById(
+            tagCreationRequestDTO.getCategory().getId()
+        );
         if (optionalCategory.isEmpty()) {
             return new ResponseMessageDTO(messageId, 401, "Category does not exist.");
         }
@@ -48,6 +55,53 @@ public class TagCreationService {
         } catch (Exception e) {
             log.error("Failed to create tag: {}", String.valueOf(e));
             return new ResponseMessageDTO(messageId, 500, "Error creating tag.");
+        }
+    }
+
+    @Transactional
+    public MultipleTagCreationResponseDTO createMultipleTagsForCategory(
+        MultipleTagCreationRequestDTO requestDTO
+    ) {
+        log.info("request: {}", requestDTO);
+        Optional<Category> optionalCategory = categoryRepository.findById(requestDTO.getCategory().getId());
+        if (optionalCategory.isEmpty()) {
+            log.error("Category does not exist.");
+            return new MultipleTagCreationResponseDTO();
+        }
+        List<String> tagsToCreate = requestDTO.getTagNames();
+        List<String> tagsThatExist = new ArrayList<>();
+        List<Tag> tagEntitiesThatExist = tagRepository.findTagsByTagNamesAndCategory(
+            tagsToCreate,
+            requestDTO.getCategory().getId()
+        );
+        tagEntitiesThatExist.forEach(
+            tag -> {
+                tagsThatExist.add(tag.getTagName());
+            }
+        );
+
+        tagsToCreate.removeAll(tagsThatExist);
+        List<Tag> tagsToSave = tagsToCreate.stream()
+            .map(tagName -> {
+                Tag t = new Tag();
+                t.setTagName(tagName);
+                t.setCategory(requestDTO.getCategory());
+                return t;
+            }).toList();
+        try {
+            tagRepository.saveAll(tagsToSave);
+
+            List<Tag> newTags = tagRepository.findTagsByTagNamesAndCategory(
+                requestDTO.getTagNames(),
+                requestDTO.getCategory().getId()
+            );
+            MultipleTagCreationResponseDTO responseDTO = tagMapper.mapTagsToMultipleTagDTO(newTags);
+
+            log.info("{} new tags saved.", newTags.size());
+            return responseDTO;
+        } catch (Exception e) {
+            log.error("Failed to create tags: {}", String.valueOf(e));
+            return new MultipleTagCreationResponseDTO();
         }
     }
 }
