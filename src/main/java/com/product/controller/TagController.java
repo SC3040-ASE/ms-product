@@ -1,7 +1,8 @@
 package com.product.controller;
 
+import com.product.dto.tag.MultipleTagCreationRequestDTO;
+import com.product.dto.tag.MultipleTagCreationResponseDTO;
 import com.product.dto.tag.TagReadInternalResponseDTO;
-import com.product.entity.Tag;
 import com.product.service.tag.TagService;
 import lombok.AllArgsConstructor;
 import org.springframework.web.bind.annotation.*;
@@ -17,5 +18,12 @@ public class TagController {
     @GetMapping("/tags")
     public List<TagReadInternalResponseDTO> fetchTags(@RequestParam List<Integer> id) {
         return tagService.fetchTags(id);
+    }
+
+    @PostMapping("/tags/createMultipleTagsPerCategory")
+    public MultipleTagCreationResponseDTO createMultipleTagsForCategory(
+        @RequestBody MultipleTagCreationRequestDTO requestDTO
+    ) {
+        return tagService.handleCreateMultipleTags(requestDTO);
     }
 }

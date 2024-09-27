@@ -42,7 +42,28 @@ public class CategoryReadService {
             log.info("Successfully retrieved category: {}", categoryReadResponseDTO.getCategoryName());
             return new ResponseMessageDTO(messageId, 200, objectMapper.writeValueAsString(categoryReadResponseDTO));
         } else {
-            return new ResponseMessageDTO(messageId, 404, "Product Not Found.");
+            return new ResponseMessageDTO(messageId, 404, "Category Not Found.");
+        }
+    }
+
+    public CategoryReadResponseDTO readCategory(CategoryReadRequestDTO categoryReadRequestDTO) throws Exception {
+        Optional<Category> optionalCategory;
+        log.info("Begin search for {}", categoryReadRequestDTO);
+        if (categoryReadRequestDTO.getId() != null) {
+            optionalCategory = categoryRepository.findById(
+                categoryReadRequestDTO.getId()
+            );
+        } else {
+            log.error("Bad request: {}.", categoryReadRequestDTO);
+            return null;
+        }
+        if (optionalCategory.isPresent()) {
+            CategoryReadResponseDTO categoryReadResponseDTO = categoryMapper.mapToCategoryReadResponse(optionalCategory.get());
+            log.info("Successfully retrieved category: {}", categoryReadResponseDTO.getCategoryName());
+            return categoryReadResponseDTO;
+        } else {
+            log.error("Category not found: {}.", categoryReadRequestDTO);
+            return null;
         }
     }
 }
