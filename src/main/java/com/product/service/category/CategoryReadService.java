@@ -66,4 +66,25 @@ public class CategoryReadService {
             return null;
         }
     }
+
+    public CategoryReadResponseDTO readCategory(Integer categoryReadRequestDTO) throws Exception {
+        Optional<Category> optionalCategory;
+        log.info("Begin search for {}", categoryReadRequestDTO);
+        if (categoryReadRequestDTO != null) {
+            optionalCategory = categoryRepository.findById(
+                categoryReadRequestDTO
+            );
+        } else {
+            log.error("Bad request: {}.", categoryReadRequestDTO);
+            return null;
+        }
+        if (optionalCategory.isPresent()) {
+            CategoryReadResponseDTO categoryReadResponseDTO = categoryMapper.mapToCategoryReadResponse(optionalCategory.get());
+            log.info("Successfully retrieved category: {}", categoryReadResponseDTO.getCategoryName());
+            return categoryReadResponseDTO;
+        } else {
+            log.error("Category not found: {}.", categoryReadRequestDTO);
+            return null;
+        }
+    }
 }

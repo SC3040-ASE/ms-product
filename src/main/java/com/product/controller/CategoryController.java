@@ -14,10 +14,10 @@ import org.springframework.web.bind.annotation.RestController;
 public class CategoryController {
     private final CategoryService categoryService;
 
-    @GetMapping("/category/findCategoryById")
+    @GetMapping("/category")
     public CategoryReadResponseDTO findCategoryNameById(
-        @RequestBody CategoryReadRequestDTO requestDTO
+        @RequestParam Integer id
     ) throws Exception {
-        return categoryService.handleReadCategoryById(requestDTO);
+        return categoryService.handleReadCategoryById(id);
     }
 }

@@ -20,7 +20,7 @@ public class TagController {
         return tagService.fetchTags(id);
     }
 
-    @PostMapping("/tags/createMultipleTagsPerCategory")
+    @PostMapping("/tags")
     public MultipleTagCreationResponseDTO createMultipleTagsForCategory(
         @RequestBody MultipleTagCreationRequestDTO requestDTO
     ) {

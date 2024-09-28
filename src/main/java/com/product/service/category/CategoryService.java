@@ -32,6 +32,10 @@ public class CategoryService {
         return categoryReadService.readCategory(categoryReadRequestDTO);
     }
 
+    public CategoryReadResponseDTO handleReadCategoryById(Integer categoryReadRequestDTO) throws Exception {
+        return categoryReadService.readCategory(categoryReadRequestDTO);
+    }
+
     public ResponseMessageDTO handleUpdateCategory(String messageId, CategoryUpdateRequestDTO categoryUpdateRequestDTO) throws Exception {
         return categoryUpdateService.updateCategory(messageId, categoryUpdateRequestDTO);
     }
