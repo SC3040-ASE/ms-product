@@ -1,24 +1,26 @@
 package com.product.service.product;
 
+import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.product.dto.image.ImageDTO;
-import com.product.dto.product.ProductReadPreviewDTO;
-import com.product.dto.product.ProductReadPreviewResponseDTO;
-import com.product.dto.product.ProductReadResponseDTO;
+import com.product.dto.product.*;
 import com.product.dto.ResponseMessageDTO;
+import com.product.dto.user.UsersIdRequestDTO;
+import com.product.dto.user.UsersTelegramHandleDTO;
 import com.product.entity.Product;
 import com.product.mapper.ProductMapper;
 import com.product.repository.ProductRepository;
 import com.product.service.blob.PictureBlobStorageService;
 import lombok.RequiredArgsConstructor;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.http.*;
 import org.springframework.stereotype.Service;
 
 import jakarta.transaction.Transactional;
+import org.springframework.web.client.RestTemplate;
+import org.springframework.web.util.UriComponentsBuilder;
 
-import java.util.Collections;
-import java.util.Comparator;
-import java.util.List;
-import java.util.Optional;
+import java.util.*;
 
 @Service
 @RequiredArgsConstructor
@@ -28,6 +30,13 @@ public class ProductReadService {
     private final ProductMapper productMapper;
     private final PictureBlobStorageService pictureBlobStorageService;
     private final ObjectMapper objectMapper;
+
+    @Value("${ms-order.url}")
+    private String orderUrl;
+
+    @Value("${ms-user.url}")
+    private String userUrl;
+
 
     @Transactional
     public ResponseMessageDTO readProduct(String messageId, Integer id) throws Exception {
@@ -67,6 +76,48 @@ public class ProductReadService {
         productReadPreviewResponseDTO.setProducts(productsPreview);
         productReadPreviewResponseDTO.setTotalProducts(products.size());
         return new ResponseMessageDTO(messageId, 200, objectMapper.writeValueAsString(productReadPreviewResponseDTO));
+    }
+
+    @Transactional
+    public ResponseMessageDTO readProductsReserved(String messageId, Integer ownerId) throws Exception{
+        RestTemplate restTemplate = new RestTemplate();
+        String orderParamUrl = UriComponentsBuilder.fromHttpUrl(orderUrl)
+                .queryParam("userId", ownerId)
+                .encode()
+                .toUriString();
+
+        ResponseEntity<String> orderResponseEntity = restTemplate.exchange(orderParamUrl, HttpMethod.GET, null, String.class);
+        List<ProductOrderDTO> productOrderDTOS = objectMapper.readValue(orderResponseEntity.getBody(),
+                new TypeReference<>() {
+                });
+
+        if(productOrderDTOS == null){
+            return new ResponseMessageDTO(messageId,200, objectMapper.writeValueAsString(new ArrayList<>()));
+        }
+
+        // get product's detail
+        List<Integer> productIds = productOrderDTOS.stream().map(ProductOrderDTO::getProductId).toList();
+        List<Product> products = productRepository.findAllById(productIds);
+
+        // get telegram id
+        List<Integer> buyersId = productOrderDTOS.stream().map(ProductOrderDTO::getBuyerId).toList();
+        String requestJson = objectMapper.writeValueAsString(new UsersIdRequestDTO(buyersId));
+        HttpHeaders headers = new HttpHeaders();
+        headers.setContentType(MediaType.APPLICATION_JSON);
+
+        HttpEntity<String> entity = new HttpEntity<String>(requestJson,headers);
+        ResponseEntity<String> userResponseEntity = restTemplate.postForEntity(userUrl, entity, String.class);
+        UsersTelegramHandleDTO usersTelegram = objectMapper.readValue(userResponseEntity.getBody(), UsersTelegramHandleDTO.class);
+
+        List<ProductReservedDTO> productsReserved = productMapper.mapToProductsReserved(products, productOrderDTOS, usersTelegram.getTelehandleResponseList());
+
+        for(ProductReservedDTO productReserved: productsReserved){
+            productReserved.setImage(pictureBlobStorageService.retrieveOneProductImage(productReserved.getProductId()));
+        }
+
+
+
+        return new ResponseMessageDTO(messageId, 200, objectMapper.writeValueAsString(productsReserved));
     }
 
 

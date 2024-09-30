@@ -280,6 +280,30 @@ definitions:
         items:
           type: string
 
+  ProductReserved:
+    type: object
+    properties:
+      productId:
+        type: integer
+        example: 2
+      productName:
+        type: string
+        example: "Apple watch"
+      price:
+        type: number
+        format: double
+        example: 499.99
+      image:
+        $ref: "#/definitions/ImageDTO"
+      buyerTelegramHandle:
+        type: string
+        example: "john_doe"
+      buyerId:
+        type: integer
+        example: 2
+
+
+
   BadRequest:
     type: object
     properties:
@@ -713,3 +737,25 @@ paths:
               message:
                 type: string
                 example: "Tags created successfully"
+
+  /products/reserved:
+    get:
+      summary: Search Products of the owner that are reserved
+      description: Search Products of the user that are reserved
+      tags:
+        - Products
+      responses:
+        200:
+          description: Products Reserved
+          schema:
+            type: array
+            items:
+              $ref: "#/definitions/ProductReserved"
+        400:
+          description: Bad Request
+          schema:
+            $ref: "#/definitions/BadRequest"
+        500:
+          description: Internal server error
+          schema:
+            $ref: "#/definitions/InternalServerError"
