@@ -137,6 +137,9 @@ public class InboundConfiguration {
                         responseMessageDTO = productService.handleReadProductsByOwnerId(requestMessageDTO.getId(),
                                 sellerId, startIndex, endIndex);
                         break;
+                    case "/products/reserved":
+                        responseMessageDTO = productService.handleReadProductsReserved(requestMessageDTO.getId(), ownerId);
+                        break;
                     case "/products/searchRange":
                         if (!headers.containsKey("X-query") || !headers.containsKey("X-startRank")
                                 || !headers.containsKey("X-endRank")) {

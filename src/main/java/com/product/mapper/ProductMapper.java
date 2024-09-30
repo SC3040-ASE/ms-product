@@ -107,4 +107,23 @@ public class ProductMapper {
         }
         return productReadPreviewResponseDTOs;
     }
+
+    public List<ProductReservedDTO> mapToProductsReserved(List<Product> products, List<ProductOrderDTO> productOrderDTOS, List<String> usersTelegram){
+        List<ProductReservedDTO> productReservedDTOS = new ArrayList<>();
+
+        for(int i=0;i<products.size();i++){
+            Product product = products.get(i);
+            ProductOrderDTO productOrder = productOrderDTOS.get(i);
+            String userTelegram = usersTelegram.get(i);
+            ProductReservedDTO productReserved = new ProductReservedDTO();
+            productReserved.setProductId(product.getId());
+            productReserved.setProductName(product.getProductName());
+            productReserved.setPrice(product.getPrice());
+            productReserved.setBuyerId(productOrder.getBuyerId());
+            productReserved.setBuyerTelegramHandle(userTelegram);
+            productReservedDTOS.add(productReserved);
+        }
+
+        return productReservedDTOS;
+    }
 }
