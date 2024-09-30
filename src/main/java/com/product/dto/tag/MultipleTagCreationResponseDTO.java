@@ -1,6 +1,5 @@
 package com.product.dto.tag;
 
-import com.product.entity.Tag;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;

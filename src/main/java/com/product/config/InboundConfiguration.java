@@ -10,6 +10,7 @@ import com.product.dto.*;
 import com.product.dto.category.*;
 import com.product.dto.product.ProductCreationRequestDTO;
 import com.product.dto.product.ProductUpdateRequestDTO;
+import com.product.dto.ResponseMessageDTO;
 import com.product.dto.tag.*;
 import com.product.service.category.CategoryService;
 import com.product.service.product.ProductService;
@@ -90,14 +91,16 @@ public class InboundConfiguration {
         String messagePath = requestMessage.getPath();
         ResponseMessageDTO responseMessageDTO;
         if (messagePath.contains("products")) {
-            log.info("Going to product.");
-            responseMessageDTO = handleProductRequests(requestMessage);
-        } else if (messagePath.contains("category")) {
-            log.info("Going to category.");
-            responseMessageDTO = handleCategoryRequests(requestMessage);
-        } else if (messagePath.contains("tag")) {
-            log.info("Going to tag.");
-            responseMessageDTO = handleTagRequests(requestMessage);
+            if(messagePath.contains("products/tag")){
+                log.info("Going to tag.");
+                responseMessageDTO = handleTagRequests(requestMessage);
+            }else if(messagePath.contains("products/category")){
+                log.info("Going to category.");
+                responseMessageDTO = handleCategoryRequests(requestMessage);
+            }else{
+                log.info("Going to product.");
+                responseMessageDTO = handleProductRequests(requestMessage);
+            }
         } else {
             log.warn("Unknown message path: {}", requestMessage.getPath());
             responseMessageDTO = new ResponseMessageDTO(requestMessage.getId(), 404, "Path does not exist.");
@@ -199,17 +202,7 @@ public class InboundConfiguration {
         switch (requestMessageDTO.getMethod()) {
             case "GET":
                 switch (requestMessageDTO.getPath()) {
-                    case "/category/search":
-                        log.info("Read body into Category Search Request");
-                        CategorySearchRequestDTO categorySearchRequestDTO = objectMapper.readValue(
-                                requestMessageDTO.getBody(),
-                                CategorySearchRequestDTO.class);
-                        log.info("Received Search Request: {}", categorySearchRequestDTO.getQuery());
-                        responseMessageDTO = categoryService.handleSearchCategory(
-                                requestMessageDTO.getId(),
-                                categorySearchRequestDTO);
-                        break;
-                    case "/category":
+                    case "/products/category":
                         log.info("Read body into Category Read Request");
                         CategoryReadRequestDTO categoryReadRequestDTO = objectMapper.readValue(
                                 requestMessageDTO.getBody(),
@@ -266,20 +259,11 @@ public class InboundConfiguration {
 
     public ResponseMessageDTO handleTagRequests(RequestMessageDTO requestMessageDTO) throws Exception {
         ResponseMessageDTO responseMessageDTO;
+        Map<String, String> headers = requestMessageDTO.getHeaders();
         switch (requestMessageDTO.getMethod()) {
             case "GET":
                 switch (requestMessageDTO.getPath()) {
-                    case "/tag/search":
-                        log.info("Read body into Tag Search Request");
-                        TagSearchRequestDTO tagSearchRequestDTO = objectMapper.readValue(
-                                requestMessageDTO.getBody(),
-                                TagSearchRequestDTO.class);
-                        log.info("Received Search Request: {}", tagSearchRequestDTO.getQuery());
-                        responseMessageDTO = tagService.handleSearchTag(
-                                requestMessageDTO.getId(),
-                                tagSearchRequestDTO);
-                        break;
-                    case "/tag":
+                    case "/products/tag":
                         log.info("Read body into Tag Read Request");
                         TagReadRequestDTO tagReadRequestDTO = objectMapper.readValue(
                                 requestMessageDTO.getBody(),
@@ -288,6 +272,17 @@ public class InboundConfiguration {
                         responseMessageDTO = tagService.handleReadTag(
                                 requestMessageDTO.getId(),
                                 tagReadRequestDTO);
+                        break;
+                    case "/products/tag/generate":
+                        if (!headers.containsKey("X-productName") || !headers.containsKey("X-productDescription") || !headers.containsKey("X-categoryId")) {
+                            log.info("Missing productName, productDescription or categoryId");
+                            responseMessageDTO = new ResponseMessageDTO(requestMessageDTO.getId(), 400, "Bad Request");
+                            break;
+                        }
+                        String productName = headers.get("X-productName");
+                        String productDescription = headers.get("X-productDescription");
+                        Integer categoryId = objectMapper.readValue(headers.get("X-categoryId"),Integer.class);
+                        responseMessageDTO = tagService.handleGenerateTag(requestMessageDTO.getId(), productName, productDescription, categoryId);
                         break;
                     default:
                         log.warn("Unknown message path: {}", requestMessageDTO.getPath());

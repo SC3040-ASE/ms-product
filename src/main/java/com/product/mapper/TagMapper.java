@@ -47,25 +47,6 @@ public class TagMapper {
         return tag;
     }
 
-    public List<TagSearchResponseDTO> mapToSearchResults(List<Object[]> results) {
-        List<TagSearchResponseDTO> searchResults = new ArrayList<>();
-        for (Object[] row : results) {
-            try {
-                TagSearchResponseDTO result = TagSearchResponseDTO
-                    .builder()
-                    .id((Integer) row[0])
-                    .category((Category) row[1])
-                    .tagName((String) row[2])
-                    // TODO: Add the embedding pointed to list of products? Need to check if im supposed to do that for both category and tag first.
-                    .build();
-                searchResults.add(result);
-            } catch (Exception e) {
-                log.error("Error converting tag search results to DTO.");
-            }
-        }
-        return searchResults;
-    }
-
     public MultipleTagCreationResponseDTO mapTagsToMultipleTagDTO(List<Tag> tags) {
         List<Integer> tagIds = new ArrayList<>();
         tags.forEach(tag -> {
