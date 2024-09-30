@@ -43,6 +43,10 @@ public class TagService {
         return tagCreationService.createTag(messageId, tagCreationRequestDTO);
     }
 
+    public MultipleTagCreationResponseDTO handleCreateMultipleTags(MultipleTagCreationRequestDTO requestDTO) {
+        return tagCreationService.createMultipleTagsForCategory(requestDTO);
+    }
+
     public ResponseMessageDTO handleReadTag(String messageId, TagReadRequestDTO tagReadRequestDTO) throws Exception {
         return tagReadService.readTag(messageId, tagReadRequestDTO);
     }

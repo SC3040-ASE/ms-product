@@ -1,9 +1,6 @@
 package com.product.mapper;
 
-import com.product.dto.tag.TagCreationRequestDTO;
-import com.product.dto.tag.TagReadResponseDTO;
-import com.product.dto.tag.TagSearchResponseDTO;
-import com.product.dto.tag.TagUpdateRequestDTO;
+import com.product.dto.tag.*;
 import com.product.entity.Category;
 import com.product.entity.Tag;
 import lombok.extern.slf4j.Slf4j;
@@ -67,5 +64,15 @@ public class TagMapper {
             }
         }
         return searchResults;
+    }
+
+    public MultipleTagCreationResponseDTO mapTagsToMultipleTagDTO(List<Tag> tags) {
+        List<Integer> tagIds = new ArrayList<>();
+        tags.forEach(tag -> {
+            tagIds.add(tag.getId());
+        });
+        return MultipleTagCreationResponseDTO.builder()
+            .tagIds(tagIds)
+            .build();
     }
 }
