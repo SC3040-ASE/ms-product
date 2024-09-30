@@ -27,6 +27,6 @@ public interface TagRepository extends JpaRepository<Tag, Integer> {
     @Query("SELECT t FROM Tag t WHERE t.id = :tagId AND t.tagName = :tagName")
     Optional<Tag> findByIdAndTagName(@Param("tagId") Integer id, @Param("tagName") String tagName);
 
-    @Query(value = "SELECT * FROM tag_search(:query, :numberOfResults)", nativeQuery = true)
-    List<Object[]> searchTag(@Param("query") String searchQuery, @Param("numberOfResults") Integer numResults);
+    @Query(value = "SELECT * FROM tag_search(:categoryId, :searchQuery)", nativeQuery = true)
+    List<String> searchTag(@Param("categoryId") Integer categoryId, @Param("searchQuery") String searchQuery);
 }

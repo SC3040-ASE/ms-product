@@ -16,7 +16,6 @@ public class CategoryService {
     private final CategoryCreationService categoryCreationService;
     private final CategoryReadService categoryReadService;
     private final CategoryUpdateService categoryUpdateService;
-    private final CategorySearchService categorySearchService;
     private final CategoryDeleteService categoryDeleteService;
     private final CategoryRepository categoryRepository;
 
@@ -42,10 +41,6 @@ public class CategoryService {
 
     public ResponseMessageDTO handleDeleteCategory(String messageId, CategoryDeleteRequestDTO categoryDeleteRequestDTO) {
         return categoryDeleteService.deleteCategory(messageId, categoryDeleteRequestDTO);
-    }
-
-    public ResponseMessageDTO handleSearchCategory(String messageId, CategorySearchRequestDTO categorySearchRequestDTO) throws Exception {
-        return categorySearchService.searchCategory(messageId, categorySearchRequestDTO);
     }
 
     public Category saveCategoryIfNotExists(String categoryName) {

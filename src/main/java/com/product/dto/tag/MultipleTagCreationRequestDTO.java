@@ -1,6 +1,5 @@
 package com.product.dto.tag;
 
-import com.product.entity.Category;
 import lombok.*;
 
 import java.util.List;

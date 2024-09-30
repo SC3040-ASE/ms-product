@@ -18,8 +18,8 @@ public class TagService {
     private final TagReadService tagReadService;
     private final TagUpdateService tagUpdateService;
     private final TagDeleteService tagDeleteService;
-    private final TagSearchService tagSearchService;
     private final TagRepository tagRepository;
+    private final TagGenerationService tagGenerationService;
 
     public List<Tag> saveTagsIfNotExists(List<String> tagNames, Category category) {
         List<Tag> existingTags = tagRepository.findTagsByTagNamesAndCategory(tagNames, category.getId());
@@ -60,16 +60,15 @@ public class TagService {
         return tagDeleteService.deleteTag(messageId, tagDeleteRequestDTO);
     }
 
-    public ResponseMessageDTO handleSearchTag(String messageId, TagSearchRequestDTO tagSearchRequestDTO)
-            throws Exception {
-        return tagSearchService.searchTag(messageId, tagSearchRequestDTO);
-    }
-
     public List<TagReadInternalResponseDTO> fetchTags(List<Integer> tagIDs) {
         return tagReadService.fetchTags(tagIDs).stream().map(tag -> {
             TagReadInternalResponseDTO tagReadInternalResponseDTO = TagReadInternalResponseDTO.builder().id(tag.getId())
                     .tagName(tag.getTagName()).build();
             return tagReadInternalResponseDTO;
         }).collect(Collectors.toList());
+    }
+
+    public ResponseMessageDTO handleGenerateTag(String messageId, String productName, String productDescription, Integer categoryId) throws Exception {
+        return tagGenerationService.generateTag(messageId, productName, productDescription, categoryId);
     }
 }

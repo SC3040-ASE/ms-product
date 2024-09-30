@@ -1,10 +1,8 @@
 package com.product.dto.category;
 
-import com.product.entity.Product;
 import lombok.Builder;
 import lombok.Data;
 
-import java.util.List;
 
 @Data
 @Builder
