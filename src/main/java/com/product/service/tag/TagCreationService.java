@@ -63,7 +63,7 @@ public class TagCreationService {
         MultipleTagCreationRequestDTO requestDTO
     ) {
         log.info("request: {}", requestDTO);
-        Optional<Category> optionalCategory = categoryRepository.findById(requestDTO.getCategory().getId());
+        Optional<Category> optionalCategory = categoryRepository.findById(requestDTO.getCategoryId());
         if (optionalCategory.isEmpty()) {
             log.error("Category does not exist.");
             return new MultipleTagCreationResponseDTO();
@@ -72,7 +72,7 @@ public class TagCreationService {
         List<String> tagsThatExist = new ArrayList<>();
         List<Tag> tagEntitiesThatExist = tagRepository.findTagsByTagNamesAndCategory(
             tagsToCreate,
-            requestDTO.getCategory().getId()
+            requestDTO.getCategoryId()
         );
         tagEntitiesThatExist.forEach(
             tag -> {
@@ -83,9 +83,11 @@ public class TagCreationService {
         tagsToCreate.removeAll(tagsThatExist);
         List<Tag> tagsToSave = tagsToCreate.stream()
             .map(tagName -> {
+                Category c = new Category();
+                c.setId(requestDTO.getCategoryId());
                 Tag t = new Tag();
                 t.setTagName(tagName);
-                t.setCategory(requestDTO.getCategory());
+                t.setCategory(c);
                 return t;
             }).toList();
         try {
@@ -93,7 +95,7 @@ public class TagCreationService {
 
             List<Tag> newTags = tagRepository.findTagsByTagNamesAndCategory(
                 requestDTO.getTagNames(),
-                requestDTO.getCategory().getId()
+                requestDTO.getCategoryId()
             );
             MultipleTagCreationResponseDTO responseDTO = tagMapper.mapTagsToMultipleTagDTO(newTags);
 
