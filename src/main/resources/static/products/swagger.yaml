@@ -417,8 +417,8 @@ paths:
             type: object
             properties:
               message:
-                type: string
-                example: "Product created successfully"
+                type: integer
+                example: 123
         403:
           description: Bad Request
           schema:

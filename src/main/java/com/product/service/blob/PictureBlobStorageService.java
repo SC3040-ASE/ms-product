@@ -10,10 +10,7 @@ import org.springframework.stereotype.Service;
 
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
-import java.util.ArrayList;
-import java.util.Base64;
-import java.util.Iterator;
-import java.util.List;
+import java.util.*;
 
 @Service
 @RequiredArgsConstructor
@@ -102,9 +99,10 @@ public class PictureBlobStorageService {
         int nextIndex = existingImages.stream()
                 .mapToInt(name -> {
                     String[] parts = name.split("[_.]");
+                    System.out.println(Arrays.toString(parts));
                     if (parts.length > 2) {
                         try {
-                            return Integer.parseInt(parts[2]);
+                            return Integer.parseInt(parts[3]);
                         } catch (NumberFormatException e) {
                             return 0;
                         }
