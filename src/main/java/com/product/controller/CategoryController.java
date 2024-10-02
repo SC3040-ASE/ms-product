@@ -7,6 +7,8 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
+import java.util.List;
+
 @RestController
 @AllArgsConstructor
 public class CategoryController {
@@ -17,5 +19,10 @@ public class CategoryController {
         @RequestParam Integer id
     ) throws Exception {
         return categoryService.handleReadCategoryById(id);
+    }
+
+    @GetMapping("/category/all")
+    public List<CategoryReadResponseDTO> getAllCategories() {
+        return categoryService.handleGetAllCategories();
     }
 }

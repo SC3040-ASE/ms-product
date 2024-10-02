@@ -258,6 +258,16 @@ definitions:
       products:
         type: object
 
+  CategoryReadResponse:
+    type: object
+    properties:
+      id:
+        type: integer
+        example: 1
+      categoryName:
+        type: string
+        example: "Book"
+
   Tag:
     type: object
     properties:
@@ -708,6 +718,20 @@ paths:
           schema:
             $ref: "#/definitions/InternalServerError"
 
+  /products/tag/all:
+    get:
+      summary: Get all tags
+      description: Get all the tags that currently exist with their category.
+      tags:
+        - tag
+      responses:
+        200:
+          description: tags retrieved
+          schema:
+            type: array
+            items:
+              $ref: "#/definitions/Tag"
+
 
   /products/category:
     post:
@@ -820,3 +844,17 @@ paths:
               message:
                 type: string
                 example: "Category retrieved successfully"
+
+  /products/category/all:
+    get:
+      summary: Get all categories
+      description: Get all existing categories
+      tags:
+        - category
+      responses:
+        200:
+          description: Category retrieved successfully
+          schema:
+            type: array
+            items:
+              $ref: "#/definitions/CategoryReadResponse"

@@ -1,5 +1,6 @@
 package com.product.service.category;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.product.dto.ResponseMessageDTO;
 import com.product.dto.category.CategoryReadRequestDTO;
@@ -12,6 +13,8 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Optional;
 
 @Service
@@ -86,5 +89,24 @@ public class CategoryReadService {
             log.error("Category not found: {}.", categoryReadRequestDTO);
             return null;
         }
+    }
+
+    public List<CategoryReadResponseDTO> getAllCategories() {
+        List<Category> categoryList = categoryRepository.findAll();
+        List<CategoryReadResponseDTO> categoryReadResponseDTOS = new ArrayList<>();
+        categoryList.forEach(category -> {
+            categoryReadResponseDTOS.add(categoryMapper.mapToCategoryReadResponse(category));
+        });
+        return categoryReadResponseDTOS;
+    }
+
+    public ResponseMessageDTO getAllCategories(String messageId) throws JsonProcessingException {
+        List<Category> categoryList = categoryRepository.findAll();
+        List<CategoryReadResponseDTO> categoryReadResponseDTOS = new ArrayList<>();
+        categoryList.forEach(category -> {
+            categoryReadResponseDTOS.add(categoryMapper.mapToCategoryReadResponse(category));
+        });
+        return new ResponseMessageDTO(messageId, 200, objectMapper.writeValueAsString(categoryReadResponseDTOS));
+
     }
 }
