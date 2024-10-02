@@ -25,6 +25,7 @@ import org.springframework.integration.channel.DirectChannel;
 import org.springframework.messaging.MessageChannel;
 import org.springframework.messaging.MessageHandler;
 
+import java.util.List;
 import java.util.Map;
 
 @Configuration
@@ -212,6 +213,10 @@ public class InboundConfiguration {
                                 requestMessageDTO.getId(),
                                 categoryReadRequestDTO);
                         break;
+                    case "/products/category/all":
+                        log.info("Get All Categories");
+                        responseMessageDTO = categoryService.handleGetAllCategories(requestMessageDTO.getId());
+                        break;
                     default:
                         log.warn("Unknown message path: {}", requestMessageDTO.getPath());
                         responseMessageDTO = new ResponseMessageDTO(requestMessageDTO.getId(), 404,
@@ -272,6 +277,10 @@ public class InboundConfiguration {
                         responseMessageDTO = tagService.handleReadTag(
                                 requestMessageDTO.getId(),
                                 tagReadRequestDTO);
+                        break;
+                    case "/products/tag/all":
+                        log.info("Get All Tags");
+                        responseMessageDTO = tagService.handleGetAllTags(requestMessageDTO.getId());
                         break;
                     case "/products/tag/generate":
                         if (!headers.containsKey("X-productName") || !headers.containsKey("X-productDescription") || !headers.containsKey("X-categoryId")) {

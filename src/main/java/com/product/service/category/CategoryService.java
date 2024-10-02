@@ -1,5 +1,6 @@
 package com.product.service.category;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
 import com.product.dto.ResponseMessageDTO;
 import com.product.dto.category.*;
 import com.product.entity.Category;
@@ -8,6 +9,8 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+
+import java.util.List;
 
 @Service
 @Slf4j
@@ -33,6 +36,13 @@ public class CategoryService {
 
     public CategoryReadResponseDTO handleReadCategoryById(Integer categoryReadRequestDTO) throws Exception {
         return categoryReadService.readCategory(categoryReadRequestDTO);
+    }
+
+    public List<CategoryReadResponseDTO> handleGetAllCategories() {
+        return categoryReadService.getAllCategories();
+    }
+    public ResponseMessageDTO handleGetAllCategories(String messageId) throws JsonProcessingException {
+        return categoryReadService.getAllCategories(messageId);
     }
 
     public ResponseMessageDTO handleUpdateCategory(String messageId, CategoryUpdateRequestDTO categoryUpdateRequestDTO) throws Exception {

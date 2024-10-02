@@ -1,5 +1,6 @@
 package com.product.service.tag;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
 import com.product.dto.ResponseMessageDTO;
 import com.product.dto.tag.*;
 import com.product.entity.Category;
@@ -49,6 +50,13 @@ public class TagService {
 
     public ResponseMessageDTO handleReadTag(String messageId, TagReadRequestDTO tagReadRequestDTO) throws Exception {
         return tagReadService.readTag(messageId, tagReadRequestDTO);
+    }
+
+    public List<TagReadWithoutProductResponseDTO> handleGetAllTags() {
+        return tagReadService.getAllTags();
+    }
+    public ResponseMessageDTO handleGetAllTags(String messageId) throws JsonProcessingException {
+        return tagReadService.getAllTags(messageId);
     }
 
     public ResponseMessageDTO handleUpdateTag(String messageId, TagUpdateRequestDTO tagUpdateRequestDTO)

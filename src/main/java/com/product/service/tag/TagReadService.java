@@ -1,9 +1,11 @@
 package com.product.service.tag;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.product.dto.ResponseMessageDTO;
 import com.product.dto.tag.TagReadRequestDTO;
 import com.product.dto.tag.TagReadResponseDTO;
+import com.product.dto.tag.TagReadWithoutProductResponseDTO;
 import com.product.entity.Tag;
 import com.product.mapper.TagMapper;
 import com.product.repository.TagRepository;
@@ -68,5 +70,23 @@ public class TagReadService {
         } else {
             return new ResponseMessageDTO(messageId, 404, "Tag not found.");
         }
+    }
+
+    public List<TagReadWithoutProductResponseDTO> getAllTags() {
+        List<Tag> tags = tagRepository.findAll();
+        List<TagReadWithoutProductResponseDTO> tagReadResponseDTOS = new ArrayList<>();
+        tags.forEach(tag -> {
+            tagReadResponseDTOS.add(tagMapper.mapTagToTagWithoutProductDTO(tag));
+        });
+        return tagReadResponseDTOS;
+    }
+
+    public ResponseMessageDTO getAllTags(String messageId) throws JsonProcessingException {
+        List<Tag> tags = tagRepository.findAll();
+        List<TagReadWithoutProductResponseDTO> tagReadResponseDTOS = new ArrayList<>();
+        tags.forEach(tag -> {
+            tagReadResponseDTOS.add(tagMapper.mapTagToTagWithoutProductDTO(tag));
+        });
+        return new ResponseMessageDTO(messageId, 200, objectMapper.writeValueAsString(tagReadResponseDTOS));
     }
 }

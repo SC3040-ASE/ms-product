@@ -41,6 +41,15 @@ public class TagMapper {
         }
     }
 
+    public TagReadWithoutProductResponseDTO mapTagToTagWithoutProductDTO(Tag tag) {
+        return TagReadWithoutProductResponseDTO
+            .builder()
+            .id(tag.getId())
+            .tagName(tag.getTagName())
+            .category(tag.getCategory())
+            .build();
+    }
+
     public Tag mapUpdatedTagDTOToTag(Tag tag, TagUpdateRequestDTO tagUpdateRequestDTO) {
         tag.setTagName(tagUpdateRequestDTO.getTagName());
         tag.setCategory(tagUpdateRequestDTO.getCategory());
