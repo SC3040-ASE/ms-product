@@ -1,5 +1,7 @@
 package com.product.service.product;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.node.ObjectNode;
 import com.product.dto.product.ProductCreationRequestDTO;
 import com.product.dto.ResponseMessageDTO;
 import com.product.entity.Category;
@@ -26,9 +28,10 @@ public class ProductCreationService {
     private final CategoryService categoryService;
     private final ProductMapper productMapper;
     private final PictureBlobStorageService pictureBlobStorageService;
+    private final ObjectMapper objectMapper;
 
     @Transactional
-    public ResponseMessageDTO createProduct(String messageId, ProductCreationRequestDTO productCreationRequestDTO) {
+    public ResponseMessageDTO createProduct(String messageId, ProductCreationRequestDTO productCreationRequestDTO) throws Exception{
         Category category = categoryService.saveCategoryIfNotExists(productCreationRequestDTO.getCategory());
         List<Tag> tags = tagService.saveTagsIfNotExists(productCreationRequestDTO.getTags(), category);
 
@@ -38,6 +41,8 @@ public class ProductCreationService {
         if(productCreationRequestDTO.getImageBase64List() != null)
             pictureBlobStorageService.saveImages(savedProduct.getId(), productCreationRequestDTO.getImageBase64List());
 
-        return new ResponseMessageDTO(messageId, 200, "Product created successfully");
+        ObjectNode response = objectMapper.createObjectNode();
+        response.put("productId", savedProduct.getId());
+        return new ResponseMessageDTO(messageId, 200, objectMapper.writeValueAsString(response));
     }
 }

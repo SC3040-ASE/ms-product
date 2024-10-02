@@ -17,7 +17,7 @@ public class ProductService {
     private final ProductDeleteService productDeleteService;
     private final ProductSearchRangeService productSearchRangeService;
 
-    public ResponseMessageDTO handleCreateProduct(String messageId, ProductCreationRequestDTO productCreationRequestDTO) {
+    public ResponseMessageDTO handleCreateProduct(String messageId, ProductCreationRequestDTO productCreationRequestDTO) throws Exception{
         return productCreationService.createProduct(messageId, productCreationRequestDTO);
     }
 
