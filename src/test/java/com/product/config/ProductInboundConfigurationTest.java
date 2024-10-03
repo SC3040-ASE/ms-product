@@ -5,6 +5,8 @@ import com.product.Application;
 import com.product.dto.RequestMessageDTO;
 import com.product.dto.ResponseMessageDTO;
 import com.product.dto.product.ProductCreationRequestDTO;
+import com.product.dto.product.ProductReadPreviewDTO;
+import com.product.dto.product.ProductReadPreviewResponseDTO;
 import com.product.dto.product.ProductReadResponseDTO;
 import com.product.entity.Category;
 import com.product.entity.Product;
@@ -25,13 +27,14 @@ import org.springframework.test.context.junit.jupiter.SpringExtension;
 import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 @ExtendWith(SpringExtension.class)
 @SpringBootTest(classes = Application.class)
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
 @Slf4j
-public class InboundConfigurationTest {
+public class ProductInboundConfigurationTest {
 
     @Autowired
     private InboundConfiguration inboundConfiguration;
@@ -65,22 +68,22 @@ public class InboundConfigurationTest {
         user.setEmail("testInbound@emai.com");
         user.setTelegramHandle("testInbound");
         user.setPassword("testInbound");
-        userRepository.save(user);
+        user = userRepository.save(user);
 
         category = new Category();
         category.setCategoryName("Test Inbound Category");
-        categoryRepository.save(category);
+        category = categoryRepository.save(category);
 
         tag1 = new Tag();
         tag1.setTagName("Test Inbound Tag 1");
         tag1.setCategory(category);
-        tagRepository.save(tag1);
+        tag1 = tagRepository.save(tag1);
 
 
         tag2 = new Tag();
         tag2.setTagName("Test Inbound Tag 2");
         tag2.setCategory(category);
-        tagRepository.save(tag2);
+        tag2 = tagRepository.save(tag2);
 
         product = new Product();
         product.setProductName("Test Inbound Product");
@@ -94,7 +97,7 @@ public class InboundConfigurationTest {
         product.setTags(new ArrayList<>());
         product.getTags().add(tag1);
         product.getTags().add(tag2);
-        productRepository.save(product);
+        product = productRepository.save(product);
 
 
     }
@@ -209,6 +212,29 @@ public class InboundConfigurationTest {
         Assertions.assertTrue(productReadResponseDTO.getTags().contains(tag2.getTagName()));
     }
 
+    @Test
+    @DisplayName("Test read products by owner id")
+    void testReadProductsByOwnerId() throws Exception{
+        Map<String,String> headers = new HashMap<>();
+        headers.put("X-User-Id", Integer.toString(user.getId()));
+        headers.put("X-Is-Admin", Boolean.toString(user.getIsAdmin()));
+        headers.put("X-sellerId", Integer.toString(user.getId()));
+        headers.put("X-startIndex", "1");
+        headers.put("X-endIndex", "2");
 
+        RequestMessageDTO requestMessageDTO = new RequestMessageDTO("123", "GET", "/products/owner", headers, null);
+
+        ResponseMessageDTO response = inboundConfiguration.handler(requestMessageDTO);
+        Assertions.assertEquals(200, response.getStatus());
+
+        ProductReadPreviewResponseDTO productReadPreviewResponseDTO = objectMapper.readValue(response.getBody(), ProductReadPreviewResponseDTO.class);
+        List<ProductReadPreviewDTO> productsReadPreview = productReadPreviewResponseDTO.getProducts();
+        Assertions.assertEquals(1, productsReadPreview.size());
+        ProductReadPreviewDTO productReadPreviewDTO = productsReadPreview.get(0);
+        Assertions.assertEquals(product.getProductName(), productReadPreviewDTO.getProductName());
+        Assertions.assertTrue(product.getPrice().compareTo(productReadPreviewDTO.getPrice())==0);
+        Assertions.assertEquals(product.getCondition(), productReadPreviewDTO.getCondition());
+        Assertions.assertEquals(product.getOwnerId(), productReadPreviewDTO.getOwnerId());
+    }
 
 }
