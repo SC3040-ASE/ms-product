@@ -4,10 +4,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.product.Application;
 import com.product.dto.RequestMessageDTO;
 import com.product.dto.ResponseMessageDTO;
-import com.product.dto.product.ProductCreationRequestDTO;
-import com.product.dto.product.ProductReadPreviewDTO;
-import com.product.dto.product.ProductReadPreviewResponseDTO;
-import com.product.dto.product.ProductReadResponseDTO;
+import com.product.dto.product.*;
 import com.product.entity.Category;
 import com.product.entity.Product;
 import com.product.entity.User;
@@ -237,4 +234,93 @@ public class ProductInboundConfigurationTest {
         Assertions.assertEquals(product.getOwnerId(), productReadPreviewDTO.getOwnerId());
     }
 
+
+    @Test
+    @DisplayName("Test Update Product")
+    void testUpdateProduct() throws Exception{
+        Product updatedProduct = new Product();
+        updatedProduct.setProductName("Test Update Product");
+        updatedProduct.setDescription("Test Update Product Description");
+        updatedProduct.setPrice(BigDecimal.valueOf(100));
+        updatedProduct.setTotalQuantity(2);
+        updatedProduct.setCurrentQuantity(2);
+        updatedProduct.setCondition("NEW");
+        updatedProduct.setOwnerId(user.getId());
+        updatedProduct.setCategory(category);
+        updatedProduct.setTags(new ArrayList<>());
+        updatedProduct.getTags().add(tag1);
+        updatedProduct.getTags().add(tag2);
+        updatedProduct = productRepository.save(updatedProduct);
+
+        Map<String,String> headers = new HashMap<>();
+        headers.put("X-User-Id", Integer.toString(user.getId()));
+        headers.put("X-Is-Admin", Boolean.toString(user.getIsAdmin()));
+
+        ProductUpdateRequestDTO productUpdateRequestDTO = new ProductUpdateRequestDTO();
+        productUpdateRequestDTO.setProductId(updatedProduct.getId());
+        productUpdateRequestDTO.setDescription(updatedProduct.getDescription());
+        productUpdateRequestDTO.setTotalQuantity(updatedProduct.getTotalQuantity());
+        productUpdateRequestDTO.setCurrentQuantity(updatedProduct.getCurrentQuantity());
+        productUpdateRequestDTO.setCondition(updatedProduct.getCondition());
+        productUpdateRequestDTO.setNewImageBase64List(new ArrayList<>());
+        productUpdateRequestDTO.setDeleteImageList(new ArrayList<>());
+        productUpdateRequestDTO.setTags(new ArrayList<>());
+
+        // updated field
+        productUpdateRequestDTO.setCategory("Test Update Category");
+        productUpdateRequestDTO.setPrice(BigDecimal.valueOf(200));
+        productUpdateRequestDTO.setProductName("Test Update Product");
+
+        RequestMessageDTO requestMessageDTO = new RequestMessageDTO("123", "PUT", "/products", headers, objectMapper.writeValueAsString(productUpdateRequestDTO));
+
+        ResponseMessageDTO response = inboundConfiguration.handler(requestMessageDTO);
+
+        Assertions.assertEquals(200,response.getStatus());
+
+        Product productUpdated = productRepository.findById(updatedProduct.getId()).orElse(null);
+
+        Assertions.assertNotNull(productUpdated);
+        Assertions.assertEquals(productUpdateRequestDTO.getProductName(), productUpdated.getProductName());
+        Assertions.assertEquals(productUpdateRequestDTO.getDescription(), productUpdated.getDescription());
+        Assertions.assertTrue(productUpdateRequestDTO.getPrice().compareTo(productUpdated.getPrice())==0);
+        Assertions.assertEquals(productUpdateRequestDTO.getTotalQuantity(), productUpdated.getTotalQuantity());
+        Assertions.assertEquals(productUpdateRequestDTO.getCondition(), productUpdated.getCondition());
+        Assertions.assertEquals(productUpdateRequestDTO.getCategory(), productUpdated.getCategory().getCategoryName());
+        Assertions.assertEquals(0, productUpdated.getTags().size());
+
+        // clean up
+        productRepository.delete(productUpdated);
+       }
+
+    @Test
+    @DisplayName("Test Delete Product")
+    void testDeleteProduct() throws Exception{
+        Product product2 = new Product();
+        product2.setProductName("Test Inbound Product 2");
+        product2.setDescription("Test Inbound Product Description 2");
+        product2.setPrice(BigDecimal.valueOf(100));
+        product2.setTotalQuantity(2);
+        product2.setCurrentQuantity(2);
+        product2.setCondition("NEW");
+        product2.setOwnerId(user.getId());
+        product2.setCategory(category);
+        product2.setTags(new ArrayList<>());
+        product2.getTags().add(tag1);
+        product2.getTags().add(tag2);
+        product2 = productRepository.save(product2);
+
+        Map<String,String> headers = new HashMap<>();
+        headers.put("X-User-Id", Integer.toString(user.getId()));
+        headers.put("X-Is-Admin", Boolean.toString(user.getIsAdmin()));
+        headers.put("X-id", Integer.toString(product2.getId()));
+
+        RequestMessageDTO requestMessageDTO = new RequestMessageDTO("123", "DELETE", "/products", headers, null);
+
+        ResponseMessageDTO response = inboundConfiguration.handler(requestMessageDTO);
+
+        Assertions.assertEquals(200,response.getStatus());
+
+        Product productDeleted = productRepository.findById(product2.getId()).orElse(null);
+        Assertions.assertNull(productDeleted);
+    }
 }
