@@ -136,6 +136,7 @@ public class ProductInboundConfigurationTest {
         Assertions.assertEquals(200,response.getStatus());
 
         Integer productId = objectMapper.readTree(response.getBody()).get("productId").asInt();
+
         Product productCreated = productRepository.findById(productId).orElse(null);
 
         Assertions.assertNotNull(productCreated);
