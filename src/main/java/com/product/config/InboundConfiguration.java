@@ -112,7 +112,6 @@ public class InboundConfiguration {
         log.info("Handling product request: {}", requestMessageDTO);
         ResponseMessageDTO responseMessageDTO;
         Map<String, String> headers = requestMessageDTO.getHeaders();
-        String body = requestMessageDTO.getBody();
         Integer ownerId = objectMapper.readValue(headers.get("X-User-Id"), Integer.class);
         Boolean isAdmin = objectMapper.readValue(headers.get("X-Is-Admin"), Boolean.class);
 
@@ -198,7 +197,8 @@ public class InboundConfiguration {
     }
 
     public ResponseMessageDTO handleCategoryRequests(RequestMessageDTO requestMessageDTO) throws Exception {
-        ResponseMessageDTO responseMessageDTO = null;
+        String unknownPath = "Unknown message path";
+        ResponseMessageDTO responseMessageDTO;
         switch (requestMessageDTO.getMethod()) {
             case "GET":
                 switch (requestMessageDTO.getPath()) {
@@ -213,9 +213,9 @@ public class InboundConfiguration {
                                 categoryReadRequestDTO);
                         break;
                     default:
-                        log.warn("Unknown message path: {}", requestMessageDTO.getPath());
+                        log.warn("{}: {}", unknownPath, requestMessageDTO.getPath());
                         responseMessageDTO = new ResponseMessageDTO(requestMessageDTO.getId(), 404,
-                                "Unknown message path.");
+                                unknownPath);
                         break;
                 }
                 break;
@@ -251,13 +251,14 @@ public class InboundConfiguration {
                 break;
             default:
                 log.warn("Unknown message type: {}", requestMessageDTO.getMethod());
-                responseMessageDTO = new ResponseMessageDTO(requestMessageDTO.getId(), 404, "Unknown message path.");
+                responseMessageDTO = new ResponseMessageDTO(requestMessageDTO.getId(), 404, "Unknown message type");
                 break;
         }
         return responseMessageDTO;
     }
 
     public ResponseMessageDTO handleTagRequests(RequestMessageDTO requestMessageDTO) throws Exception {
+        String unknownPath = "Unknown message path";
         ResponseMessageDTO responseMessageDTO;
         Map<String, String> headers = requestMessageDTO.getHeaders();
         switch (requestMessageDTO.getMethod()) {
@@ -285,9 +286,9 @@ public class InboundConfiguration {
                         responseMessageDTO = tagService.handleGenerateTag(requestMessageDTO.getId(), productName, productDescription, categoryId);
                         break;
                     default:
-                        log.warn("Unknown message path: {}", requestMessageDTO.getPath());
+                        log.warn("{}: {}",unknownPath, requestMessageDTO.getPath());
                         responseMessageDTO = new ResponseMessageDTO(requestMessageDTO.getId(), 404,
-                                "Unknown message path.");
+                                unknownPath);
                         break;
                 }
                 break;
@@ -323,7 +324,7 @@ public class InboundConfiguration {
                 break;
             default:
                 log.warn("Unknown message type: {}", requestMessageDTO.getMethod());
-                responseMessageDTO = new ResponseMessageDTO(requestMessageDTO.getId(), 404, "Unknown message path.");
+                responseMessageDTO = new ResponseMessageDTO(requestMessageDTO.getId(), 404, "Unknown message type");
                 break;
         }
         return responseMessageDTO;

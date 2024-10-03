@@ -1,15 +1,15 @@
-package com.product.service.blob;
+package com.product.service;
 
 
 import com.product.Application;
 import com.product.dto.image.ImageDTO;
+import com.product.service.blob.PictureBlobStorageService;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.codec.binary.Base64;
 import org.junit.jupiter.api.*;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 import org.springframework.util.ResourceUtils;
 import org.testcontainers.shaded.org.apache.commons.io.FileUtils;
@@ -21,7 +21,6 @@ import java.util.List;
 
 @ExtendWith(SpringExtension.class)
 @SpringBootTest(classes = Application.class)
-@ActiveProfiles("dev")
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
 @Slf4j
 public class PictureBlobStorageServiceTest {
@@ -56,7 +55,7 @@ public class PictureBlobStorageServiceTest {
 
     @Test
     @DisplayName("Test multiple images")
-    public void testMultipleImage() {
+    void testMultipleImage() {
         pictureBlobService.saveImages(-1, base64ImageList);
         List<ImageDTO> images = pictureBlobService.retrieveProductImages(-1);
         Assertions.assertEquals(images.stream().map(ImageDTO:: getImageBase64).toList(), base64ImageList);
@@ -67,7 +66,7 @@ public class PictureBlobStorageServiceTest {
 
     @Test
     @DisplayName("Test one images")
-    public void testRetrieveOneImage() {
+    void testRetrieveOneImage() {
         pictureBlobService.saveImages(-1, base64ImageList);
         ImageDTO image = pictureBlobService.retrieveOneProductImage(-1);
         Assertions.assertEquals(image.getImageBase64(), base64ImageList.get(0));
@@ -78,7 +77,7 @@ public class PictureBlobStorageServiceTest {
 
     @Test
     @DisplayName("Test update images")
-    public void testUpdateImages() {
+    void testUpdateImages() {
         List<String> imageToBeDeleted = new ArrayList<>();
         imageToBeDeleted.add("product_image_0.jpg");
 

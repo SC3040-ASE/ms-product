@@ -5,7 +5,6 @@ import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import com.product.dto.ResponseMessageDTO;
-import com.product.mapper.TagMapper;
 import com.product.repository.TagRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
@@ -31,7 +30,7 @@ public class TagGenerationService {
     private final TagRepository tagRepository;
 
     @Autowired
-    public TagGenerationService(ObjectMapper objectMapper, TagRepository tagRepository, TagMapper tagMapper){
+    public TagGenerationService(ObjectMapper objectMapper, TagRepository tagRepository){
         this.objectMapper = objectMapper;
         this.tagRepository = tagRepository;
         BASE_URL = "https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=";
@@ -102,7 +101,7 @@ public class TagGenerationService {
                 .path("text")
                 .asText();
 
-        return objectMapper.readValue(text, new TypeReference<List<String>>() {
+        return objectMapper.readValue(text, new TypeReference<>() {
         });
     }
 

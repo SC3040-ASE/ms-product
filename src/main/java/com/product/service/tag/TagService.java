@@ -61,11 +61,8 @@ public class TagService {
     }
 
     public List<TagReadInternalResponseDTO> fetchTags(List<Integer> tagIDs) {
-        return tagReadService.fetchTags(tagIDs).stream().map(tag -> {
-            TagReadInternalResponseDTO tagReadInternalResponseDTO = TagReadInternalResponseDTO.builder().id(tag.getId())
-                    .tagName(tag.getTagName()).build();
-            return tagReadInternalResponseDTO;
-        }).collect(Collectors.toList());
+        return tagReadService.fetchTags(tagIDs).stream().map(tag -> TagReadInternalResponseDTO.builder().id(tag.getId())
+                .tagName(tag.getTagName()).build()).collect(Collectors.toList());
     }
 
     public ResponseMessageDTO handleGenerateTag(String messageId, String productName, String productDescription, Integer categoryId) throws Exception {

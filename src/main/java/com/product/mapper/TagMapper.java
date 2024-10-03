@@ -1,7 +1,6 @@
 package com.product.mapper;
 
 import com.product.dto.tag.*;
-import com.product.entity.Category;
 import com.product.entity.Tag;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
@@ -49,9 +48,7 @@ public class TagMapper {
 
     public MultipleTagCreationResponseDTO mapTagsToMultipleTagDTO(List<Tag> tags) {
         List<Integer> tagIds = new ArrayList<>();
-        tags.forEach(tag -> {
-            tagIds.add(tag.getId());
-        });
+        tags.forEach(tag -> tagIds.add(tag.getId()));
         return MultipleTagCreationResponseDTO.builder()
             .tagIds(tagIds)
             .build();

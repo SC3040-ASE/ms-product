@@ -32,10 +32,10 @@ public class ProductReadService {
     private final ObjectMapper objectMapper;
 
     @Value("${ms-order.url}")
-    private String orderUrl;
+    private String orderBaseUrl;
 
     @Value("${ms-user.url}")
-    private String userUrl;
+    private String userBaseUrl;
 
 
     @Transactional
@@ -81,6 +81,9 @@ public class ProductReadService {
     @Transactional
     public ResponseMessageDTO readProductsReserved(String messageId, Integer ownerId) throws Exception{
         RestTemplate restTemplate = new RestTemplate();
+
+        String orderUrl = orderBaseUrl + "/orders/products";
+
         String orderParamUrl = UriComponentsBuilder.fromHttpUrl(orderUrl)
                 .queryParam("userId", ownerId)
                 .encode()
@@ -104,8 +107,9 @@ public class ProductReadService {
         String requestJson = objectMapper.writeValueAsString(new UsersIdRequestDTO(buyersId));
         HttpHeaders headers = new HttpHeaders();
         headers.setContentType(MediaType.APPLICATION_JSON);
+        HttpEntity<String> entity = new HttpEntity<>(requestJson,headers);
 
-        HttpEntity<String> entity = new HttpEntity<String>(requestJson,headers);
+        String userUrl = userBaseUrl + "/api/v1/user/getTelehandleById";
         ResponseEntity<String> userResponseEntity = restTemplate.postForEntity(userUrl, entity, String.class);
         UsersTelegramHandleDTO usersTelegram = objectMapper.readValue(userResponseEntity.getBody(), UsersTelegramHandleDTO.class);
 

@@ -3,8 +3,6 @@ package com.product.service.tag;
 import com.product.dto.ResponseMessageDTO;
 import com.product.dto.tag.TagDeleteRequestDTO;
 import com.product.entity.Tag;
-import com.product.mapper.TagMapper;
-import com.product.repository.CategoryRepository;
 import com.product.repository.TagRepository;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;

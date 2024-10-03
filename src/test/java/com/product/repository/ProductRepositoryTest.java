@@ -10,12 +10,9 @@ import com.product.mapper.ProductMapper;
 import org.apache.commons.lang3.tuple.Pair;
 import org.junit.jupiter.api.*;
 
-import static org.junit.jupiter.api.Assertions.assertTrue;
-
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 
 import java.math.BigDecimal;
@@ -24,7 +21,6 @@ import java.util.List;
 
 @ExtendWith(SpringExtension.class)
 @SpringBootTest(classes = Application.class)
-@ActiveProfiles("dev")
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
 public class ProductRepositoryTest {
 
@@ -57,7 +53,7 @@ public class ProductRepositoryTest {
         user1.setUsername("productTest1");
         user1.setPassword("productTest1Pass");
         user1.setEmail("productTest1@example.com");
-        user1.setTelegramHandle("productTest1Tele");
+        user1.setTelegramHandle("productTest1Telegram");
         user1.setIsAdmin(false);
         user1.setCreatedOn(LocalDateTime.now());
         user1.setUpdatedOn(LocalDateTime.now());
@@ -67,7 +63,7 @@ public class ProductRepositoryTest {
         user2.setUsername("productTest2");
         user2.setPassword("productTest2Pass");
         user2.setEmail("productTest2@example.com");
-        user2.setTelegramHandle("productTest2Tele");
+        user2.setTelegramHandle("productTest2Telegram");
         user2.setIsAdmin(false);
         user2.setCreatedOn(LocalDateTime.now());
         user2.setUpdatedOn(LocalDateTime.now());
@@ -141,11 +137,11 @@ public class ProductRepositoryTest {
 
     @Test
     @DisplayName("Test read product")
-    public void testReadProduct() {
+    void testReadProduct() {
         Product readProduct = productRepository.findById(testProduct.getId()).orElse(null);
         Assertions.assertNotNull(readProduct);
         Assertions.assertEquals(testProduct.getProductName(), readProduct.getProductName());
-        assertTrue(testProduct.getPrice().compareTo(readProduct.getPrice()) == 0,
+        Assertions.assertTrue(testProduct.getPrice().compareTo(readProduct.getPrice()) == 0,
                 "Prices should be equal");
         Assertions.assertEquals(testProduct.getCondition(), readProduct.getCondition());
         Assertions.assertEquals(testProduct.getTotalQuantity(), readProduct.getTotalQuantity());
@@ -156,7 +152,7 @@ public class ProductRepositoryTest {
 
     @Test
     @DisplayName("Test update product")
-    public void testUpdateProduct() {
+    void testUpdateProduct() {
         Product productToUpdate = productRepository.findById(testProduct.getId()).orElse(null);
         Assertions.assertNotNull(productToUpdate);
 
@@ -167,13 +163,13 @@ public class ProductRepositoryTest {
         Product updatedProduct = productRepository.findById(testProduct.getId()).orElse(null);
         Assertions.assertNotNull(updatedProduct);
         Assertions.assertEquals("Updated Product", updatedProduct.getProductName());
-        assertTrue(productToUpdate.getPrice().compareTo(updatedProduct.getPrice()) == 0,
+        Assertions.assertTrue(productToUpdate.getPrice().compareTo(updatedProduct.getPrice()) == 0,
                 "Prices should be equal");
     }
 
     @Test
     @DisplayName("Test search products")
-    public void testSearchProducts() {
+    void testSearchProducts() {
         List<Object[]> searchResults = productRepository.searchProductsRange("Test Search Product", 1,1);
         Assertions.assertFalse(searchResults.isEmpty());
 
@@ -189,7 +185,7 @@ public class ProductRepositoryTest {
 
     @Test
     @DisplayName("Test delete product")
-    public void testDeleteProduct() {
+    void testDeleteProduct() {
         Product deleteProduct = new Product();
         deleteProduct.setOwnerId(user1.getId());
         deleteProduct.setProductName("Delete Product");

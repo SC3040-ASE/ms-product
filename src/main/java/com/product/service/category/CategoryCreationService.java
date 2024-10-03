@@ -25,7 +25,7 @@ public class CategoryCreationService {
         Category savedCategory;
         try {
             category = categoryMapper.mapToEntity(categoryCreationRequestDTO);
-            log.info("Saving " + category.getCategoryName() + " to repository");
+            log.info("Saving {} to repository", category.getCategoryName());
             savedCategory = categoryRepository.saveAndFlush(category);
         } catch (Exception e) {
             return new ResponseMessageDTO(messageId, 500, "Error creating category.");

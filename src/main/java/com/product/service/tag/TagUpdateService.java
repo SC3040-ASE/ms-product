@@ -6,7 +6,6 @@ import com.product.dto.tag.TagReadResponseDTO;
 import com.product.dto.tag.TagUpdateRequestDTO;
 import com.product.entity.Tag;
 import com.product.mapper.TagMapper;
-import com.product.repository.CategoryRepository;
 import com.product.repository.TagRepository;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;

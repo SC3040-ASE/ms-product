@@ -5,12 +5,10 @@ import com.product.dto.category.CategoryReadResponseDTO;
 import com.product.dto.category.CategorySearchResponseDTO;
 import com.product.dto.category.CategoryUpdateRequestDTO;
 import com.product.entity.Category;
-import com.product.entity.Product;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 
 @Component

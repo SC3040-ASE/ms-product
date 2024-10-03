@@ -7,7 +7,6 @@ import com.product.dto.category.CategoryReadResponseDTO;
 import com.product.entity.Category;
 import com.product.mapper.CategoryMapper;
 import com.product.repository.CategoryRepository;
-import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
