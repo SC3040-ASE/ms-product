@@ -101,7 +101,6 @@ public class PictureBlobStorageService {
         int nextIndex = existingImages.stream()
                 .mapToInt(name -> {
                     String[] parts = name.split("[_.]");
-                    System.out.println(Arrays.toString(parts));
                     if (parts.length > 2) {
                         try {
                             return Integer.parseInt(parts[3]);
