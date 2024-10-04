@@ -9,7 +9,6 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.annotation.Rollback;
-import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 import org.testcontainers.shaded.com.fasterxml.jackson.databind.ObjectMapper;
 
@@ -17,7 +16,6 @@ import java.util.Optional;
 
 @ExtendWith(SpringExtension.class)
 @SpringBootTest(classes = Application.class)
-@ActiveProfiles("dev")
 @Slf4j
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
 public class TagRepositoryTest {
@@ -51,7 +49,7 @@ public class TagRepositoryTest {
     @Test
     @DisplayName("Test create tag")
     @Rollback(value = false)
-    public void CreateTagTest() {
+    void CreateTagTest() {
         Tag newTag = new Tag();
         newTag.setTagName("newTag");
         newTag.setCategory(mainCat);
@@ -67,7 +65,7 @@ public class TagRepositoryTest {
 
     @Test
     @DisplayName("Test read tag")
-    public void ReadTagTest() {
+    void ReadTagTest() {
         Optional<Tag> optionalTag1 = tagRepository.findById(tag1.getId());
 
         Assertions.assertTrue(optionalTag1.isPresent());
@@ -78,7 +76,7 @@ public class TagRepositoryTest {
 
     @Test
     @DisplayName("Test update tag")
-    public void UpdateTagTest() {
+    void UpdateTagTest() {
         Tag storeTag1 = tag1;
 
         Optional<Tag> optionalTag1 = tagRepository.findById(tag1.getId());
@@ -97,7 +95,7 @@ public class TagRepositoryTest {
 
     @Test
     @DisplayName("Test delete tag")
-    public void DeleteTagTest() {
+    void DeleteTagTest() {
         Tag deleteTag = new Tag();
         deleteTag.setTagName("deleteTag");
         deleteTag.setCategory(mainCat);

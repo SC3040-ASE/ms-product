@@ -11,7 +11,6 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.annotation.Rollback;
-import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 
 import java.util.ArrayList;
@@ -20,7 +19,6 @@ import java.util.Optional;
 
 @ExtendWith(SpringExtension.class)
 @SpringBootTest(classes = Application.class)
-@ActiveProfiles("dev")
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
 @Slf4j
 public class CategoryRepositoryTest {
@@ -45,11 +43,11 @@ public class CategoryRepositoryTest {
     }
 
     @BeforeAll
-    public void setup() throws Exception {
+    public void setup() {
         cat1 = new Category();
         cat1.setCategoryName("testCat1");
 
-        Category savedCat1 = categoryRepository.saveAndFlush(cat1);
+        categoryRepository.saveAndFlush(cat1);
     }
 
     @AfterAll
@@ -60,7 +58,7 @@ public class CategoryRepositoryTest {
     @Test
     @DisplayName("Test create category")
     @Rollback(value = false)
-    public void CreateCategoryTest() {
+    void CreateCategoryTest() {
         Category createCat = new Category();
         createCat.setCategoryName("testCat2");
         categoryRepository.saveAndFlush(createCat);
@@ -78,7 +76,7 @@ public class CategoryRepositoryTest {
 
     @Test
     @DisplayName("Test read category")
-    public void ReadCategoryTest() {
+    void ReadCategoryTest() {
         Optional<Category> optionalCategory1 = categoryRepository.findByName(cat1.getCategoryName());
 
         Assertions.assertTrue(optionalCategory1.isPresent());
@@ -89,7 +87,7 @@ public class CategoryRepositoryTest {
 
     @Test
     @DisplayName("Test update category")
-    public void UpdateCategoryTest() throws Exception {
+    void UpdateCategoryTest() {
         Optional<Category> optionalCategory1 = categoryRepository.findByName(cat1.getCategoryName());
 
         Assertions.assertTrue(optionalCategory1.isPresent());
@@ -107,7 +105,7 @@ public class CategoryRepositoryTest {
 
     @Test
     @DisplayName("Test delete category")
-    public void DeleteCategoryTest() {
+    void DeleteCategoryTest() {
         Category deleteCat = new Category();
         deleteCat.setCategoryName("deleteCat");
         categoryRepository.saveAndFlush(deleteCat);
