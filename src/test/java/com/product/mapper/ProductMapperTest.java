@@ -196,6 +196,7 @@ public class ProductMapperTest {
         product.setTags(tags);
         product.setCondition("New");
         product.setTotalQuantity(50);
+        product.setCurrentQuantity(50);
         product.setCreatedOn(Timestamp.valueOf("2022-01-01 10:00:00"));
         product.setCategory(category);
         product.setDescription("Test description");
@@ -225,6 +226,7 @@ public class ProductMapperTest {
         Assertions.assertThat(response.getCondition()).isEqualTo("New");
         Assertions.assertThat(response.getImages()).isEqualTo(images);
         Assertions.assertThat(response.getTotalQuantity()).isEqualTo(50);
+        Assertions.assertThat(response.getCurrentQuantity()).isEqualTo(50);
 
         Assertions.assertThat(response.getCreatedOn()).isEqualTo(Timestamp.valueOf("2022-01-01 10:00:00"));
         Assertions.assertThat(response.getCategoryName()).isEqualTo("CategoryName");
