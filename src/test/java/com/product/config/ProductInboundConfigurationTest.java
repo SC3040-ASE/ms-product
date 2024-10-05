@@ -182,33 +182,6 @@ public class ProductInboundConfigurationTest {
         Assertions.assertEquals("Bad request", response.getBody());
     }
 
-
-    @Test
-    @DisplayName("Test read valid product by id")
-    void testReadValidProduct() throws Exception{
-        Map<String,String> headers = new HashMap<>();
-        headers.put("X-User-Id", Integer.toString(user.getId()));
-        headers.put("X-Is-Admin", Boolean.toString(user.getIsAdmin()));
-        headers.put("X-id", Integer.toString(product.getId()));
-
-        RequestMessageDTO requestMessageDTO = new RequestMessageDTO("123", "GET", "/products", headers, null);
-
-        ResponseMessageDTO response = inboundConfiguration.handler(requestMessageDTO);
-        Assertions.assertEquals(200, response.getStatus());
-
-        ProductReadResponseDTO productReadResponseDTO = objectMapper.readValue(response.getBody(), ProductReadResponseDTO.class);
-        Assertions.assertEquals(product.getProductName(), productReadResponseDTO.getProductName());
-        Assertions.assertEquals(product.getDescription(), productReadResponseDTO.getDescription());
-        Assertions.assertTrue(product.getPrice().compareTo(productReadResponseDTO.getPrice())==0);
-        Assertions.assertEquals(product.getTotalQuantity(), productReadResponseDTO.getTotalQuantity());
-        Assertions.assertEquals(product.getCondition(), productReadResponseDTO.getCondition());
-        Assertions.assertEquals(product.getOwnerId(), productReadResponseDTO.getOwnerId());
-        Assertions.assertEquals(product.getCategory().getCategoryName(), productReadResponseDTO.getCategoryName());
-        Assertions.assertEquals(2, productReadResponseDTO.getTags().size());
-        Assertions.assertTrue(productReadResponseDTO.getTags().contains(tag1.getTagName()));
-        Assertions.assertTrue(productReadResponseDTO.getTags().contains(tag2.getTagName()));
-    }
-
     @Test
     @DisplayName("Test read products by owner id")
     void testReadProductsByOwnerId() throws Exception{

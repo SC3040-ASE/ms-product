@@ -40,12 +40,24 @@ public class ProductReadService {
 
     @Transactional
     public ResponseMessageDTO readProduct(String messageId, Integer id) throws Exception {
+        RestTemplate restTemplate = new RestTemplate();
+
+
         Optional<Product> product = productRepository.findById(id);
 
         if (product.isPresent()) {
             Product foundProduct = product.get();
             List<ImageDTO> images = pictureBlobStorageService.retrieveProductImages(foundProduct.getId());
-            ProductReadResponseDTO foundProductDTO = productMapper.mapToProductReadResponse(foundProduct, images);
+            String userUrl = userBaseUrl + "/api/v1/user/getUsernameById?userId=" + foundProduct.getOwnerId();
+
+            ResponseEntity<String> userResponse = restTemplate.exchange(userUrl, HttpMethod.GET, null, String.class);
+            String ownerUsername = userResponse.getBody();
+
+            if(ownerUsername == null){
+                return new ResponseMessageDTO(messageId, 500, "Failed to get owner username");
+            }
+
+            ProductReadResponseDTO foundProductDTO = productMapper.mapToProductReadResponse(foundProduct, images, ownerUsername);
             return new ResponseMessageDTO(messageId, 200, objectMapper.writeValueAsString(foundProductDTO));
         } else {
             return new ResponseMessageDTO(messageId, 404, "Product not found");

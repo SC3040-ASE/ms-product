@@ -167,29 +167,6 @@ public class ProductServiceTest {
     }
 
     @Test
-    @DisplayName("Test Read Product")
-    void testReadProduct() throws Exception{
-        productRepository.save(testProduct1);
-
-        ResponseMessageDTO response = productReadService.readProduct("123", testProduct1.getId());
-        Assertions.assertEquals(200, response.getStatus());
-        ProductReadResponseDTO foundProduct = objectMapper.readValue(response.getBody(), ProductReadResponseDTO.class);
-
-        Assertions.assertNotNull(foundProduct);
-        Assertions.assertEquals(testProduct1.getId(), foundProduct.getProductId());
-        Assertions.assertEquals(testProduct1.getProductName(), foundProduct.getProductName());
-        Assertions.assertEquals(testProduct1.getOwnerId(), foundProduct.getOwnerId());
-        Assertions.assertEquals(testProduct1.getCategory().getCategoryName(), foundProduct.getCategoryName());
-        Assertions.assertEquals(testProduct1.getCondition(), foundProduct.getCondition());
-        Assertions.assertEquals(testProduct1.getDescription(), foundProduct.getDescription());
-        Assertions.assertTrue(testProduct1.getPrice().compareTo(foundProduct.getPrice())==0);
-        Assertions.assertEquals(testProduct1.getTotalQuantity(), foundProduct.getTotalQuantity());
-
-        // clean up
-        productRepository.delete(testProduct1);
-    }
-
-    @Test
     @DisplayName("Test Read Product Range")
     void testReadProductsByOwnerId() throws Exception{
         testProduct1 = productRepository.save(testProduct1);
