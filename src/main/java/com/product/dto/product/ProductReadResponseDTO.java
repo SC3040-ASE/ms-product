@@ -11,6 +11,7 @@ import java.util.List;
 public class ProductReadResponseDTO {
     private Integer productId;
     private Integer ownerId;
+    private String ownerUsername;
     private String productName;
     private BigDecimal price;
     private List<String> tags;

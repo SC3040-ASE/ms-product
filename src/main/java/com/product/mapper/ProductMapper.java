@@ -70,7 +70,7 @@ public class ProductMapper {
         return Pair.of(searchResults, totalResults);
     }
 
-    public ProductReadResponseDTO mapToProductReadResponse(Product product, List<ImageDTO> images) {
+    public ProductReadResponseDTO mapToProductReadResponse(Product product, List<ImageDTO> images, String ownerUsername) {
         ProductReadResponseDTO productReadResponseDTO = new ProductReadResponseDTO();
         productReadResponseDTO.setProductId(product.getId());
         productReadResponseDTO.setOwnerId(product.getOwnerId());
@@ -88,6 +88,7 @@ public class ProductMapper {
         productReadResponseDTO.setCreatedOn(product.getCreatedOn());
         productReadResponseDTO.setCategoryName(product.getCategory().getCategoryName());
         productReadResponseDTO.setDescription(product.getDescription());
+        productReadResponseDTO.setOwnerUsername(ownerUsername);
 
         return productReadResponseDTO;
     }
