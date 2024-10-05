@@ -212,7 +212,7 @@ public class ProductMapperTest {
         ProductMapper productMapper = new ProductMapper();
 
         // Act
-        ProductReadResponseDTO response = productMapper.mapToProductReadResponse(product, images);
+        ProductReadResponseDTO response = productMapper.mapToProductReadResponse(product, images, "ownerUsername");
 
         // Assert
         Assertions.assertThat(response.getProductId()).isEqualTo(1);
