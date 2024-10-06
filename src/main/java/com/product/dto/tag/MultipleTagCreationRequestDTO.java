@@ -11,5 +11,5 @@ import java.util.List;
 @ToString
 public class MultipleTagCreationRequestDTO {
     private Integer categoryId;
-    private List<String> tagNames;
+    private List<String> tags;
 }
