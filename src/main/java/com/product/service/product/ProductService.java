@@ -29,8 +29,8 @@ public class ProductService {
         return productReadService.readProductsByOwnerId(messageId, ownerId, startRank, endRank);
     }
 
-    public ResponseMessageDTO handleReadProductsReserved(String messageId, Integer ownerId) throws Exception{
-        return productReadService.readProductsReserved(messageId, ownerId);
+    public ResponseMessageDTO handleReadProductsReserved(String messageId, Integer ownerId, Boolean isBuyer) throws Exception{
+        return productReadService.readProductsReserved(messageId, ownerId, isBuyer);
     }
 
     public ResponseMessageDTO handleUpdateProduct(String messageId, ProductUpdateRequestDTO productUpdateRequestDTO) {

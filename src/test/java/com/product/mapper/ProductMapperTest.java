@@ -16,9 +16,7 @@ import org.springframework.boot.test.context.SpringBootTest;
 
 import java.math.BigDecimal;
 import java.sql.Timestamp;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
+import java.util.*;
 
 @SpringBootTest(classes = Application.class)
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
@@ -318,8 +316,12 @@ public class ProductMapperTest {
 
         ProductMapper productMapper = new ProductMapper();
 
+        Map<Integer,String> usersTelegramMap = new HashMap<>();
+        usersTelegramMap.put(101, "telegramUser1");
+        usersTelegramMap.put(102, "telegramUser2");
+
         // Act
-        List<ProductReservedDTO> result = productMapper.mapToProductsReserved(products, productOrderDTOS, usersTelegram);
+        List<ProductReservedDTO> result = productMapper.mapToProductsReserved(products, productOrderDTOS, usersTelegramMap);
 
         // Assert
         Assertions.assertThat(result).hasSize(2);
