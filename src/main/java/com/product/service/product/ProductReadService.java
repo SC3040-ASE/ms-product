@@ -111,6 +111,10 @@ public class ProductReadService {
             return new ResponseMessageDTO(messageId,200, objectMapper.writeValueAsString(new ArrayList<>()));
         }
 
+        if(productOrderDTOS.isEmpty()){
+            return new ResponseMessageDTO(messageId,200, objectMapper.writeValueAsString(new ArrayList<>()));
+        }
+
         // get product's detail
         List<Integer> productIds = productOrderDTOS.stream().map(ProductOrderDTO::getProductId).toList();
         List<Product> products = productRepository.findAllById(productIds);
