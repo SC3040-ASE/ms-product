@@ -11,6 +11,7 @@ import org.apache.commons.lang3.tuple.Pair;
 import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 
 @Component
 public class ProductMapper {
@@ -110,13 +111,13 @@ public class ProductMapper {
         return productReadPreviewResponseDTOs;
     }
 
-    public List<ProductReservedDTO> mapToProductsReserved(List<Product> products, List<ProductOrderDTO> productOrderDTOS, List<String> usersTelegram){
+    public List<ProductReservedDTO> mapToProductsReserved(List<Product> products, List<ProductOrderDTO> productOrderDTOS, Map<Integer,String> usersTelegramMap){
         List<ProductReservedDTO> productReservedDTOS = new ArrayList<>();
 
         for(int i=0;i<products.size();i++){
             Product product = products.get(i);
             ProductOrderDTO productOrder = productOrderDTOS.get(i);
-            String userTelegram = usersTelegram.get(i);
+            String userTelegram = usersTelegramMap.get(productOrder.getBuyerId());
             ProductReservedDTO productReserved = new ProductReservedDTO();
             productReserved.setProductId(product.getId());
             productReserved.setProductName(product.getProductName());
