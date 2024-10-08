@@ -546,10 +546,16 @@ paths:
 
   /products/reserved:
     get:
-      summary: Search Products of the owner that are reserved
-      description: Search Products of the user that are reserved
+      summary: Search Reserved Products
+      description: Retrieve a list of products that are reserved by the current user, either as a buyer or a seller.
       tags:
         - Products
+      parameters:
+        - name: isBuyer
+          in: query
+          description: Specify whether to search for products where the current user is the buyer (true) or the seller (false).
+          required: true
+          type: boolean
       responses:
         200:
           description: Products Reserved
