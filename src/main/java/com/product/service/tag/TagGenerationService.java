@@ -37,7 +37,7 @@ public class TagGenerationService {
         restTemplate = new RestTemplateBuilder().build();
         systemInstructionTextTemplate = "You are tasked with generating a list of tags based on a product's name and description. " +
                 "The tags should capture key characteristics and concepts that are closely related to the product, reflecting its most relevant features. " +
-                "Generate a maximum of 10 tags. " +
+                "Generate at least of 10 tags. " +
                 "Here are some of the existing tags in database, prioritize the tags in this list:" +
                 "%s \n"+
                 "return the answer using this JSON schema:" +
@@ -51,7 +51,9 @@ public class TagGenerationService {
 
         List<String> tagList = generateTagUsingLLM(prompt, existingTags);
 
-        return new ResponseMessageDTO(messageId, 200, objectMapper.writeValueAsString(tagList));
+        List<String> smallLetterTagList = tagList.stream().map(String::toLowerCase).toList();
+
+        return new ResponseMessageDTO(messageId, 200, objectMapper.writeValueAsString(smallLetterTagList));
     }
 
 
