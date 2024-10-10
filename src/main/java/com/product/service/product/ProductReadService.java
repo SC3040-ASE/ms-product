@@ -139,6 +139,7 @@ public class ProductReadService {
         for(int i=0;i<telehandleResponseList.size();i++){
             userTelegramMap.put(telehandleResponseList.get(i).getUserId(), telehandleResponseList.get(i).getTelegram_handle());
         }
+        
         List<ProductReservedDTO> productsReserved = productMapper.mapToProductsReserved(products, productOrderDTOS, userTelegramMap, ownerId);
 
         for(ProductReservedDTO productReserved: productsReserved){
