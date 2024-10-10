@@ -6,4 +6,5 @@ import lombok.Data;
 public class ProductOrderDTO {
     private int buyerId;
     private int productId;
+    private String status;
 }

@@ -111,7 +111,7 @@ public class ProductMapper {
         return productReadPreviewResponseDTOs;
     }
 
-    public List<ProductReservedDTO> mapToProductsReserved(List<Product> products, List<ProductOrderDTO> productOrderDTOS, Map<Integer,String> usersTelegramMap){
+    public List<ProductReservedDTO> mapToProductsReserved(List<Product> products, List<ProductOrderDTO> productOrderDTOS, Map<Integer,String> usersTelegramMap, Integer ownerId){
         List<ProductReservedDTO> productReservedDTOS = new ArrayList<>();
 
         for(int i=0;i<products.size();i++){
@@ -124,6 +124,8 @@ public class ProductMapper {
             productReserved.setPrice(product.getPrice());
             productReserved.setBuyerId(productOrder.getBuyerId());
             productReserved.setBuyerTelegramHandle(userTelegram);
+            productReserved.setSellerTelegramHandle(usersTelegramMap.get(ownerId));
+            productReserved.setOrderStatus(productOrder.getStatus());
             productReservedDTOS.add(productReserved);
         }
 

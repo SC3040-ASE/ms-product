@@ -1,5 +1,6 @@
 package com.product.config;
 
+import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.cloud.spring.pubsub.core.PubSubTemplate;
 import com.google.cloud.spring.pubsub.integration.AckMode;
@@ -25,6 +26,7 @@ import org.springframework.integration.channel.DirectChannel;
 import org.springframework.messaging.MessageChannel;
 import org.springframework.messaging.MessageHandler;
 
+import java.util.List;
 import java.util.Map;
 
 @Configuration
@@ -140,13 +142,14 @@ public class InboundConfiguration {
                                 sellerId, startIndex, endIndex);
                         break;
                     case "/products/reserved":
-                        if (!headers.containsKey("X-isBuyer")) {
+                        if (!headers.containsKey("X-isBuyer") || !headers.containsKey("X-orderStatus")) {
                             log.info("Missing isBuyer");
                             responseMessageDTO = new ResponseMessageDTO(requestMessageDTO.getId(), 400, "Bad Request");
                             break;
                         }
                         Boolean isBuyer = objectMapper.readValue(headers.get("X-isBuyer"), Boolean.class);
-                        responseMessageDTO = productService.handleReadProductsReserved(requestMessageDTO.getId(), ownerId, isBuyer);
+                        String orderStatus = headers.get("X-orderStatus");
+                        responseMessageDTO = productService.handleReadProductsReserved(requestMessageDTO.getId(), ownerId, isBuyer, orderStatus);
                         break;
                     case "/products/searchRange":
                         if (!headers.containsKey("X-query") || !headers.containsKey("X-startRank")

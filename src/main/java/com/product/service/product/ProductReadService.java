@@ -91,7 +91,7 @@ public class ProductReadService {
     }
 
     @Transactional
-    public ResponseMessageDTO readProductsReserved(String messageId, Integer ownerId, Boolean isBuyer) throws Exception{
+    public ResponseMessageDTO readProductsReserved(String messageId, Integer ownerId, Boolean isBuyer, String orderStatus) throws Exception{
         RestTemplate restTemplate = new RestTemplate();
 
         String orderUrl = orderBaseUrl + "/orders/products";
@@ -99,6 +99,7 @@ public class ProductReadService {
         String orderParamUrl = UriComponentsBuilder.fromHttpUrl(orderUrl)
                 .queryParam("userId", ownerId)
                 .queryParam("isBuyer", isBuyer)
+                .queryParam("status", orderStatus)
                 .encode()
                 .toUriString();
 
@@ -120,8 +121,9 @@ public class ProductReadService {
         List<Product> products = productRepository.findAllById(productIds);
 
         // get telegram id
-        Set<Integer> buyersId = productOrderDTOS.stream().map(ProductOrderDTO::getBuyerId).collect(HashSet::new, HashSet::add, HashSet::addAll);
-        String requestJson = objectMapper.writeValueAsString(new UsersIdRequestDTO(new ArrayList<>(buyersId)));
+        Set<Integer> usersId = productOrderDTOS.stream().map(ProductOrderDTO::getBuyerId).collect(HashSet::new, HashSet::add, HashSet::addAll);
+        usersId.add(ownerId);
+        String requestJson = objectMapper.writeValueAsString(new UsersIdRequestDTO(new ArrayList<>(usersId)));
         HttpHeaders headers = new HttpHeaders();
         headers.setContentType(MediaType.APPLICATION_JSON);
         HttpEntity<String> entity = new HttpEntity<>(requestJson,headers);
@@ -134,7 +136,7 @@ public class ProductReadService {
         for(int i=0;i<buyersId.size();i++){
             userTelegramMap.put(buyersId.toArray(new Integer[0])[i], usersTelegram.getTelehandleResponseList().get(i));
         }
-        List<ProductReservedDTO> productsReserved = productMapper.mapToProductsReserved(products, productOrderDTOS, userTelegramMap);
+        List<ProductReservedDTO> productsReserved = productMapper.mapToProductsReserved(products, productOrderDTOS, userTelegramMap, ownerId);
 
         for(ProductReservedDTO productReserved: productsReserved){
             productReserved.setImage(pictureBlobStorageService.retrieveOneProductImage(productReserved.getProductId()));

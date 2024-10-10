@@ -7,6 +7,8 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
+import java.util.List;
+
 @Service
 @Slf4j
 @RequiredArgsConstructor
@@ -29,8 +31,8 @@ public class ProductService {
         return productReadService.readProductsByOwnerId(messageId, ownerId, startRank, endRank);
     }
 
-    public ResponseMessageDTO handleReadProductsReserved(String messageId, Integer ownerId, Boolean isBuyer) throws Exception{
-        return productReadService.readProductsReserved(messageId, ownerId, isBuyer);
+    public ResponseMessageDTO handleReadProductsReserved(String messageId, Integer ownerId, Boolean isBuyer, String orderStatus) throws Exception{
+        return productReadService.readProductsReserved(messageId, ownerId, isBuyer, orderStatus);
     }
 
     public ResponseMessageDTO handleUpdateProduct(String messageId, ProductUpdateRequestDTO productUpdateRequestDTO) {

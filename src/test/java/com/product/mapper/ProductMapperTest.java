@@ -300,6 +300,7 @@ public class ProductMapperTest {
 
         ProductOrderDTO order1 = new ProductOrderDTO();
         order1.setBuyerId(101);
+        order1.setStatus("pending");
 
         Product product2 = new Product();
         product2.setId(2);
@@ -308,6 +309,7 @@ public class ProductMapperTest {
 
         ProductOrderDTO order2 = new ProductOrderDTO();
         order2.setBuyerId(102);
+        order2.setStatus("pending");
 
         products.add(product1);
         productOrderDTOS.add(order1);
@@ -321,7 +323,7 @@ public class ProductMapperTest {
         usersTelegramMap.put(102, "telegramUser2");
 
         // Act
-        List<ProductReservedDTO> result = productMapper.mapToProductsReserved(products, productOrderDTOS, usersTelegramMap);
+        List<ProductReservedDTO> result = productMapper.mapToProductsReserved(products, productOrderDTOS, usersTelegramMap, 100);
 
         // Assert
         Assertions.assertThat(result).hasSize(2);
