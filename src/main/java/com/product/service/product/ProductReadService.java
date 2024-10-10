@@ -5,6 +5,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.product.dto.image.ImageDTO;
 import com.product.dto.product.*;
 import com.product.dto.ResponseMessageDTO;
+import com.product.dto.user.TelehandleResponse;
 import com.product.dto.user.UsersIdRequestDTO;
 import com.product.dto.user.UsersTelegramHandleDTO;
 import com.product.entity.Product;
@@ -132,9 +133,11 @@ public class ProductReadService {
         ResponseEntity<String> userResponseEntity = restTemplate.postForEntity(userUrl, entity, String.class);
         UsersTelegramHandleDTO usersTelegram = objectMapper.readValue(userResponseEntity.getBody(), UsersTelegramHandleDTO.class);
 
+        List<TelehandleResponse> telehandleResponseList = usersTelegram.getTelehandleResponseList();
         Map<Integer, String> userTelegramMap = new HashMap<>();
-        for(int i=0;i<usersId.size();i++){
-            userTelegramMap.put(usersId.toArray(new Integer[0])[i], usersTelegram.getTelehandleResponseList().get(i));
+      
+        for(int i=0;i<telehandleResponseList.size();i++){
+            userTelegramMap.put(telehandleResponseList.get(i).getUserId(), telehandleResponseList.get(i).getTelegram_handle());
         }
         List<ProductReservedDTO> productsReserved = productMapper.mapToProductsReserved(products, productOrderDTOS, userTelegramMap, ownerId);
 

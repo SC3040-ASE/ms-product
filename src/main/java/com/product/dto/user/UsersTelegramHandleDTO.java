@@ -6,5 +6,5 @@ import java.util.List;
 
 @Data
 public class UsersTelegramHandleDTO {
-    private List<String> telehandleResponseList;
+    private List<TelehandleResponse> telehandleResponseList;
 }
