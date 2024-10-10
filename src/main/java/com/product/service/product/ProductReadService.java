@@ -133,8 +133,8 @@ public class ProductReadService {
         UsersTelegramHandleDTO usersTelegram = objectMapper.readValue(userResponseEntity.getBody(), UsersTelegramHandleDTO.class);
 
         Map<Integer, String> userTelegramMap = new HashMap<>();
-        for(int i=0;i<buyersId.size();i++){
-            userTelegramMap.put(buyersId.toArray(new Integer[0])[i], usersTelegram.getTelehandleResponseList().get(i));
+        for(int i=0;i<usersId.size();i++){
+            userTelegramMap.put(usersId.toArray(new Integer[0])[i], usersTelegram.getTelehandleResponseList().get(i));
         }
         List<ProductReservedDTO> productsReserved = productMapper.mapToProductsReserved(products, productOrderDTOS, userTelegramMap, ownerId);
 
