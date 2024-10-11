@@ -111,20 +111,21 @@ public class ProductMapper {
         return productReadPreviewResponseDTOs;
     }
 
-    public List<ProductReservedDTO> mapToProductsReserved(List<Product> products, List<ProductOrderDTO> productOrderDTOS, Map<Integer,String> usersTelegramMap, Integer ownerId){
+    public List<ProductReservedDTO> mapToProductsReserved(List<Product> products, List<ProductOrderDTO> productOrderDTOS, Map<Integer,String> usersTelegramMap){
         List<ProductReservedDTO> productReservedDTOS = new ArrayList<>();
 
         for(int i=0;i<products.size();i++){
             Product product = products.get(i);
             ProductOrderDTO productOrder = productOrderDTOS.get(i);
-            String userTelegram = usersTelegramMap.get(productOrder.getBuyerId());
+            String buyerTelegram = usersTelegramMap.get(productOrder.getBuyerId());
+            String sellerTelegram = usersTelegramMap.get(productOrder.getSellerId());
             ProductReservedDTO productReserved = new ProductReservedDTO();
             productReserved.setProductId(product.getId());
             productReserved.setProductName(product.getProductName());
             productReserved.setPrice(product.getPrice());
             productReserved.setBuyerId(productOrder.getBuyerId());
-            productReserved.setBuyerTelegramHandle(userTelegram);
-            productReserved.setSellerTelegramHandle(usersTelegramMap.get(ownerId));
+            productReserved.setBuyerTelegramHandle(buyerTelegram);
+            productReserved.setSellerTelegramHandle(sellerTelegram);
             productReserved.setOrderStatus(productOrder.getStatus());
             productReservedDTOS.add(productReserved);
         }

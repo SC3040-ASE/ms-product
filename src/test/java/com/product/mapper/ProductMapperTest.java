@@ -323,7 +323,7 @@ public class ProductMapperTest {
         usersTelegramMap.put(102, "telegramUser2");
 
         // Act
-        List<ProductReservedDTO> result = productMapper.mapToProductsReserved(products, productOrderDTOS, usersTelegramMap, 100);
+        List<ProductReservedDTO> result = productMapper.mapToProductsReserved(products, productOrderDTOS, usersTelegramMap);
 
         // Assert
         Assertions.assertThat(result).hasSize(2);

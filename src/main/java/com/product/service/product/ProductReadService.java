@@ -123,6 +123,7 @@ public class ProductReadService {
 
         // get telegram id
         Set<Integer> usersId = productOrderDTOS.stream().map(ProductOrderDTO::getBuyerId).collect(HashSet::new, HashSet::add, HashSet::addAll);
+        usersId.addAll(productOrderDTOS.stream().map(ProductOrderDTO::getSellerId).toList());
         usersId.add(ownerId);
         String requestJson = objectMapper.writeValueAsString(new UsersIdRequestDTO(new ArrayList<>(usersId)));
         HttpHeaders headers = new HttpHeaders();
@@ -140,7 +141,7 @@ public class ProductReadService {
             userTelegramMap.put(telehandleResponseList.get(i).getUserId(), telehandleResponseList.get(i).getTelegram_handle());
         }
         
-        List<ProductReservedDTO> productsReserved = productMapper.mapToProductsReserved(products, productOrderDTOS, userTelegramMap, ownerId);
+        List<ProductReservedDTO> productsReserved = productMapper.mapToProductsReserved(products, productOrderDTOS, userTelegramMap);
 
         for(ProductReservedDTO productReserved: productsReserved){
             productReserved.setImage(pictureBlobStorageService.retrieveOneProductImage(productReserved.getProductId()));
