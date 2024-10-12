@@ -13,5 +13,7 @@ public class ProductReservedDTO {
     private ImageDTO image;
     private String buyerTelegramHandle;
     private Integer buyerId;
+    private String sellerTelegramHandle;
+    private String orderStatus;
 }
 

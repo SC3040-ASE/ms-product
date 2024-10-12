@@ -311,6 +311,12 @@ definitions:
       buyerId:
         type: integer
         example: 2
+      sellerTelegramHandle:
+        type: string
+        example: "jane_doe"
+      orderStatus:
+        type: string
+        example: "pending"
 
 
 
@@ -556,6 +562,11 @@ paths:
           description: Specify whether to search for products where the current user is the buyer (true) or the seller (false).
           required: true
           type: boolean
+        - name: orderStatus
+          in: query
+          description: Specify the order status to filter the results in capital letters. E.g. PENDING,CANCELLED
+          required: false
+          type: string
       responses:
         200:
           description: Products Reserved

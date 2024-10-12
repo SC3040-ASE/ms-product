@@ -92,7 +92,7 @@ public class ProductReadService {
     }
 
     @Transactional
-    public ResponseMessageDTO readProductsReserved(String messageId, Integer ownerId, Boolean isBuyer) throws Exception{
+    public ResponseMessageDTO readProductsReserved(String messageId, Integer ownerId, Boolean isBuyer, String orderStatus) throws Exception{
         RestTemplate restTemplate = new RestTemplate();
 
         String orderUrl = orderBaseUrl + "/orders/products";
@@ -100,6 +100,7 @@ public class ProductReadService {
         String orderParamUrl = UriComponentsBuilder.fromHttpUrl(orderUrl)
                 .queryParam("userId", ownerId)
                 .queryParam("isBuyer", isBuyer)
+                .queryParam("status", orderStatus)
                 .encode()
                 .toUriString();
 
@@ -119,10 +120,17 @@ public class ProductReadService {
         // get product's detail
         List<Integer> productIds = productOrderDTOS.stream().map(ProductOrderDTO::getProductId).toList();
         List<Product> products = productRepository.findAllById(productIds);
+        Map<Integer, Product> productMap = new HashMap<>();
+        for(Product product: products){
+            productMap.put(product.getId(), product);
+        }
+
 
         // get telegram id
-        Set<Integer> buyersId = productOrderDTOS.stream().map(ProductOrderDTO::getBuyerId).collect(HashSet::new, HashSet::add, HashSet::addAll);
-        String requestJson = objectMapper.writeValueAsString(new UsersIdRequestDTO(new ArrayList<>(buyersId)));
+        Set<Integer> usersId = productOrderDTOS.stream().map(ProductOrderDTO::getBuyerId).collect(HashSet::new, HashSet::add, HashSet::addAll);
+        usersId.addAll(productOrderDTOS.stream().map(ProductOrderDTO::getSellerId).toList());
+        usersId.add(ownerId);
+        String requestJson = objectMapper.writeValueAsString(new UsersIdRequestDTO(new ArrayList<>(usersId)));
         HttpHeaders headers = new HttpHeaders();
         headers.setContentType(MediaType.APPLICATION_JSON);
         HttpEntity<String> entity = new HttpEntity<>(requestJson,headers);
@@ -133,10 +141,12 @@ public class ProductReadService {
 
         List<TelehandleResponse> telehandleResponseList = usersTelegram.getTelehandleResponseList();
         Map<Integer, String> userTelegramMap = new HashMap<>();
+      
         for(int i=0;i<telehandleResponseList.size();i++){
             userTelegramMap.put(telehandleResponseList.get(i).getUserId(), telehandleResponseList.get(i).getTelegram_handle());
         }
-        List<ProductReservedDTO> productsReserved = productMapper.mapToProductsReserved(products, productOrderDTOS, userTelegramMap);
+        
+        List<ProductReservedDTO> productsReserved = productMapper.mapToProductsReserved(productOrderDTOS, userTelegramMap, productMap);
 
         for(ProductReservedDTO productReserved: productsReserved){
             productReserved.setImage(pictureBlobStorageService.retrieveOneProductImage(productReserved.getProductId()));

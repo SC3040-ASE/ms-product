@@ -29,7 +29,7 @@ public class TagService {
         List<Tag> newTags = tagNames.stream()
                 .filter(tagName -> !existingTagNames.contains(tagName))
                 .map(tagName -> {
-                    Tag tag = new Tag(tagName);
+                    Tag tag = new Tag(tagName.toLowerCase());
                     tag.setCategory(category);
                     return tag;
                 })
