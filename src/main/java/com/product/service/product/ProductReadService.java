@@ -120,6 +120,11 @@ public class ProductReadService {
         // get product's detail
         List<Integer> productIds = productOrderDTOS.stream().map(ProductOrderDTO::getProductId).toList();
         List<Product> products = productRepository.findAllById(productIds);
+        Map<Integer, Product> productMap = new HashMap<>();
+        for(Product product: products){
+            productMap.put(product.getId(), product);
+        }
+
 
         // get telegram id
         Set<Integer> usersId = productOrderDTOS.stream().map(ProductOrderDTO::getBuyerId).collect(HashSet::new, HashSet::add, HashSet::addAll);
@@ -141,7 +146,7 @@ public class ProductReadService {
             userTelegramMap.put(telehandleResponseList.get(i).getUserId(), telehandleResponseList.get(i).getTelegram_handle());
         }
         
-        List<ProductReservedDTO> productsReserved = productMapper.mapToProductsReserved(products, productOrderDTOS, userTelegramMap);
+        List<ProductReservedDTO> productsReserved = productMapper.mapToProductsReserved(productOrderDTOS, userTelegramMap, productMap);
 
         for(ProductReservedDTO productReserved: productsReserved){
             productReserved.setImage(pictureBlobStorageService.retrieveOneProductImage(productReserved.getProductId()));

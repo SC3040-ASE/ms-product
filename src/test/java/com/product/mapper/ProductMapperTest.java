@@ -289,43 +289,43 @@ public class ProductMapperTest {
     @DisplayName("Test map to products reserved")
     void testMapToProductsReserved() {
         // Arrange
-        List<Product> products = new ArrayList<>();
         List<ProductOrderDTO> productOrderDTOS = new ArrayList<>();
-        List<String> usersTelegram = Arrays.asList("telegramUser1", "telegramUser2");
 
         Product product1 = new Product();
         product1.setId(1);
         product1.setProductName("Product 1");
         product1.setPrice(new BigDecimal("10.00"));
 
-        ProductOrderDTO order1 = new ProductOrderDTO();
-        order1.setBuyerId(101);
-        order1.setStatus("pending");
-
         Product product2 = new Product();
         product2.setId(2);
         product2.setProductName("Product 2");
         product2.setPrice(new BigDecimal("20.00"));
 
+        Map<Integer,Product> productMap = new HashMap<>();
+        productMap.put(product1.getId(), product1);
+        productMap.put(product2.getId(), product2);
+
+
+        ProductOrderDTO order1 = new ProductOrderDTO();
+        order1.setBuyerId(101);
+        order1.setStatus("pending");
+        order1.setProductId(product1.getId());
+
         ProductOrderDTO order2 = new ProductOrderDTO();
         order2.setBuyerId(102);
         order2.setStatus("pending");
+        order2.setProductId(product2.getId());
 
-        products.add(product1);
         productOrderDTOS.add(order1);
-        products.add(product2);
         productOrderDTOS.add(order2);
-
-        ProductMapper productMapper = new ProductMapper();
 
         Map<Integer,String> usersTelegramMap = new HashMap<>();
         usersTelegramMap.put(101, "telegramUser1");
         usersTelegramMap.put(102, "telegramUser2");
 
-        // Act
-        List<ProductReservedDTO> result = productMapper.mapToProductsReserved(products, productOrderDTOS, usersTelegramMap);
+        ProductMapper productMapper = new ProductMapper();
+        List<ProductReservedDTO> result = productMapper.mapToProductsReserved(productOrderDTOS, usersTelegramMap, productMap);
 
-        // Assert
         Assertions.assertThat(result).hasSize(2);
 
         ProductReservedDTO dto1 = result.get(0);

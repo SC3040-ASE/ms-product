@@ -564,7 +564,7 @@ paths:
           type: boolean
         - name: orderStatus
           in: query
-          description: Specify the order status to filter the results. E.g. pending,cancelled
+          description: Specify the order status to filter the results in capital letters. E.g. PENDING,CANCELLED
           required: false
           type: string
       responses:
