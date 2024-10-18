@@ -22,6 +22,7 @@ public class TagDeleteService {
         Optional<Tag> optionalTag;
         if (
             tagDeleteRequestDTO.getId() == null
+                || tagDeleteRequestDTO.getTagName() == null
                 || tagDeleteRequestDTO.getTagName().isEmpty()
                 || tagDeleteRequestDTO.getCategory().getId() == null
         ) {
