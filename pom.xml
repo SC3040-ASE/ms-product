@@ -91,10 +91,13 @@
             <artifactId>spring-cloud-gcp-starter-pubsub</artifactId>
         </dependency>
 
+        <!-- https://mvnrepository.com/artifact/org.springframework.integration/spring-integration-core -->
         <dependency>
             <groupId>org.springframework.integration</groupId>
             <artifactId>spring-integration-core</artifactId>
+            <version>6.3.4</version>
         </dependency>
+
 
         <dependency>
             <groupId>org.projectlombok</groupId>
