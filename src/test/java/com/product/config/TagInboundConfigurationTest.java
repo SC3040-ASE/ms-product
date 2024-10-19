@@ -1,6 +1,5 @@
 package com.product.config;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.product.Application;
@@ -54,7 +53,7 @@ public class TagInboundConfigurationTest {
     private User user;
 
     @BeforeAll
-    public void setup(){
+    public void setup() {
         category = new Category();
         category.setCategoryName("testTagGeneration");
         category = categoryRepository.save(category);
@@ -74,7 +73,7 @@ public class TagInboundConfigurationTest {
     }
 
     @AfterAll
-    public void tearDown(){
+    public void tearDown() {
         tagRepository.delete(taggy);
         categoryRepository.delete(category);
         userRepository.delete(user);
@@ -82,8 +81,8 @@ public class TagInboundConfigurationTest {
 
     @Test
     @DisplayName("Test Tag Generation")
-    void testTagGeneration() throws Exception{
-        Map<String,String> headers = new HashMap<>();
+    void testTagGeneration() throws Exception {
+        Map<String, String> headers = new HashMap<>();
         headers.put("X-User-Id", "-1");
         headers.put("X-Is-Admin", "false");
         headers.put("X-productName", "apple watch");
@@ -91,11 +90,12 @@ public class TagInboundConfigurationTest {
         headers.put("X-categoryId", category.getId().toString());
 
 
-        RequestMessageDTO requestMessageDTO = new RequestMessageDTO("123", "GET", "/products/tag/generate",headers,null);
+        RequestMessageDTO requestMessageDTO = new RequestMessageDTO("123", "GET", "/products/tag/generate", headers, null);
         ResponseMessageDTO response = inboundConfiguration.handler(requestMessageDTO);
         Assertions.assertEquals(200, response.getStatus());
         Assertions.assertNotNull(response.getBody());
-        List<String> tags = objectMapper.readValue(response.getBody(), new TypeReference<>(){});
+        List<String> tags = objectMapper.readValue(response.getBody(), new TypeReference<>() {
+        });
         Assertions.assertFalse(tags.isEmpty());
     }
 
@@ -103,7 +103,7 @@ public class TagInboundConfigurationTest {
     @Transactional
     @DisplayName("Test Tag Creation")
     void testTagCreation() throws Exception {
-        Map<String,String> headers = new HashMap<>();
+        Map<String, String> headers = new HashMap<>();
         headers.put("X-User-Id", Integer.toString(user.getId()));
         headers.put("X-Is-Admin", Boolean.toString(user.getIsAdmin()));
 
@@ -136,7 +136,7 @@ public class TagInboundConfigurationTest {
     @Transactional
     @DisplayName("Test Tag Update")
     void testTagUpdate() throws Exception {
-        Map<String,String> headers = new HashMap<>();
+        Map<String, String> headers = new HashMap<>();
         headers.put("X-User-Id", Integer.toString(user.getId()));
         headers.put("X-Is-Admin", Boolean.toString(user.getIsAdmin()));
 
@@ -179,7 +179,7 @@ public class TagInboundConfigurationTest {
     @Transactional
     @DisplayName("Test Tag Delete")
     void testTagDelete() throws Exception {
-        Map<String,String> headers = new HashMap<>();
+        Map<String, String> headers = new HashMap<>();
         headers.put("X-User-Id", Integer.toString(user.getId()));
         headers.put("X-Is-Admin", Boolean.toString(user.getIsAdmin()));
         Tag tag = new Tag();
@@ -216,7 +216,7 @@ public class TagInboundConfigurationTest {
     @Transactional
     @DisplayName("Test Tag Get")
     void testTagGet() throws Exception {
-        Map<String,String> headers = new HashMap<>();
+        Map<String, String> headers = new HashMap<>();
         headers.put("X-User-Id", Integer.toString(user.getId()));
         headers.put("X-Is-Admin", Boolean.toString(user.getIsAdmin()));
 
@@ -249,7 +249,8 @@ public class TagInboundConfigurationTest {
         );
         response = inboundConfiguration.handler(requestMessageDTO);
         Assertions.assertEquals(200, response.getStatus());
-        List<Tag> tags = objectMapper.readValue(response.getBody(), new TypeReference<>() {});
+        List<Tag> tags = objectMapper.readValue(response.getBody(), new TypeReference<>() {
+        });
         Assertions.assertFalse(tags.isEmpty());
     }
 }
