@@ -30,7 +30,7 @@ public class CategoryDeleteService {
             ) {
                 return new ResponseMessageDTO(messageId, 403, "Forbidden Delete Request.");
             } else {
-                if (!optionalCategory.get().getProducts().isEmpty()) {
+                if (optionalCategory.get().getProducts() != null && !optionalCategory.get().getProducts().isEmpty()) {
                     log.info("There are products tied to this category. Rejecting delete request.");
                     return new ResponseMessageDTO(messageId, 403, "Forbidden Delete Request.");
                 }
