@@ -13,7 +13,7 @@ import java.util.List;
 
 @SpringBootTest(classes = Application.class)
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
-public class TagMapperTest {
+class TagMapperTest {
     @Autowired
     private TagMapper tagMapper;
 

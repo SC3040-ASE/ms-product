@@ -22,7 +22,7 @@ import java.util.List;
 @ExtendWith(SpringExtension.class)
 @SpringBootTest(classes = Application.class)
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
-public class ProductRepositoryTest {
+class ProductRepositoryTest {
 
     @Autowired
     private ProductRepository productRepository;
@@ -115,7 +115,7 @@ public class ProductRepositoryTest {
 
     @Test
     @DisplayName("Test create product")
-    public void testCreateProduct() {
+    void testCreateProduct() {
         Product product = new Product();
         product.setOwnerId(user2.getId());
         product.setProductName("Another Test Product");
@@ -141,8 +141,7 @@ public class ProductRepositoryTest {
         Product readProduct = productRepository.findById(testProduct.getId()).orElse(null);
         Assertions.assertNotNull(readProduct);
         Assertions.assertEquals(testProduct.getProductName(), readProduct.getProductName());
-        Assertions.assertTrue(testProduct.getPrice().compareTo(readProduct.getPrice()) == 0,
-                "Prices should be equal");
+        Assertions.assertEquals(0,testProduct.getPrice().compareTo(readProduct.getPrice()));
         Assertions.assertEquals(testProduct.getCondition(), readProduct.getCondition());
         Assertions.assertEquals(testProduct.getTotalQuantity(), readProduct.getTotalQuantity());
         Assertions.assertEquals(testProduct.getCurrentQuantity(), readProduct.getCurrentQuantity());
@@ -163,8 +162,7 @@ public class ProductRepositoryTest {
         Product updatedProduct = productRepository.findById(testProduct.getId()).orElse(null);
         Assertions.assertNotNull(updatedProduct);
         Assertions.assertEquals("Updated Product", updatedProduct.getProductName());
-        Assertions.assertTrue(productToUpdate.getPrice().compareTo(updatedProduct.getPrice()) == 0,
-                "Prices should be equal");
+        Assertions.assertEquals(0,productToUpdate.getPrice().compareTo(updatedProduct.getPrice()));
     }
 
     @Test

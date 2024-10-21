@@ -49,7 +49,7 @@ public class ProductMapper {
     public Pair<List<ProductSearchResultDTO>,Integer> mapToSearchResults(List<Object[]> results) {
         List<ProductSearchResultDTO> searchResults = new ArrayList<>();
         int totalResults = 0;
-        if(results.size()>0){
+        if(!results.isEmpty()){
             totalResults = (Integer) results.get(0)[9];
         }
 

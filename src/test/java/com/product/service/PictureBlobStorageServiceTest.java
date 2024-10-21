@@ -23,7 +23,7 @@ import java.util.List;
 @SpringBootTest(classes = Application.class)
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
 @Slf4j
-public class PictureBlobStorageServiceTest {
+class PictureBlobStorageServiceTest {
 
     @Autowired
     private PictureBlobStorageService pictureBlobService;

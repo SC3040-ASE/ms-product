@@ -29,7 +29,7 @@ import java.util.*;
 @SpringBootTest(classes = Application.class)
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
 @Slf4j
-public class TagInboundConfigurationTest {
+class TagInboundConfigurationTest {
 
     @Autowired
     private InboundConfiguration inboundConfiguration;

@@ -26,7 +26,7 @@ import java.util.Optional;
 @SpringBootTest(classes = Application.class)
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
 @Slf4j
-public class TagServiceTest {
+class TagServiceTest {
 
     @Autowired
     private TagGenerationService tagGenerationService;

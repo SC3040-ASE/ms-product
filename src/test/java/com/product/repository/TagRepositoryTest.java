@@ -10,7 +10,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.annotation.Rollback;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
-import org.testcontainers.shaded.com.fasterxml.jackson.databind.ObjectMapper;
 
 import java.util.Optional;
 
@@ -18,8 +17,7 @@ import java.util.Optional;
 @SpringBootTest(classes = Application.class)
 @Slf4j
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
-public class TagRepositoryTest {
-    private static final ObjectMapper objectMapper = new ObjectMapper();
+class TagRepositoryTest {
     @Autowired
     private TagRepository tagRepository;
     @Autowired
@@ -28,10 +26,10 @@ public class TagRepositoryTest {
     private Category mainCat;
 
     @BeforeAll
-    public void setup() throws Exception {
+    public void setup(){
         mainCat = new Category();
         mainCat.setCategoryName("testCat");
-        Category savedCat = categoryRepository.saveAndFlush(mainCat);
+        categoryRepository.saveAndFlush(mainCat);
 
         tag1 = new Tag();
         tag1.setTagName("testTag1");

@@ -1,13 +1,12 @@
 package com.product.service.product;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
 import com.product.dto.*;
 import com.product.dto.product.ProductCreationRequestDTO;
 import com.product.dto.product.ProductUpdateRequestDTO;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
-
-import java.util.List;
 
 @Service
 @Slf4j
@@ -23,7 +22,7 @@ public class ProductService {
         return productCreationService.createProduct(messageId, productCreationRequestDTO);
     }
 
-    public ResponseMessageDTO handleReadProduct(String messageId, Integer id) throws Exception {
+    public ResponseMessageDTO handleReadProduct(String messageId, Integer id) throws JsonProcessingException {
         return productReadService.readProduct(messageId, id);
     }
 

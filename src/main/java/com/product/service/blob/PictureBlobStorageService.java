@@ -17,16 +17,16 @@ import java.util.*;
 public class PictureBlobStorageService {
 
     private final BlobContainerClient pictureContainerClient;
-    private final String directoryNameTemplate = "product_";
-    private final String imageFileNameTemplate = "product_image_";
+    private static final String DIRECTORY_NAME_TEMPLATE = "product_";
+    private static final String IMAGE_FILE_NAME_TEMPLATE = "product_image_";
 
     public void saveImages(int productId, List<String> imageBase64List) {
-        String directory = directoryNameTemplate + productId;
+        String directory = DIRECTORY_NAME_TEMPLATE + productId;
         for (int i = 0; i < imageBase64List.size(); i++) {
             String imageBase64 = imageBase64List.get(i);
             byte[] imageBytes = Base64.getDecoder().decode(imageBase64);
             BlockBlobClient blobClient = pictureContainerClient
-                    .getBlobClient(directory + "/" + imageFileNameTemplate + i+".jpg")
+                    .getBlobClient(directory + "/" + IMAGE_FILE_NAME_TEMPLATE + i+".jpg")
                     .getBlockBlobClient();
 
             ByteArrayInputStream dataStream = new ByteArrayInputStream(imageBytes);
@@ -35,7 +35,7 @@ public class PictureBlobStorageService {
     }
 
     public void deleteDirectory(int productId) {
-        String directory = directoryNameTemplate + productId +"/";
+        String directory = DIRECTORY_NAME_TEMPLATE + productId +"/";
 
         Iterable<BlobItem> blobs = pictureContainerClient.listBlobsByHierarchy(directory);
 
@@ -46,7 +46,7 @@ public class PictureBlobStorageService {
 
 
     public List<ImageDTO> retrieveProductImages(int productId) {
-        String directory = directoryNameTemplate + productId + "/";
+        String directory = DIRECTORY_NAME_TEMPLATE + productId + "/";
 
         List<ImageDTO> images = new ArrayList<>();
 
@@ -65,7 +65,7 @@ public class PictureBlobStorageService {
     }
 
     public ImageDTO retrieveOneProductImage(int productId) {
-        String directory = directoryNameTemplate + productId + "/";
+        String directory = DIRECTORY_NAME_TEMPLATE + productId + "/";
         ImageDTO image = null;
 
         Iterator<BlobItem> blobItemIterator = pictureContainerClient.listBlobsByHierarchy(directory).iterator();
@@ -86,7 +86,7 @@ public class PictureBlobStorageService {
 
 
     public void updateProductImages(int productId, List<String> imagesToDelete, List<String> base64ImagesToAdd) {
-        String directory = directoryNameTemplate + productId + "/";
+        String directory = DIRECTORY_NAME_TEMPLATE + productId + "/";
 
         for (String imageName : imagesToDelete) {
             String filePath = directory + imageName;
@@ -115,7 +115,7 @@ public class PictureBlobStorageService {
 
         for (String base64Image : base64ImagesToAdd) {
             byte[] imageBytes = Base64.getDecoder().decode(base64Image);
-            String imageName = imageFileNameTemplate + nextIndex + ".jpg";
+            String imageName = IMAGE_FILE_NAME_TEMPLATE + nextIndex + ".jpg";
             BlockBlobClient blobClient = pictureContainerClient
                     .getBlobClient(directory + imageName)
                     .getBlockBlobClient();

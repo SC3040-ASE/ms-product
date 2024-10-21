@@ -34,7 +34,6 @@ public class TagUpdateService {
         if (tagUpdateRequestDTO.getId().equals(optionalTag.get().getId())) {
             Tag updatedTag = tagMapper.mapUpdatedTagDTOToTag(optionalTag.get(), tagUpdateRequestDTO);
             Tag savedTag = tagRepository.saveAndFlush(updatedTag);
-            log.info("Successfully updated tag: {}", savedTag);
             TagReadResponseDTO newTag = tagMapper.mapTagToTagDTO(savedTag);
             return new ResponseMessageDTO(messageId, 200, objectMapper.writeValueAsString(newTag));
         } else {

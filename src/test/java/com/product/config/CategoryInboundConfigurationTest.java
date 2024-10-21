@@ -6,9 +6,7 @@ import com.product.Application;
 import com.product.dto.RequestMessageDTO;
 import com.product.dto.ResponseMessageDTO;
 import com.product.dto.category.*;
-import com.product.dto.tag.TagCreationRequestDTO;
 import com.product.entity.Category;
-import com.product.entity.Tag;
 import com.product.entity.User;
 import com.product.repository.CategoryRepository;
 import com.product.repository.UserRepository;
@@ -26,7 +24,7 @@ import java.util.*;
 @SpringBootTest(classes = Application.class)
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
 @Slf4j
-public class CategoryInboundConfigurationTest {
+class CategoryInboundConfigurationTest {
     @Autowired
     private InboundConfiguration inboundConfiguration;
 

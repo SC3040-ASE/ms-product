@@ -6,7 +6,6 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.product.Application;
 import com.product.dto.ResponseMessageDTO;
 import com.product.dto.category.*;
-import com.product.dto.tag.TagCreationRequestDTO;
 import com.product.entity.Category;
 import com.product.repository.CategoryRepository;
 import com.product.service.category.CategoryCreationService;
@@ -14,7 +13,6 @@ import com.product.service.category.CategoryDeleteService;
 import com.product.service.category.CategoryReadService;
 import com.product.service.category.CategoryUpdateService;
 import lombok.extern.slf4j.Slf4j;
-import org.junit.Assert;
 import org.junit.jupiter.api.*;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -27,7 +25,7 @@ import java.util.List;
 @SpringBootTest(classes = Application.class)
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
 @Slf4j
-public class CategoryServiceTest {
+class CategoryServiceTest {
     @Autowired
     private CategoryRepository categoryRepository;
 
@@ -46,16 +44,6 @@ public class CategoryServiceTest {
     @Autowired
     private ObjectMapper objectMapper;
 
-
-    @BeforeAll
-    public void setup(){
-
-    }
-
-    @AfterAll
-    public void tearDown(){
-
-    }
 
     @Test
     @DisplayName("Test Create Category")
@@ -103,7 +91,7 @@ public class CategoryServiceTest {
 
         ResponseMessageDTO response = categoryReadService.getAllCategories("123");
         Assertions.assertEquals(200, response.getStatus());
-        List<CategoryReadResponseDTO> dtoList1 = objectMapper.readValue(response.getBody(), new TypeReference<>() {});
+        objectMapper.readValue(response.getBody(), new TypeReference<>() {});
         Assertions.assertFalse(dtoList.isEmpty());
     }
 
