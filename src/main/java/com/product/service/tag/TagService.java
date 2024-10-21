@@ -73,7 +73,7 @@ public class TagService {
                 .tagName(tag.getTagName()).build()).toList();
     }
 
-    public ResponseMessageDTO handleGenerateTag(String messageId, String productName, String productDescription, Integer categoryId) throws Exception {
+    public ResponseMessageDTO handleGenerateTag(String messageId, String productName, String productDescription, Integer categoryId) throws JsonProcessingException {
         return tagGenerationService.generateTag(messageId, productName, productDescription, categoryId);
     }
 }

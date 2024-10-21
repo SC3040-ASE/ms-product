@@ -154,7 +154,7 @@ class ProductServiceTest {
         Assertions.assertEquals(productCreationRequestDTO.getCategory(), databaseProduct.getCategory().getCategoryName());
         Assertions.assertEquals(productCreationRequestDTO.getCondition(), databaseProduct.getCondition());
         Assertions.assertEquals(productCreationRequestDTO.getDescription(), databaseProduct.getDescription());
-        Assertions.assertTrue(productCreationRequestDTO.getPrice().compareTo(databaseProduct.getPrice())==0);
+        Assertions.assertEquals(0,productCreationRequestDTO.getPrice().compareTo(databaseProduct.getPrice()));
         Assertions.assertEquals(productCreationRequestDTO.getTotalQuantity(), databaseProduct.getTotalQuantity());
 
         List<String> savedImages = pictureBlobStorageService.retrieveProductImages(productId).stream().map(ImageDTO::getImageBase64).toList();
@@ -232,7 +232,7 @@ class ProductServiceTest {
         Assertions.assertEquals(testProduct1Updated.getCategory(), updatedProduct.getCategory().getCategoryName());
         Assertions.assertEquals(testProduct1Updated.getCondition(), updatedProduct.getCondition());
         Assertions.assertEquals(testProduct1Updated.getDescription(), updatedProduct.getDescription());
-        Assertions.assertTrue(testProduct1Updated.getPrice().compareTo(updatedProduct.getPrice())==0);
+        Assertions.assertEquals(0,testProduct1Updated.getPrice().compareTo(updatedProduct.getPrice()));
         Assertions.assertEquals(testProduct1Updated.getTotalQuantity(), updatedProduct.getTotalQuantity());
         Assertions.assertEquals(testProduct1Updated.getCurrentQuantity(), updatedProduct.getCurrentQuantity());
 

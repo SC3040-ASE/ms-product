@@ -142,7 +142,7 @@ class ProductInboundConfigurationTest {
         Assertions.assertNotNull(productCreated);
         Assertions.assertEquals(productCreationRequestDTO.getProductName(), productCreated.getProductName());
         Assertions.assertEquals(productCreationRequestDTO.getDescription(), productCreated.getDescription());
-        Assertions.assertTrue(productCreationRequestDTO.getPrice().compareTo(productCreated.getPrice())==0);
+        Assertions.assertEquals(0,productCreationRequestDTO.getPrice().compareTo(productCreated.getPrice()));
         Assertions.assertEquals(productCreationRequestDTO.getTotalQuantity(), productCreated.getTotalQuantity());
         Assertions.assertEquals(productCreationRequestDTO.getCondition(), productCreated.getCondition());
         Assertions.assertEquals(productCreationRequestDTO.getOwnerId(), productCreated.getOwnerId());
@@ -202,7 +202,7 @@ class ProductInboundConfigurationTest {
         Assertions.assertEquals(1, productsReadPreview.size());
         ProductReadPreviewDTO productReadPreviewDTO = productsReadPreview.get(0);
         Assertions.assertEquals(product.getProductName(), productReadPreviewDTO.getProductName());
-        Assertions.assertTrue(product.getPrice().compareTo(productReadPreviewDTO.getPrice())==0);
+        Assertions.assertEquals(0,product.getPrice().compareTo(productReadPreviewDTO.getPrice()));
         Assertions.assertEquals(product.getCondition(), productReadPreviewDTO.getCondition());
         Assertions.assertEquals(product.getOwnerId(), productReadPreviewDTO.getOwnerId());
     }
@@ -255,7 +255,7 @@ class ProductInboundConfigurationTest {
         Assertions.assertNotNull(productUpdated);
         Assertions.assertEquals(productUpdateRequestDTO.getProductName(), productUpdated.getProductName());
         Assertions.assertEquals(productUpdateRequestDTO.getDescription(), productUpdated.getDescription());
-        Assertions.assertTrue(productUpdateRequestDTO.getPrice().compareTo(productUpdated.getPrice())==0);
+        Assertions.assertEquals(0,productUpdateRequestDTO.getPrice().compareTo(productUpdated.getPrice()));
         Assertions.assertEquals(productUpdateRequestDTO.getTotalQuantity(), productUpdated.getTotalQuantity());
         Assertions.assertEquals(productUpdateRequestDTO.getCondition(), productUpdated.getCondition());
         Assertions.assertEquals(productUpdateRequestDTO.getCategory(), productUpdated.getCategory().getCategoryName());

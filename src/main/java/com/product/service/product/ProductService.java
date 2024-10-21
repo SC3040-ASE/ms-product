@@ -1,5 +1,6 @@
 package com.product.service.product;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
 import com.product.dto.*;
 import com.product.dto.product.ProductCreationRequestDTO;
 import com.product.dto.product.ProductUpdateRequestDTO;
@@ -21,7 +22,7 @@ public class ProductService {
         return productCreationService.createProduct(messageId, productCreationRequestDTO);
     }
 
-    public ResponseMessageDTO handleReadProduct(String messageId, Integer id) throws Exception {
+    public ResponseMessageDTO handleReadProduct(String messageId, Integer id) throws JsonProcessingException {
         return productReadService.readProduct(messageId, id);
     }
 
