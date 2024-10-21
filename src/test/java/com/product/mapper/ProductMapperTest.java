@@ -20,7 +20,7 @@ import java.util.*;
 
 @SpringBootTest(classes = Application.class)
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
-public class ProductMapperTest {
+class ProductMapperTest {
 
     @Autowired
     private ProductMapper productMapper;
@@ -93,8 +93,6 @@ public class ProductMapperTest {
 
         Category updatedCategory = new Category("UpdatedCategory");
 
-        ProductMapper productMapper = new ProductMapper();
-
         // Act
         Product updatedProduct = productMapper.updateProductFromDTO(product, dto, existingTags, updatedCategory);
 
@@ -142,8 +140,6 @@ public class ProductMapperTest {
                 0.85f, // score
                 100 // totalResults (ignored for other rows)
         });
-
-        ProductMapper productMapper = new ProductMapper();
 
         // Act
         Pair<List<ProductSearchResultDTO>, Integer> result = productMapper.mapToSearchResults(results);
@@ -206,9 +202,7 @@ public class ProductMapperTest {
         image2.setImageName("imageUrl2");
         image2.setImageBase64("base64Image2");
         List<ImageDTO> images = Arrays.asList(image1, image2);
-
-        ProductMapper productMapper = new ProductMapper();
-
+        
         // Act
         ProductReadResponseDTO response = productMapper.mapToProductReadResponse(product, images, "ownerUsername");
 
@@ -257,9 +251,7 @@ public class ProductMapperTest {
 
         products.add(product1);
         products.add(product2);
-
-        ProductMapper productMapper = new ProductMapper();
-
+        
         // Act
         List<ProductReadPreviewDTO> result = productMapper.mapToReadPreviewResults(products);
 
@@ -323,7 +315,6 @@ public class ProductMapperTest {
         usersTelegramMap.put(101, "telegramUser1");
         usersTelegramMap.put(102, "telegramUser2");
 
-        ProductMapper productMapper = new ProductMapper();
         List<ProductReservedDTO> result = productMapper.mapToProductsReserved(productOrderDTOS, usersTelegramMap, productMap);
 
         Assertions.assertThat(result).hasSize(2);

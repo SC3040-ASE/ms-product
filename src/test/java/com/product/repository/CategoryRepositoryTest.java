@@ -21,7 +21,7 @@ import java.util.Optional;
 @SpringBootTest(classes = Application.class)
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
 @Slf4j
-public class CategoryRepositoryTest {
+class CategoryRepositoryTest {
     private static final ObjectMapper objectMapper = new ObjectMapper();
     @Autowired
     private CategoryRepository categoryRepository;

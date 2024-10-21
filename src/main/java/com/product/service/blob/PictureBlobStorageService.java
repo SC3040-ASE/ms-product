@@ -17,8 +17,8 @@ import java.util.*;
 public class PictureBlobStorageService {
 
     private final BlobContainerClient pictureContainerClient;
-    private final String directoryNameTemplate = "product_";
-    private final String imageFileNameTemplate = "product_image_";
+    private final static String directoryNameTemplate = "product_";
+    private final static String imageFileNameTemplate = "product_image_";
 
     public void saveImages(int productId, List<String> imageBase64List) {
         String directory = directoryNameTemplate + productId;

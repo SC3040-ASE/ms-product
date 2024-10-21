@@ -31,7 +31,7 @@ import java.util.Map;
 @SpringBootTest(classes = Application.class)
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
 @Slf4j
-public class ProductInboundConfigurationTest {
+class ProductInboundConfigurationTest {
 
     @Autowired
     private InboundConfiguration inboundConfiguration;

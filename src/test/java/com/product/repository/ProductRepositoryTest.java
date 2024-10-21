@@ -22,7 +22,7 @@ import java.util.List;
 @ExtendWith(SpringExtension.class)
 @SpringBootTest(classes = Application.class)
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
-public class ProductRepositoryTest {
+class ProductRepositoryTest {
 
     @Autowired
     private ProductRepository productRepository;
@@ -115,7 +115,7 @@ public class ProductRepositoryTest {
 
     @Test
     @DisplayName("Test create product")
-    public void testCreateProduct() {
+    void testCreateProduct() {
         Product product = new Product();
         product.setOwnerId(user2.getId());
         product.setProductName("Another Test Product");

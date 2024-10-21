@@ -40,7 +40,7 @@ import java.util.stream.Stream;
 @SpringBootTest(classes = Application.class)
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
 @Slf4j
-public class ProductServiceTest {
+class ProductServiceTest {
 
     @Autowired
     private ProductCreationService productCreationService;

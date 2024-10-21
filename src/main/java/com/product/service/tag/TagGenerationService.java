@@ -1,5 +1,6 @@
 package com.product.service.tag;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -24,7 +25,7 @@ public class TagGenerationService {
     @Value("${gemini.api.key}")
     private String apiKey;
     private final ObjectMapper objectMapper;
-    private final String BASE_URL;
+    private final String baseUrl;
     private final String systemInstructionTextTemplate;
     private final RestTemplate restTemplate;
     private final TagRepository tagRepository;
@@ -33,7 +34,7 @@ public class TagGenerationService {
     public TagGenerationService(ObjectMapper objectMapper, TagRepository tagRepository){
         this.objectMapper = objectMapper;
         this.tagRepository = tagRepository;
-        BASE_URL = "https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=";
+        baseUrl = "https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=";
         restTemplate = new RestTemplateBuilder().build();
         systemInstructionTextTemplate = "You are tasked with generating a list of tags based on a product's name and description. " +
                 "The tags should capture key characteristics and concepts that are closely related to the product, reflecting its most relevant features. " +
@@ -45,7 +46,7 @@ public class TagGenerationService {
 
     }
 
-    public ResponseMessageDTO generateTag(String messageId, String productName, String productDescription, Integer categoryId) throws Exception {
+    public ResponseMessageDTO generateTag(String messageId, String productName, String productDescription, Integer categoryId) throws JsonProcessingException {
         String prompt = String.format("Product name: %s, Product Description: %s", productName, productDescription);
         List<String> existingTags = tagRepository.searchTag(categoryId,prompt);
 
@@ -57,13 +58,11 @@ public class TagGenerationService {
     }
 
 
-    public List<String> generateTagUsingLLM(String prompt, List<String> existingList) throws Exception {
-        String apiUrl = BASE_URL + apiKey;
+    public List<String> generateTagUsingLLM(String prompt, List<String> existingList) throws JsonProcessingException {
+        String apiUrl = baseUrl + apiKey;
 
         HttpHeaders headers = new HttpHeaders();
         headers.set("Content-Type", "application/json");
-
-        ObjectMapper objectMapper = new ObjectMapper();
 
         // content
         ObjectNode contentNode = objectMapper.createObjectNode();

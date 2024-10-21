@@ -1,5 +1,6 @@
 package com.product.service.product;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.product.dto.image.ImageDTO;
@@ -40,7 +41,7 @@ public class ProductReadService {
 
 
     @Transactional
-    public ResponseMessageDTO readProduct(String messageId, Integer id) throws Exception {
+    public ResponseMessageDTO readProduct(String messageId, Integer id) throws JsonProcessingException {
         RestTemplate restTemplate = new RestTemplate();
 
 
@@ -141,9 +142,9 @@ public class ProductReadService {
 
         List<TelehandleResponse> telehandleResponseList = usersTelegram.getTelehandleResponseList();
         Map<Integer, String> userTelegramMap = new HashMap<>();
-      
-        for(int i=0;i<telehandleResponseList.size();i++){
-            userTelegramMap.put(telehandleResponseList.get(i).getUserId(), telehandleResponseList.get(i).getTelegram_handle());
+
+        for (TelehandleResponse telehandleResponse : telehandleResponseList) {
+            userTelegramMap.put(telehandleResponse.getUserId(), telehandleResponse.getTelegram_handle());
         }
         
         List<ProductReservedDTO> productsReserved = productMapper.mapToProductsReserved(productOrderDTOS, userTelegramMap, productMap);

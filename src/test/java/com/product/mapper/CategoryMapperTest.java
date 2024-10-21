@@ -14,7 +14,7 @@ import org.springframework.boot.test.context.SpringBootTest;
 
 @SpringBootTest(classes = Application.class)
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
-public class CategoryMapperTest {
+class CategoryMapperTest {
     @Autowired
     private CategoryMapper categoryMapper;
 

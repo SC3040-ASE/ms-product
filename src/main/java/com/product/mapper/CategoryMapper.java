@@ -45,7 +45,6 @@ public class CategoryMapper {
                     .builder()
                     .id((Integer) row[0])
                     .categoryName((String) row[1])
-                    // TODO: Add the embedding pointed to list of products? Need to check if im supposed to do that for both category and tag first.
                     .build();
                 searchResults.add(result);
             } catch (Exception e) {

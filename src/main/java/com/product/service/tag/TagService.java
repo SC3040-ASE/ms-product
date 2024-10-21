@@ -33,7 +33,7 @@ public class TagService {
                     tag.setCategory(category);
                     return tag;
                 })
-                .collect(Collectors.toList());
+                .toList();
 
         List<Tag> savedNewTags = tagRepository.saveAll(newTags);
         existingTags.addAll(savedNewTags);
@@ -70,7 +70,7 @@ public class TagService {
 
     public List<TagReadInternalResponseDTO> fetchTags(List<Integer> tagIDs) {
         return tagReadService.fetchTags(tagIDs).stream().map(tag -> TagReadInternalResponseDTO.builder().id(tag.getId())
-                .tagName(tag.getTagName()).build()).collect(Collectors.toList());
+                .tagName(tag.getTagName()).build()).toList();
     }
 
     public ResponseMessageDTO handleGenerateTag(String messageId, String productName, String productDescription, Integer categoryId) throws Exception {
