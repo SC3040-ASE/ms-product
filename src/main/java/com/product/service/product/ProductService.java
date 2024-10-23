@@ -34,7 +34,7 @@ public class ProductService {
         return productReadService.readProductsReserved(messageId, ownerId, isBuyer, orderStatus);
     }
 
-    public ResponseMessageDTO handleUpdateProduct(String messageId, ProductUpdateRequestDTO productUpdateRequestDTO) {
+    public ResponseMessageDTO handleUpdateProduct(String messageId, ProductUpdateRequestDTO productUpdateRequestDTO) throws JsonProcessingException {
         return productUpdateService.updateProduct(messageId, productUpdateRequestDTO);
     }
 

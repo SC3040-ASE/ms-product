@@ -17,6 +17,7 @@ import jakarta.transaction.Transactional;
 import lombok.extern.slf4j.Slf4j;
 import org.junit.jupiter.api.*;
 import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockserver.integration.ClientAndServer;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
@@ -26,6 +27,9 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+
+import static org.mockserver.model.HttpRequest.request;
+import static org.mockserver.model.HttpResponse.response;
 
 @ExtendWith(SpringExtension.class)
 @SpringBootTest(classes = Application.class)
@@ -56,9 +60,11 @@ class ProductInboundConfigurationTest {
     private Tag tag2;
     private Product product;
     private User user;
+    protected ClientAndServer mockServer;
 
     @BeforeAll
     public void setup(){
+        mockServer = ClientAndServer.startClientAndServer(8003);
         user = new User();
         user.setIsAdmin(false);
         user.setUsername("testInbound");
@@ -106,6 +112,9 @@ class ProductInboundConfigurationTest {
         tagRepository.delete(tag2);
         categoryRepository.delete(category);
         userRepository.delete(user);
+        if (mockServer != null) {
+            mockServer.stop();
+        }
     }
 
 
@@ -114,6 +123,12 @@ class ProductInboundConfigurationTest {
     @Transactional
     @DisplayName("Test Product Creation")
     void testProductCreation() throws Exception{
+        mockServer.when(request()
+                        .withMethod("POST")
+                        .withPath("/order-requests/products"))
+                .respond(
+                        response().withStatusCode(200)
+                                .withBody("Mock response"));
         Map<String,String> headers = new HashMap<>();
         headers.put("X-User-Id", Integer.toString(user.getId()));
         headers.put("X-Is-Admin", Boolean.toString(user.getIsAdmin()));
@@ -211,6 +226,12 @@ class ProductInboundConfigurationTest {
     @Test
     @DisplayName("Test Update Product")
     void testUpdateProduct() throws Exception{
+        mockServer.when(request()
+                        .withMethod("POST")
+                        .withPath("/order-requests/products"))
+                .respond(
+                        response().withStatusCode(200)
+                                .withBody("Mock response"));
         Product updatedProduct = new Product();
         updatedProduct.setProductName("Test Update Product");
         updatedProduct.setDescription("Test Update Product Description");

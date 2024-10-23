@@ -1,5 +1,6 @@
 package com.product.service;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.product.Application;
 import com.product.dto.ResponseMessageDTO;
@@ -22,11 +23,15 @@ import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.codec.binary.Base64;
 import org.junit.jupiter.api.*;
 import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockserver.integration.ClientAndServer;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 import org.springframework.util.ResourceUtils;
 import org.testcontainers.shaded.org.apache.commons.io.FileUtils;
+import static org.mockserver.integration.ClientAndServer.startClientAndServer;
+import static org.mockserver.model.HttpRequest.request;
+import static org.mockserver.model.HttpResponse.response;
 
 import java.io.File;
 import java.math.BigDecimal;
@@ -62,18 +67,18 @@ class ProductServiceTest {
     private ObjectMapper objectMapper;
     @Autowired
     private PictureBlobStorageService pictureBlobStorageService;
-
-
     private Category testCategory;
     private Tag testTag;
     private Product testProduct1;
     private Product testProduct2;
     private User user1;
     private List<String> base64Images;
+    protected ClientAndServer mockServer;
 
 
     @BeforeAll
     public void setup() throws Exception{
+        mockServer = startClientAndServer(8003);
         base64Images = new ArrayList<>();
         File image1 = ResourceUtils.getFile("classpath:image/test-image-1.jpg");
         byte[] encoded1 = Base64.encodeBase64(FileUtils.readFileToByteArray(image1));
@@ -127,11 +132,24 @@ class ProductServiceTest {
         tagRepository.delete(testTag);
         categoryRepository.delete(testCategory);
         userRepository.delete(user1);
+
+        if (mockServer != null) {
+            mockServer.stop();
+        }
     }
 
     @Test
     @DisplayName("Test Create Product")
     void testCreateProduct() throws Exception {
+        mockServer.when(request()
+                        .withMethod("POST")
+                        .withPath("/order-requests/products"))
+                        .respond(
+                        response().withStatusCode(200)
+                                .withBody("Mock response"));
+
+
+
         ProductCreationRequestDTO productCreationRequestDTO = new ProductCreationRequestDTO();
         productCreationRequestDTO.setOwnerId(user1.getId());
         productCreationRequestDTO.setProductName("testCreate");
@@ -192,6 +210,13 @@ class ProductServiceTest {
     @Test
     @DisplayName("Test Update Product Quantity")
     void testUpdateProductQuantity(){
+
+        mockServer.when(request()
+                        .withMethod("POST")
+                        .withPath("/order-requests/products"))
+                .respond(
+                        response().withStatusCode(200)
+                                .withBody("Mock response"));
         testProduct1 = productRepository.save(testProduct1);
         productUpdateService.updateProductQuantity(testProduct1.getId(), -1);
         Product updatedProduct = productRepository.findById(testProduct1.getId()).orElse(null);
@@ -205,7 +230,7 @@ class ProductServiceTest {
 
     @Test
     @DisplayName("Test Update Product")
-    void testUpdateProduct(){
+    void testUpdateProduct() throws JsonProcessingException {
         testProduct1 = productRepository.save(testProduct1);
 
         ProductUpdateRequestDTO testProduct1Updated = new ProductUpdateRequestDTO();

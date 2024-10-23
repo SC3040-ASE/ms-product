@@ -1,6 +1,8 @@
 package com.product.service.product;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
 import com.product.dto.ResponseMessageDTO;
+import com.product.dto.product.ProductOrderRequestDTO;
 import com.product.dto.product.ProductUpdateRequestDTO;
 import com.product.entity.Category;
 import com.product.entity.Product;
@@ -29,6 +31,7 @@ public class ProductUpdateService {
     private final CategoryService categoryService;
     private final ProductMapper productMapper;
     private final PictureBlobStorageService pictureBlobStorageService;
+    private final ProductOrderTriggerService productOrderTriggerService;
 
     @Transactional
     public void updateProductQuantity(Integer productId, Integer quantityDiff) {
@@ -44,7 +47,7 @@ public class ProductUpdateService {
     }
 
     @Transactional
-    public ResponseMessageDTO updateProduct(String messageId, ProductUpdateRequestDTO productUpdateRequestDTO) {
+    public ResponseMessageDTO updateProduct(String messageId, ProductUpdateRequestDTO productUpdateRequestDTO) throws JsonProcessingException {
         Optional<Product> product = productRepository.findById(productUpdateRequestDTO.getProductId());
 
         if (product.isPresent()) {
@@ -60,6 +63,18 @@ public class ProductUpdateService {
             Product savedProduct = productRepository.saveAndFlush(updatedProduct);
 
             pictureBlobStorageService.updateProductImages(savedProduct.getId(), productUpdateRequestDTO.getDeleteImageList(), productUpdateRequestDTO.getNewImageBase64List());
+
+            ProductOrderRequestDTO productOrderRequestDTO = new ProductOrderRequestDTO();
+            productOrderRequestDTO.setCategoryId(savedProduct.getCategory().getId());
+            productOrderRequestDTO.setCurrentQuantity(savedProduct.getCurrentQuantity());
+            productOrderRequestDTO.setProductId(savedProduct.getId());
+            productOrderRequestDTO.setOwnerId(savedProduct.getOwnerId());
+            productOrderRequestDTO.setPrice(savedProduct.getPrice());
+            productOrderRequestDTO.setTags(tags.stream().map(Tag::getId).toList());
+
+
+            productOrderTriggerService.triggerOrderRequest(productOrderRequestDTO);
+
 
             return new ResponseMessageDTO(messageId, 200, "Product updated successfully");
         } else {
