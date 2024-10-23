@@ -94,7 +94,7 @@ class ProductServiceTest {
         categoryRepository.save(testCategory);
 
         testTag = new Tag();
-        testTag.setTagName("testProductServiceTag");
+        testTag.setTagName("testProductServiceTag".toLowerCase());
         testTag.setCategory(testCategory);
         tagRepository.save(testTag);
 
@@ -131,11 +131,11 @@ class ProductServiceTest {
 
     @Test
     @DisplayName("Test Create Product")
-    void testCreateProduct() throws Exception{
+    void testCreateProduct() throws Exception {
         ProductCreationRequestDTO productCreationRequestDTO = new ProductCreationRequestDTO();
         productCreationRequestDTO.setOwnerId(user1.getId());
         productCreationRequestDTO.setProductName("testCreate");
-        productCreationRequestDTO.setCategory("test");
+        productCreationRequestDTO.setCategory(testCategory.getCategoryName());
         productCreationRequestDTO.setImageBase64List(base64Images);
         productCreationRequestDTO.setCondition("NEW");
         productCreationRequestDTO.setDescription("test");
@@ -154,7 +154,7 @@ class ProductServiceTest {
         Assertions.assertEquals(productCreationRequestDTO.getCategory(), databaseProduct.getCategory().getCategoryName());
         Assertions.assertEquals(productCreationRequestDTO.getCondition(), databaseProduct.getCondition());
         Assertions.assertEquals(productCreationRequestDTO.getDescription(), databaseProduct.getDescription());
-        Assertions.assertEquals(0,productCreationRequestDTO.getPrice().compareTo(databaseProduct.getPrice()));
+        Assertions.assertEquals(0, productCreationRequestDTO.getPrice().compareTo(databaseProduct.getPrice()));
         Assertions.assertEquals(productCreationRequestDTO.getTotalQuantity(), databaseProduct.getTotalQuantity());
 
         List<String> savedImages = pictureBlobStorageService.retrieveProductImages(productId).stream().map(ImageDTO::getImageBase64).toList();
