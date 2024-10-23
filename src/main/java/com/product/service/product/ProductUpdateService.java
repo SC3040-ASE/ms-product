@@ -14,6 +14,7 @@ import com.product.service.blob.PictureBlobStorageService;
 import com.product.service.tag.TagService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.lang3.tuple.Pair;
 import org.springframework.stereotype.Service;
 
 import jakarta.transaction.Transactional;
@@ -46,14 +47,34 @@ public class ProductUpdateService {
         }
     }
 
-    @Transactional
     public ResponseMessageDTO updateProduct(String messageId, ProductUpdateRequestDTO productUpdateRequestDTO) throws JsonProcessingException {
+
+        Pair<ProductOrderRequestDTO,Integer> response = updateToDatabase(productUpdateRequestDTO);
+        Integer status = response.getRight();
+
+        if (status == 200) {
+            productOrderTriggerService.triggerOrderRequest(response.getKey());
+            return new ResponseMessageDTO(messageId, 200, "Product updated successfully");
+        } else if (status == 403) {
+            return new ResponseMessageDTO(messageId, 403, "Unauthorized to update product");
+        } else {
+            return new ResponseMessageDTO(messageId, 404, "Product not found");
+        }
+
+    }
+
+
+    @Transactional
+    public Pair<ProductOrderRequestDTO,Integer> updateToDatabase(ProductUpdateRequestDTO productUpdateRequestDTO) throws JsonProcessingException {
         Optional<Product> product = productRepository.findById(productUpdateRequestDTO.getProductId());
+
+
+
 
         if (product.isPresent()) {
             
             if (!product.get().getOwnerId().equals(productUpdateRequestDTO.getOwnerId()) && !productUpdateRequestDTO.getIsAdmin()) {
-                return new ResponseMessageDTO(messageId, 403, "Forbidden");
+                return Pair.of(null, 403);
             }
 
             Category category = categoryService.saveCategoryIfNotExists(productUpdateRequestDTO.getCategory());
@@ -73,12 +94,9 @@ public class ProductUpdateService {
             productOrderRequestDTO.setTags(tags.stream().map(Tag::getId).toList());
 
 
-            productOrderTriggerService.triggerOrderRequest(productOrderRequestDTO);
-
-
-            return new ResponseMessageDTO(messageId, 200, "Product updated successfully");
+            return Pair.of(productOrderRequestDTO, 200);
         } else {
-            return new ResponseMessageDTO(messageId, 404, "Product not found");
+            return Pair.of(null, 404);
         }
 
     }

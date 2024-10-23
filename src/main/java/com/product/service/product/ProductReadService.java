@@ -66,6 +66,12 @@ public class ProductReadService {
         }
     }
 
+
+    public List<ProductActiveDTO> getActiveProducts(Integer categoryId) {
+        List<Product> products = productRepository.findActiveProductsByCategoryId(categoryId);
+        return productMapper.mapToProductActiveDTOs(products);
+    }
+
     @Transactional
     public ResponseMessageDTO readProductsByOwnerId(String messageId, Integer ownerId, Integer startIndex, Integer endIndex) throws Exception {
         List<Product> products = productRepository.findProductsByOwnerId(ownerId);

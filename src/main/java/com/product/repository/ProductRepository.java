@@ -16,4 +16,7 @@ public interface ProductRepository extends JpaRepository<Product, Integer> {
 
     @Query(value = "SELECT * FROM PRODUCT WHERE owner_id = :ownerId", nativeQuery = true)
     List<Product> findProductsByOwnerId(@Param("ownerId") int ownerId);
+
+    @Query(value = "SELECT * FROM PRODUCT WHERE category_id = :categoryId AND current_quantity >= 1 ORDER BY created_on ASC", nativeQuery = true)
+    List<Product> findActiveProductsByCategoryId(@Param("categoryId") int categoryId);
 }

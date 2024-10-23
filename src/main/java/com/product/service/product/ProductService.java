@@ -2,11 +2,14 @@ package com.product.service.product;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.product.dto.*;
+import com.product.dto.product.ProductActiveDTO;
 import com.product.dto.product.ProductCreationRequestDTO;
 import com.product.dto.product.ProductUpdateRequestDTO;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
+
+import java.util.List;
 
 @Service
 @Slf4j
@@ -28,6 +31,10 @@ public class ProductService {
 
     public ResponseMessageDTO handleReadProductsByOwnerId(String messageId, Integer ownerId, Integer startRank, Integer endRank) throws Exception {
         return productReadService.readProductsByOwnerId(messageId, ownerId, startRank, endRank);
+    }
+
+    public List<ProductActiveDTO> handleGetActiveProducts(Integer categoryId) {
+        return productReadService.getActiveProducts(categoryId);
     }
 
     public ResponseMessageDTO handleReadProductsReserved(String messageId, Integer ownerId, Boolean isBuyer, String orderStatus) throws Exception{
