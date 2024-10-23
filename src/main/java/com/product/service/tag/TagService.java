@@ -23,11 +23,13 @@ public class TagService {
     private final TagGenerationService tagGenerationService;
 
     public List<Tag> saveTagsIfNotExists(List<String> tagNames, Category category) {
+        tagNames = tagNames.stream().map(String::toLowerCase).collect(Collectors.toList());
+
         List<Tag> existingTags = tagRepository.findTagsByTagNamesAndCategory(tagNames, category.getId());
 
         List<String> existingTagNames = existingTags.stream().map(Tag::getTagName).toList();
         List<Tag> newTags = tagNames.stream()
-                .filter(tagName -> !existingTagNames.contains(tagName))
+                .filter(tagName -> !existingTagNames.contains(tagName.toLowerCase()))
                 .map(tagName -> {
                     Tag tag = new Tag(tagName.toLowerCase());
                     tag.setCategory(category);

@@ -27,6 +27,9 @@ public class TagUpdateService {
         if (tagUpdateRequestDTO.getId() == null) {
             return new ResponseMessageDTO(messageId, 401, "Bad Request. Missing tag information.");
         }
+
+        tagUpdateRequestDTO.setTagName(tagUpdateRequestDTO.getTagName().toLowerCase());
+
         Optional<Tag> optionalTag = tagRepository.findById(tagUpdateRequestDTO.getId());
         if (optionalTag.isEmpty()) {
             return new ResponseMessageDTO(messageId, 404, "Tag not found.");

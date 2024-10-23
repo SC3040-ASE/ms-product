@@ -30,6 +30,7 @@ public class TagCreationService {
 
     @Transactional
     public ResponseMessageDTO createTag(String messageId, TagCreationRequestDTO tagCreationRequestDTO) {
+        tagCreationRequestDTO.setTagName(tagCreationRequestDTO.getTagName().toLowerCase());
         Optional<Category> optionalCategory = categoryRepository.findById(
             tagCreationRequestDTO.getCategory().getId());
         if (optionalCategory.isEmpty()) {
@@ -59,6 +60,11 @@ public class TagCreationService {
     public MultipleTagCreationResponseDTO createMultipleTagsForCategory(
         MultipleTagCreationRequestDTO requestDTO) {
         log.info("request: {}", requestDTO);
+
+        requestDTO.setTags(requestDTO.getTags().stream()
+            .map(String::toLowerCase)
+            .toList());
+
         Optional<Category> optionalCategory = categoryRepository.findById(requestDTO.getCategoryId());
         if (optionalCategory.isEmpty()) {
             log.error("Category does not exist.");
