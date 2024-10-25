@@ -1,5 +1,6 @@
 package com.product.config;
 
+import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.product.Application;
 import com.product.dto.RequestMessageDTO;
@@ -60,11 +61,13 @@ class ProductInboundConfigurationTest {
     private Tag tag2;
     private Product product;
     private User user;
-    protected ClientAndServer mockServer;
+    protected ClientAndServer mockOrderServer;
+    protected ClientAndServer mockUserServer;
 
     @BeforeAll
     public void setup(){
-        mockServer = ClientAndServer.startClientAndServer(8003);
+        mockOrderServer = ClientAndServer.startClientAndServer(8003);
+        mockUserServer = ClientAndServer.startClientAndServer(8002);
         user = new User();
         user.setIsAdmin(false);
         user.setUsername("testInbound");
@@ -112,8 +115,11 @@ class ProductInboundConfigurationTest {
         tagRepository.delete(tag2);
         categoryRepository.delete(category);
         userRepository.delete(user);
-        if (mockServer != null) {
-            mockServer.stop();
+        if (mockOrderServer != null) {
+            mockOrderServer.stop();
+        }
+        if (mockUserServer != null) {
+            mockUserServer.stop();
         }
     }
 
@@ -123,7 +129,7 @@ class ProductInboundConfigurationTest {
     @Transactional
     @DisplayName("Test Product Creation")
     void testProductCreation() throws Exception{
-        mockServer.when(request()
+        mockOrderServer.when(request()
                         .withMethod("POST")
                         .withPath("/order-requests/products"))
                 .respond(
@@ -226,7 +232,7 @@ class ProductInboundConfigurationTest {
     @Test
     @DisplayName("Test Update Product")
     void testUpdateProduct() throws Exception{
-        mockServer.when(request()
+        mockOrderServer.when(request()
                         .withMethod("POST")
                         .withPath("/order-requests/products"))
                 .respond(
@@ -316,5 +322,48 @@ class ProductInboundConfigurationTest {
 
         Product productDeleted = productRepository.findById(product2.getId()).orElse(null);
         Assertions.assertNull(productDeleted);
+    }
+
+
+    @Test
+    @DisplayName("Test read products reserved")
+    void testReadProductReserved() throws Exception {
+
+
+        String orderResponseMessage = String.format("[{\"productId\":%d,\"buyerId\":%d,\"sellerId\":1,\"status\":\"RESERVED\"}]", product.getId(), user.getId());
+        mockOrderServer.when(request()
+                        .withMethod("GET")
+                        .withPath("/orders/products"))
+                .respond(
+                        response().withStatusCode(200)
+                                .withBody(orderResponseMessage));
+
+        String userResponseMessage = String.format("{\"telehandleResponseList\":[{\"userId\":%d,\"telegram_handle\":\"%s\"}]}", user.getId(), user.getTelegramHandle());
+
+        mockUserServer.when(request()
+                        .withMethod("POST")
+                        .withPath("/api/v1/user/getTelehandleById"))
+                .respond(
+                        response().withStatusCode(200)
+                                .withBody(userResponseMessage));
+
+        Map<String,String> headers = new HashMap<>();
+        headers.put("X-User-Id", Integer.toString(user.getId()));
+        headers.put("X-Is-Admin", Boolean.toString(user.getIsAdmin()));
+        headers.put("X-ownerId", Integer.toString(user.getId()));
+        headers.put("X-isBuyer", "true");
+        headers.put("X-orderStatus", "RESERVED");
+
+        RequestMessageDTO requestMessageDTO = new RequestMessageDTO("123", "GET", "/products/reserved", headers, null);
+
+        ResponseMessageDTO response = inboundConfiguration.handler(requestMessageDTO);
+        Assertions.assertEquals(200, response.getStatus());
+
+        List<ProductReservedDTO> productReservedDTOList = objectMapper.readValue(response.getBody(), new TypeReference<List<ProductReservedDTO>>() {
+        });
+        Assertions.assertEquals(1, productReservedDTOList.size());
+        ProductReservedDTO productReservedDTO = productReservedDTOList.get(0);
+        Assertions.assertEquals(product.getProductName(), productReservedDTO.getProductName());
+        Assertions.assertEquals(0,product.getPrice().compareTo(productReservedDTO.getPrice()));
     }
 }
