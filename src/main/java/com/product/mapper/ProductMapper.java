@@ -46,6 +46,26 @@ public class ProductMapper {
         return product;
     }
 
+    public List<ProductActiveDTO> mapToProductActiveDTOs(List<Product> products){
+
+        List<ProductActiveDTO> productActiveDTOs = new ArrayList<>();
+        for (Product product : products) {
+            ProductActiveDTO productActiveDTO = new ProductActiveDTO();
+            productActiveDTO.setProductId(product.getId());
+            productActiveDTO.setOwnerId(product.getOwnerId());
+            productActiveDTO.setPrice(product.getPrice());
+            productActiveDTO.setCategoryId(product.getCategory().getId());
+            productActiveDTO.setCurrentQuantity(product.getCurrentQuantity());
+            List<Integer> tagIds = new ArrayList<>();
+            for (Tag tag : product.getTags()) {
+                tagIds.add(tag.getId());
+            }
+            productActiveDTO.setTags(tagIds);
+            productActiveDTOs.add(productActiveDTO);
+        }
+        return productActiveDTOs;
+    }
+
     public Pair<List<ProductSearchResultDTO>,Integer> mapToSearchResults(List<Object[]> results) {
         List<ProductSearchResultDTO> searchResults = new ArrayList<>();
         int totalResults = 0;

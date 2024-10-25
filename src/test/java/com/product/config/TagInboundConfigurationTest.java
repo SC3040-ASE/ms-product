@@ -126,7 +126,7 @@ class TagInboundConfigurationTest {
         Tag tag = objectMapper.readValue(response.getBody(), Tag.class);
         Optional<Tag> t = tagRepository.findById(tag.getId());
         Assertions.assertTrue(t.isPresent());
-        Assertions.assertEquals("testTag", t.get().getTagName());
+        Assertions.assertEquals("testTag".toLowerCase(), t.get().getTagName());
 
         // Clean up
         tagRepository.deleteById(t.get().getId());
@@ -160,7 +160,7 @@ class TagInboundConfigurationTest {
         Tag tag = objectMapper.readValue(response.getBody(), Tag.class);
         Optional<Tag> t = tagRepository.findById(tag.getId());
         Assertions.assertTrue(t.isPresent());
-        Assertions.assertEquals("tempTag2", t.get().getTagName());
+        Assertions.assertEquals("tempTag2".toLowerCase(), t.get().getTagName());
 
         // Clean up
         tagUpdateRequestDTO.setTagName("tempTag");

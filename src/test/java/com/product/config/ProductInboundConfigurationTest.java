@@ -1,5 +1,6 @@
 package com.product.config;
 
+import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.product.Application;
 import com.product.dto.RequestMessageDTO;
@@ -17,6 +18,7 @@ import jakarta.transaction.Transactional;
 import lombok.extern.slf4j.Slf4j;
 import org.junit.jupiter.api.*;
 import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockserver.integration.ClientAndServer;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
@@ -26,6 +28,9 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+
+import static org.mockserver.model.HttpRequest.request;
+import static org.mockserver.model.HttpResponse.response;
 
 @ExtendWith(SpringExtension.class)
 @SpringBootTest(classes = Application.class)
@@ -56,9 +61,13 @@ class ProductInboundConfigurationTest {
     private Tag tag2;
     private Product product;
     private User user;
+    protected ClientAndServer mockOrderServer;
+    protected ClientAndServer mockUserServer;
 
     @BeforeAll
     public void setup(){
+        mockOrderServer = ClientAndServer.startClientAndServer(8003);
+        mockUserServer = ClientAndServer.startClientAndServer(8002);
         user = new User();
         user.setIsAdmin(false);
         user.setUsername("testInbound");
@@ -106,6 +115,12 @@ class ProductInboundConfigurationTest {
         tagRepository.delete(tag2);
         categoryRepository.delete(category);
         userRepository.delete(user);
+        if (mockOrderServer != null) {
+            mockOrderServer.stop();
+        }
+        if (mockUserServer != null) {
+            mockUserServer.stop();
+        }
     }
 
 
@@ -114,6 +129,12 @@ class ProductInboundConfigurationTest {
     @Transactional
     @DisplayName("Test Product Creation")
     void testProductCreation() throws Exception{
+        mockOrderServer.when(request()
+                        .withMethod("POST")
+                        .withPath("/order-requests/products"))
+                .respond(
+                        response().withStatusCode(200)
+                                .withBody("Mock response"));
         Map<String,String> headers = new HashMap<>();
         headers.put("X-User-Id", Integer.toString(user.getId()));
         headers.put("X-Is-Admin", Boolean.toString(user.getIsAdmin()));
@@ -211,6 +232,12 @@ class ProductInboundConfigurationTest {
     @Test
     @DisplayName("Test Update Product")
     void testUpdateProduct() throws Exception{
+        mockOrderServer.when(request()
+                        .withMethod("POST")
+                        .withPath("/order-requests/products"))
+                .respond(
+                        response().withStatusCode(200)
+                                .withBody("Mock response"));
         Product updatedProduct = new Product();
         updatedProduct.setProductName("Test Update Product");
         updatedProduct.setDescription("Test Update Product Description");
@@ -295,5 +322,48 @@ class ProductInboundConfigurationTest {
 
         Product productDeleted = productRepository.findById(product2.getId()).orElse(null);
         Assertions.assertNull(productDeleted);
+    }
+
+
+    @Test
+    @DisplayName("Test read products reserved")
+    void testReadProductReserved() throws Exception {
+
+
+        String orderResponseMessage = String.format("[{\"productId\":%d,\"buyerId\":%d,\"sellerId\":1,\"status\":\"RESERVED\"}]", product.getId(), user.getId());
+        mockOrderServer.when(request()
+                        .withMethod("GET")
+                        .withPath("/orders/products"))
+                .respond(
+                        response().withStatusCode(200)
+                                .withBody(orderResponseMessage));
+
+        String userResponseMessage = String.format("{\"telehandleResponseList\":[{\"userId\":%d,\"telegram_handle\":\"%s\"}]}", user.getId(), user.getTelegramHandle());
+
+        mockUserServer.when(request()
+                        .withMethod("POST")
+                        .withPath("/api/v1/user/getTelehandleById"))
+                .respond(
+                        response().withStatusCode(200)
+                                .withBody(userResponseMessage));
+
+        Map<String,String> headers = new HashMap<>();
+        headers.put("X-User-Id", Integer.toString(user.getId()));
+        headers.put("X-Is-Admin", Boolean.toString(user.getIsAdmin()));
+        headers.put("X-ownerId", Integer.toString(user.getId()));
+        headers.put("X-isBuyer", "true");
+        headers.put("X-orderStatus", "RESERVED");
+
+        RequestMessageDTO requestMessageDTO = new RequestMessageDTO("123", "GET", "/products/reserved", headers, null);
+
+        ResponseMessageDTO response = inboundConfiguration.handler(requestMessageDTO);
+        Assertions.assertEquals(200, response.getStatus());
+
+        List<ProductReservedDTO> productReservedDTOList = objectMapper.readValue(response.getBody(), new TypeReference<List<ProductReservedDTO>>() {
+        });
+        Assertions.assertEquals(1, productReservedDTOList.size());
+        ProductReservedDTO productReservedDTO = productReservedDTOList.get(0);
+        Assertions.assertEquals(product.getProductName(), productReservedDTO.getProductName());
+        Assertions.assertEquals(0,product.getPrice().compareTo(productReservedDTO.getPrice()));
     }
 }

@@ -4,6 +4,8 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import com.product.dto.product.ProductCreationRequestDTO;
 import com.product.dto.ResponseMessageDTO;
+import com.product.dto.product.ProductOrderDTO;
+import com.product.dto.product.ProductOrderRequestDTO;
 import com.product.entity.Category;
 import com.product.entity.Product;
 import com.product.entity.Tag;
@@ -29,9 +31,23 @@ public class ProductCreationService {
     private final ProductMapper productMapper;
     private final PictureBlobStorageService pictureBlobStorageService;
     private final ObjectMapper objectMapper;
+    private final ProductOrderTriggerService productOrderTriggerService;
+
+    public ResponseMessageDTO createProduct(String messageId, ProductCreationRequestDTO productCreationRequestDTO) throws Exception{
+
+        ProductOrderRequestDTO productOrderRequestDTO = saveProductToDatabase(productCreationRequestDTO);
+
+        productOrderTriggerService.triggerOrderRequest(productOrderRequestDTO);
+
+        ObjectNode response = objectMapper.createObjectNode();
+        response.put("productId", productOrderRequestDTO.getProductId());
+
+        return new ResponseMessageDTO(messageId, 200, objectMapper.writeValueAsString(response));
+    }
+
 
     @Transactional
-    public ResponseMessageDTO createProduct(String messageId, ProductCreationRequestDTO productCreationRequestDTO) throws Exception{
+    public ProductOrderRequestDTO saveProductToDatabase(ProductCreationRequestDTO productCreationRequestDTO) throws Exception{
         Category category = categoryService.saveCategoryIfNotExists(productCreationRequestDTO.getCategory());
         List<Tag> tags = tagService.saveTagsIfNotExists(productCreationRequestDTO.getTags(), category);
 
@@ -41,8 +57,15 @@ public class ProductCreationService {
         if(productCreationRequestDTO.getImageBase64List() != null)
             pictureBlobStorageService.saveImages(savedProduct.getId(), productCreationRequestDTO.getImageBase64List());
 
-        ObjectNode response = objectMapper.createObjectNode();
-        response.put("productId", savedProduct.getId());
-        return new ResponseMessageDTO(messageId, 200, objectMapper.writeValueAsString(response));
+        ProductOrderRequestDTO productOrderRequestDTO = new ProductOrderRequestDTO();
+        productOrderRequestDTO.setCategoryId(savedProduct.getCategory().getId());
+        productOrderRequestDTO.setCurrentQuantity(savedProduct.getCurrentQuantity());
+        productOrderRequestDTO.setProductId(savedProduct.getId());
+        productOrderRequestDTO.setOwnerId(savedProduct.getOwnerId());
+        productOrderRequestDTO.setPrice(savedProduct.getPrice());
+        productOrderRequestDTO.setTags(tags.stream().map(Tag::getId).toList());
+
+        return productOrderRequestDTO;
+
     }
 }
